@@ -1,5 +1,7 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idle_game/core/IdleGame.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 
 import '../../generated/intl/app_localizations.dart';
@@ -23,24 +25,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(AppLocalizations.of(context)!.app_name),
           ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: .center,
-              children: [
-                Text(AppLocalizations.of(context)!.app_name),
-                const Text('You have pushed the button this many times:'),
-                Text(
-                  "${ref.read(gameStateProvider).value?.counter}",
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ],
+          body: GameWidget(
+            game: IdleGame(
+              gameStateNotifier: ref.read(gameStateProvider.notifier),
             ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () =>
-                ref.read(gameStateProvider.notifier).incrementCounter(),
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
           ),
         );
       },
