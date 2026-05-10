@@ -20,7 +20,6 @@ class IdleGame extends FlameGame with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    await super.onLoad();
 
     counterText = TextComponent(
       text: '${gameStateNotifier.currentData.counter}',
@@ -57,6 +56,8 @@ class IdleGame extends FlameGame with TapCallbacks {
 
     add(columnComponent);
     add(button);
+
+    return super.onLoad();
   }
 
   @override
@@ -67,6 +68,13 @@ class IdleGame extends FlameGame with TapCallbacks {
       columnComponent.size = size;
       button.position = Vector2(size.x - 30, size.y - 30);
     }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    counterText.text = '${gameStateNotifier.currentData.counter}';
   }
 
   @override

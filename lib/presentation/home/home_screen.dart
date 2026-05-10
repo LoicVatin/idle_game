@@ -14,22 +14,23 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  IdleGame? _game;
+
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
 
     return gameState.when(
       data: (data) {
+        _game ??= IdleGame(
+          gameStateNotifier: ref.read(gameStateProvider.notifier),
+        );
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(AppLocalizations.of(context)!.app_name),
           ),
-          body: GameWidget(
-            game: IdleGame(
-              gameStateNotifier: ref.read(gameStateProvider.notifier),
-            ),
-          ),
+          body: Stack(children: [GameWidget(game: _game!)]),
         );
       },
       error: (error, stackTrace) =>
