@@ -7,11 +7,14 @@ import 'package:flame/game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 
 class IdleGame extends FlameGame with TapCallbacks {
-  late final ColumnComponent columnComponent;
-  late final TextComponent counterText;
-  late final CircleComponent button;
-
   final GameStateNotifier gameStateNotifier;
+
+  late final TextComponent woodComponent;
+  late final ColumnComponent columnComponent;
+  late final CircleComponent addButton;
+  late final CircleComponent subtractButton;
+  late final CircleComponent upgradeButton;
+  late final CircleComponent downgradeButton;
 
   IdleGame({required this.gameStateNotifier});
 
@@ -20,22 +23,58 @@ class IdleGame extends FlameGame with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-
-    counterText = TextComponent(
-      text: '${gameStateNotifier.currentData.counter}',
-      textRenderer: TextPaint(
-        style: Theme.of(buildContext!).textTheme.headlineMedium,
-      ),
+    woodComponent = TextComponent(
+      text:
+          '${gameStateNotifier.currentData.wood.type.name} : '
+          '${gameStateNotifier.currentData.wood.amount.toStringAsFixed(2)}'
+          ' (${gameStateNotifier.currentData.wood.generationRatePerSecond.toStringAsFixed(2)}/s)',
     );
 
-    button = CircleComponent(
-      anchor: Anchor.bottomRight,
-      position: Vector2(size.x - 30, size.y - 30),
+    addButton = CircleComponent(
       radius: 30,
       paint: Paint()..color = Colors.deepPurple,
       children: [
         IconComponent(
-          icon: Icons.add,
+          icon: Icons.add_circle_outline,
+          size: Vector2.all(30),
+          anchor: Anchor.center,
+          position: Vector2.all(30),
+        ),
+      ],
+    );
+
+    subtractButton = CircleComponent(
+      radius: 30,
+      paint: Paint()..color = Colors.deepPurple,
+      children: [
+        IconComponent(
+          icon: Icons.remove_circle_outline,
+          size: Vector2.all(30),
+          anchor: Anchor.center,
+          position: Vector2.all(30),
+        ),
+      ],
+    );
+
+    upgradeButton = CircleComponent(
+      radius: 30,
+      paint: Paint()..color = Colors.deepPurple,
+      children: [
+        IconComponent(
+          icon: Icons.trending_up,
+          size: Vector2.all(30),
+          anchor: Anchor.center,
+          position: Vector2.all(30),
+        ),
+      ],
+    );
+
+    downgradeButton = CircleComponent(
+      radius: 30,
+      paint: Paint()..color = Colors.deepPurple,
+      children: [
+        IconComponent(
+          icon: Icons.trending_down,
           size: Vector2.all(30),
           anchor: Anchor.center,
           position: Vector2.all(30),
@@ -49,13 +88,15 @@ class IdleGame extends FlameGame with TapCallbacks {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        TextComponent(text: 'You have pushed the button this many times:'),
-        counterText,
+        woodComponent,
+        addButton,
+        subtractButton,
+        upgradeButton,
+        downgradeButton,
       ],
     );
 
     add(columnComponent);
-    add(button);
 
     return super.onLoad();
   }
@@ -66,7 +107,6 @@ class IdleGame extends FlameGame with TapCallbacks {
 
     if (isLoaded) {
       columnComponent.size = size;
-      button.position = Vector2(size.x - 30, size.y - 30);
     }
   }
 
@@ -74,13 +114,29 @@ class IdleGame extends FlameGame with TapCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    counterText.text = '${gameStateNotifier.currentData.counter}';
+    woodComponent.text =
+        '${gameStateNotifier.currentData.wood.type.name} : '
+        '${gameStateNotifier.currentData.wood.amount.toStringAsFixed(2)}'
+        ' (${gameStateNotifier.currentData.wood.generationRatePerSecond.toStringAsFixed(2)}/s)';
+
+    gameStateNotifier.updateResource(dt);
   }
 
   @override
   void onTapDown(TapDownEvent event) {
-    if (button.containsPoint(event.localPosition)) {
-      gameStateNotifier.incrementCounter();
+    if (upgradeButton.containsPoint(event.localPosition)) {
+      gameStateNotifier.upgradeResource(0.1);
     }
+    if (downgradeButton.containsPoint(event.localPosition)) {
+      gameStateNotifier.downgradeResource(0.1);
+    }
+    if (addButton.containsPoint(event.localPosition)) {
+      gameStateNotifier.add(1.0);
+    }
+    if (subtractButton.containsPoint(event.localPosition)) {
+      gameStateNotifier.subtract(1.0);
+    }
+
+    super.onTapDown(event);
   }
 }
