@@ -11,16 +11,22 @@ final gameStateProvider =
 
 @immutable
 class GameStateData {
-  final Resource wood;
+  final Map<ResourceType, Resource> resources;
 
-  const GameStateData({required this.wood});
+  const GameStateData({required this.resources});
 
   factory GameStateData.initial() {
-    return GameStateData(wood: Resource(type: ResourceType.wood));
+    final resources = {
+      ResourceType.wood: Resource(type: ResourceType.wood),
+      ResourceType.stone: Resource(type: ResourceType.stone),
+      ResourceType.food: Resource(type: ResourceType.food)
+    };
+
+    return GameStateData(resources: resources);
   }
 
-  GameStateData copyWith({Resource? wood}) {
-    return GameStateData(wood: wood ?? this.wood);
+  GameStateData copyWith({Map<ResourceType, Resource>? resources}) {
+    return GameStateData(resources: resources ?? this.resources);
   }
 }
 
@@ -36,56 +42,92 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     state = AsyncData(data);
   }
 
-  void add(double amount) {
+  Resource get(ResourceType type) {
+    print("get");
+    return currentData.resources.putIfAbsent(type, () => Resource(type: type));
+  }
+
+  void add(ResourceType type, double amount) {
     print("add ($amount)");
     if (amount <= 0) return;
 
     final data = currentData;
-    final resource = currentData.wood.copyWith();
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
     resource.add(amount);
-    _setData(data.copyWith(wood: resource));
+    _setData(data.copyWith(resources: resources));
   }
 
-  void subtract(double amount) {
+  void subtract(ResourceType type, double amount) {
     print("subtract ($amount)");
     if (amount <= 0) return;
 
     final data = currentData;
-    final resource = currentData.wood.copyWith();
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
     resource.subtract(amount);
-    _setData(data.copyWith(wood: resource));
+    _setData(data.copyWith(resources: resources));
   }
 
-  void upgradeResource(double amount) {
+  void upgradeResource(ResourceType type, double amount) {
     print("upgradeResource ($amount)");
     if (amount <= 0) return;
 
     final data = currentData;
-    final resource = currentData.wood.copyWith();
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
     resource.upgrade(amount);
-    _setData(data.copyWith(wood: resource));
+    _setData(data.copyWith(resources: resources));
   }
 
-  void downgradeResource(double amount) {
+  void downgradeResource(ResourceType type, double amount) {
     print("downgradeResource ($amount)");
     if (amount <= 0) return;
 
     final data = currentData;
-    final resource = currentData.wood.copyWith();
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
     resource.downgrade(amount);
-    _setData(data.copyWith(wood: resource));
+    _setData(data.copyWith(resources: resources));
+  }
+
+  void resetResource(ResourceType type, {bool amount =false, bool rate = false}) {
+    print("resetResource()");
+
+    final data = currentData;
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
+    resource.reset(amount, rate);
+    _setData(data.copyWith(resources: resources));
   }
 
   void updateResource(double dt) {
     if (dt <= 0) return;
 
     final data = currentData;
-    final resource = currentData.wood.copyWith();
+    final resources = currentData.resources.copyWith();
+    for(final resource in resources.values) {
+      final generatedAmount = resource.generationRatePerSecond * dt;
 
-    final generatedAmount = resource.generationRatePerSecond * dt;
+      resource.add(generatedAmount.toDouble());
+    }
 
-    resource.add(generatedAmount.toDouble());
+    _setData(data.copyWith(resources: resources));
+  }
+}
 
-    _setData(data.copyWith(wood: resource));
+extension _ResourceMapCopy on Map<ResourceType, Resource> {
+  Map<ResourceType, Resource> copyWith() {
+    return map(
+          (type, resource) => MapEntry(
+        type,
+        resource.copyWith(),
+      ),
+    );
   }
 }

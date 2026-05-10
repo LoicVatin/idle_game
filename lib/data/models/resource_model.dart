@@ -20,7 +20,7 @@ class Resource {
       type: type ?? this.type,
       amount: amount ?? this.amount,
       generationRatePerSecond:
-      generationRatePerSecond ?? this.generationRatePerSecond,
+          generationRatePerSecond ?? this.generationRatePerSecond,
     );
   }
 
@@ -31,4 +31,11 @@ class Resource {
   void upgrade(double value) => generationRatePerSecond += value;
 
   void downgrade(double value) => generationRatePerSecond -= value;
+
+  void reset(bool resetAmount, bool resetGenerationRatePerSecond) {
+    amount = resetAmount ? 0.0 : amount;
+    generationRatePerSecond = resetGenerationRatePerSecond
+        ? 0.0
+        : generationRatePerSecond;
+  }
 }

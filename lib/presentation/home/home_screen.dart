@@ -1,7 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idle_game/core/IdleGame.dart';
+import 'package:idle_game/core/game/IdleGame.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 
 import '../../generated/intl/app_localizations.dart';
