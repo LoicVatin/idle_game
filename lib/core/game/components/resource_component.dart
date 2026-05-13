@@ -5,7 +5,9 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/IdleGame.dart';
+import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
+import 'package:idle_game/core/game/components/worker_component.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 import 'circle_button_component.dart';
@@ -29,19 +31,26 @@ class ResourceComponent extends PositionComponent
   late CircleButtonComponent _resetButton;
   late CircleButtonComponent _stopButton;
 
+  late WorkerComponent _workerComponent;
+  late EncounterComponent _encounterComponent;
+
   @override
   FutureOr<void> onLoad() async {
     size = Vector2(game.size.x, 150);
     final resource = game.gameStateNotifier.get(_resourceType);
 
-    _typeComponent = TextComponent(text: resource.type.name);
+    _typeComponent = TextComponent(text: resource.type.name, priority: 5);
 
-    _amountComponent = TextComponent(text: resource.amount.toStringAsFixed(2));
+    _amountComponent = TextComponent(
+      text: resource.amount.toStringAsFixed(2),
+      priority: 5,
+    );
 
     _rateComponent = TextComponent(
       anchor: Anchor.bottomRight,
       text: '(${resource.generationRatePerSecond.toStringAsFixed(2)}/s)',
       position: size,
+      priority: 5,
     );
 
     _addButton = RectangleButtonComponent(
@@ -100,12 +109,27 @@ class ResourceComponent extends PositionComponent
         ColumnComponent(gap: 10, children: [_upgradeButton, _downgradeButton]),
         ColumnComponent(gap: 10, children: [_resetButton, _stopButton]),
       ],
+      priority: 5,
     );
 
     add(_buttonsComponent);
     add(_rateComponent);
 
     add(RowComponent(gap: 10, children: [_typeComponent, _amountComponent]));
+
+    _workerComponent = WorkerComponent(
+      type: _resourceType,
+      position: Vector2(10, size.y - 10),
+      anchor: Anchor.bottomLeft,
+    );
+    add(_workerComponent);
+
+    _encounterComponent = EncounterComponent(
+      type: _resourceType,
+      position: Vector2(size.x - 10, size.y - 10),
+      anchor: Anchor.bottomRight,
+    );
+    add(_encounterComponent);
   }
 
   @override
