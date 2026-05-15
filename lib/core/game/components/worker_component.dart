@@ -1,10 +1,15 @@
+import 'dart:async';
+
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/IdleGame.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
+import 'encounter_component.dart';
+
 class WorkerComponent extends RectangleComponent
-    with HasGameReference<IdleGame> {
+    with HasGameReference<IdleGame>, CollisionCallbacks {
   ResourceType type;
 
   WorkerComponent({
@@ -34,4 +39,23 @@ class WorkerComponent extends RectangleComponent
            ),
          ],
        );
+
+  @override
+  FutureOr<void> onLoad() async {
+    await super.onLoad();
+
+    add(RectangleHitbox());
+  }
+
+  @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    super.onCollisionStart(intersectionPoints, other);
+
+    if (other is EncounterComponent) {
+      print("onCollisionStart");
+    }
+  }
 }

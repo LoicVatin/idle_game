@@ -1,10 +1,13 @@
+import 'dart:async';
+
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/IdleGame.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class EncounterComponent extends RectangleComponent
-    with HasGameReference<IdleGame> {
+    with HasGameReference<IdleGame>, CollisionCallbacks {
   ResourceType type;
 
   EncounterComponent({
@@ -38,4 +41,22 @@ class EncounterComponent extends RectangleComponent
            ),
          ],
        );
+
+  @override
+  FutureOr<void> onLoad() async {
+    await super.onLoad();
+
+    add(RectangleHitbox(collisionType: CollisionType.passive));
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    final resource = game.gameStateNotifier.get(type);
+    x -= resource.generationRatePerSecond * dt * 10;
+    if (x < -width) {
+      removeFromParent();
+    }
+  }
 }

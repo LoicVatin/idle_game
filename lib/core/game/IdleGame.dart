@@ -8,7 +8,7 @@ import 'package:idle_game/presentation/core/game_provider.dart';
 
 import '../../data/models/resource_model.dart';
 
-class IdleGame extends FlameGame with TapCallbacks {
+class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
 
   IdleGame({required this.gameStateNotifier});
