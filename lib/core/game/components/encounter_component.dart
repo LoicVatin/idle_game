@@ -9,9 +9,15 @@ import 'package:idle_game/data/models/resource_model.dart';
 class EncounterComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
   ResourceType type;
+  double health;
+  final double reward;
+  bool isAttacked = false;
+  double attackedTimer = 0;
 
   EncounterComponent({
     required this.type,
+    required this.health,
+    required this.reward,
     double radius = 24,
     super.position,
     super.anchor,
@@ -53,10 +59,33 @@ class EncounterComponent extends RectangleComponent
   void update(double dt) {
     super.update(dt);
 
-    final resource = game.gameStateNotifier.get(type);
-    x -= resource.generationRatePerSecond * dt * 10;
-    if (x < -width) {
-      removeFromParent();
+    if (isAttacked) {
+      attackedTimer -= dt;
+
+      if (attackedTimer <= 0) {
+        isAttacked = false;
+        paint.color = Colors.red;
+      }
     }
+
+    final resource = game.gameStateNotifier.get(type);
+    if(!resource.encounter) {
+      x -= resource.generationRatePerSecond *dt * 10;
+      if(x < -width) {
+        removeFromParent();
+      }
+    }
+  }
+
+  bool takeDamage(double amount) {
+    health -= amount;
+    isAttacked = true;
+    attackedTimer = 0.15;
+    paint.color = Colors.orange;
+    if(health <= 0) {
+      return true;
+    }
+
+    return false;
   }
 }

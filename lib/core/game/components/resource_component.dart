@@ -15,6 +15,8 @@ import 'circle_button_component.dart';
 class ResourceComponent extends PositionComponent
     with HasGameReference<IdleGame>, TapCallbacks {
   final ResourceType _resourceType;
+  double encounterTimer = 0;
+  static const double _padding = 10.0;
 
   ResourceComponent({required ResourceType type}) : _resourceType = type;
 
@@ -32,7 +34,6 @@ class ResourceComponent extends PositionComponent
   late CircleButtonComponent _stopButton;
 
   late WorkerComponent _workerComponent;
-  late EncounterComponent _encounterComponent;
 
   @override
   FutureOr<void> onLoad() async {
@@ -49,13 +50,14 @@ class ResourceComponent extends PositionComponent
     _rateComponent = TextComponent(
       anchor: Anchor.bottomRight,
       text: '(${resource.generationRatePerSecond.toStringAsFixed(2)}/s)',
-      position: size,
+      position: Vector2(size.x - _padding, size.y - _padding),
       priority: 5,
     );
 
     _addButton = RectangleButtonComponent(
       icon: Icons.add_circle_outline,
       onPressed: () {
+        encounterTimer += 0.25;
         game.gameStateNotifier.add(_resourceType, 1.0);
       },
     );
@@ -100,7 +102,8 @@ class ResourceComponent extends PositionComponent
     );
 
     _buttonsComponent = RowComponent(
-      size: size,
+      position: Vector2(_padding, _padding),
+      size: Vector2(size.x - _padding * 2, size.y - _padding * 2),
       gap: 10.0,
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,21 +118,20 @@ class ResourceComponent extends PositionComponent
     add(_buttonsComponent);
     add(_rateComponent);
 
-    add(RowComponent(gap: 10, children: [_typeComponent, _amountComponent]));
+    add(
+      RowComponent(
+        position: Vector2(_padding, _padding),
+        gap: 10,
+        children: [_typeComponent, _amountComponent],
+      ),
+    );
 
     _workerComponent = WorkerComponent(
       type: _resourceType,
-      position: Vector2(10, size.y - 10),
+      position: Vector2(_padding, size.y - _padding),
       anchor: Anchor.bottomLeft,
     );
     add(_workerComponent);
-
-    _encounterComponent = EncounterComponent(
-      type: _resourceType,
-      position: Vector2(size.x - 10, size.y - 10),
-      anchor: Anchor.bottomRight,
-    );
-    add(_encounterComponent);
   }
 
   @override
@@ -143,9 +145,21 @@ class ResourceComponent extends PositionComponent
 
     _rateComponent
       ..text = '(${resource.generationRatePerSecond.toStringAsFixed(2)}/s)'
-      ..position = size;
+      ..position = Vector2(size.x - _padding, size.y - _padding);
 
-    _buttonsComponent.size = size;
+    _buttonsComponent.size = Vector2(
+      size.x - _padding * 2,
+      size.y - _padding * 2,
+    );
+
+    if (resource.generationRatePerSecond > 0) {
+      encounterTimer += dt;
+    }
+    if (encounterTimer >=
+        (resource.encounterInterval - resource.generationRatePerSecond)) {
+      encounterTimer = 0;
+      generateEncounter();
+    }
   }
 
   @override
@@ -164,12 +178,27 @@ class ResourceComponent extends PositionComponent
     super.onGameResize(size);
     if (isLoaded) {
       this.size = Vector2(game.size.x, 150);
-      _buttonsComponent.size = this.size;
+      _buttonsComponent.size = Vector2(
+        this.size.x - _padding * 2,
+        this.size.y - _padding * 2,
+      );
     }
   }
 
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+  }
+
+  void generateEncounter() {
+    final encounter = EncounterComponent(
+      type: _resourceType,
+      health: 3,
+      reward: 5,
+      position: Vector2(size.x + (_padding * 2), size.y - _padding),
+      anchor: Anchor.bottomRight,
+    );
+
+    add(encounter);
   }
 }

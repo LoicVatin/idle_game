@@ -11,6 +11,12 @@ import 'encounter_component.dart';
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
   ResourceType type;
+  bool isAttacking = false;
+  double attackTimer = 0;
+
+  final double confrontationAttackInterval = 0.35;
+  EncounterComponent? confrontationTarget;
+  double confrontationAttackTimer = 0;
 
   WorkerComponent({
     required this.type,
@@ -48,6 +54,22 @@ class WorkerComponent extends RectangleComponent
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (isAttacking) {
+      attackTimer -= dt;
+
+      if (attackTimer <= 0) {
+        isAttacking = false;
+        paint.color = Colors.green;
+      }
+    }
+
+    updateConfrontation(dt);
+  }
+
+  @override
   void onCollisionStart(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
@@ -55,7 +77,61 @@ class WorkerComponent extends RectangleComponent
     super.onCollisionStart(intersectionPoints, other);
 
     if (other is EncounterComponent) {
-      print("onCollisionStart");
+      startConfrontation(other);
     }
+  }
+
+  void attack() {
+    isAttacking = true;
+    attackTimer = 0.15;
+    paint.color = const Color(0xFFFFF176);
+  }
+
+  void updateConfrontation(double dt) {
+    final resource = game.gameStateNotifier.currentData.resources[type]!;
+    final target = confrontationTarget;
+
+    if (!resource.encounter) return;
+
+    if (target == null || target.isRemoved) {
+      endConfrontation();
+      return;
+    }
+
+    confrontationAttackTimer -= dt;
+
+    if (confrontationAttackTimer > 0) {
+      return;
+    }
+
+    confrontationAttackTimer = confrontationAttackInterval;
+    attack();
+
+    final defeated = target.takeDamage(resource.damage);
+
+    if (defeated) {
+      target.removeFromParent();
+      game.gameStateNotifier.defeatEncounter(type, target.reward);
+      endConfrontation();
+    }
+  }
+
+  void startConfrontation(EncounterComponent enemy) {
+    print("startConfrontation");
+    final resource = game.gameStateNotifier.currentData.resources[type]!;
+    if (confrontationTarget == enemy) {
+      return;
+    }
+
+    confrontationTarget = enemy;
+    confrontationAttackTimer = 0;
+    game.gameStateNotifier.toggleEncounter(type, true);
+  }
+
+  void endConfrontation() {
+    final resource = game.gameStateNotifier.currentData.resources[type]!;
+    confrontationTarget = null;
+    confrontationAttackTimer = 0;
+    game.gameStateNotifier.toggleEncounter(type, false);
   }
 }

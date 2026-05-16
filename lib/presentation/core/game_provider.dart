@@ -119,6 +119,28 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
 
     _setData(data.copyWith(resources: resources));
   }
+
+
+  void toggleEncounter(ResourceType type, bool toggle) {
+    final data = currentData;
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
+    resource.toggleEncounter(toggle);
+
+    _setData(data.copyWith(resources: resources));
+  }
+
+  void defeatEncounter(ResourceType type, double baseReward) {
+    final data = currentData;
+    final resources = currentData.resources.copyWith();
+    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+
+    final reward = baseReward * 1;
+
+    resource.add(reward);
+    _setData(data.copyWith(resources: resources));
+  }
 }
 
 extension _ResourceMapCopy on Map<ResourceType, Resource> {
