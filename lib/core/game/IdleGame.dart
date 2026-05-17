@@ -1,5 +1,4 @@
 import 'package:flame/events.dart';
-import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flame/game.dart';
@@ -7,26 +6,32 @@ import 'package:idle_game/core/game/components/resource_component.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 
 import '../../data/models/resource_model.dart';
+import 'components/scrollable_component_list.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
 
   IdleGame({required this.gameStateNotifier});
 
+  late final ScrollableComponentList _resourceList;
+
   @override
-  Color backgroundColor() => const Color(0xFF101820);
+  Color backgroundColor() => Colors.black;
 
   @override
   Future<void> onLoad() async {
-    ColumnComponent column = ColumnComponent(
-      gap: 20,
-      children: [
-        ResourceComponent(type: ResourceType.wood),
-        ResourceComponent(type: ResourceType.stone),
-        ResourceComponent(type: ResourceType.food),
-      ],
+    _resourceList = ScrollableComponentList(
+      position: Vector2.zero(),
+      size: Vector2(size.x, size.y),
     );
-    add(column);
+
+    await add(_resourceList);
+
+    await _resourceList.setItems([
+      ResourceComponent(type: ResourceType.wood),
+      ResourceComponent(type: ResourceType.stone),
+      ResourceComponent(type: ResourceType.food),
+    ]);
 
     return super.onLoad();
   }
@@ -36,7 +41,9 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     super.onGameResize(size);
 
     if (isLoaded) {
-      columnComponent.size = size;
+      _resourceList
+        ..position = Vector2.zero()
+        ..size = Vector2(size.x, size.y);
     }
   }
 
