@@ -19,7 +19,7 @@ class GameStateData {
     final resources = {
       ResourceType.wood: Resource(type: ResourceType.wood),
       ResourceType.stone: Resource(type: ResourceType.stone),
-      ResourceType.food: Resource(type: ResourceType.food)
+      ResourceType.food: Resource(type: ResourceType.food),
     };
 
     return GameStateData(resources: resources);
@@ -31,125 +31,125 @@ class GameStateData {
 }
 
 class GameStateNotifier extends AsyncNotifier<GameStateData> {
-  GameStateData get currentData => state.value ?? GameStateData.initial();
+  static const double _statePublishInterval = 0.25;
+
+  double _statePublishTimer = 0;
+  late GameStateData _currentData;
+
+  GameStateData get currentData => _currentData;
 
   @override
   FutureOr<GameStateData> build() {
-    return GameStateData.initial();
+    _currentData = GameStateData.initial();
+    return _currentData;
   }
 
-  void _setData(GameStateData data) {
-    state = AsyncData(data);
+  void _publish() {
+    state = AsyncData(
+      _currentData.copyWith(resources: _currentData.resources.copyWith()),
+    );
+    _statePublishTimer = 0;
   }
 
   Resource get(ResourceType type) {
-    print("get");
-    return currentData.resources.putIfAbsent(type, () => Resource(type: type));
+    return _currentData.resources[type] ??= Resource(type: type);
+  }
+
+  void _mutateResource(
+    ResourceType type,
+    void Function(Resource resource) mutate,
+  ) {
+    final resource = get(type);
+    mutate(resource);
+    _publish();
   }
 
   void add(ResourceType type, double amount) {
-    print("add ($amount)");
     if (amount <= 0) return;
 
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    resource.add(amount);
-    _setData(data.copyWith(resources: resources));
+    _mutateResource(type, (resource) {
+      resource.add(amount);
+    });
   }
 
   void subtract(ResourceType type, double amount) {
-    print("subtract ($amount)");
     if (amount <= 0) return;
 
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    resource.subtract(amount);
-    _setData(data.copyWith(resources: resources));
+    _mutateResource(type, (resource) {
+      resource.subtract(amount);
+    });
   }
 
   void upgradeResource(ResourceType type, double amount) {
-    print("upgradeResource ($amount)");
     if (amount <= 0) return;
 
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    resource.upgrade(amount);
-    _setData(data.copyWith(resources: resources));
+    _mutateResource(type, (resource) {
+      resource.upgrade(amount);
+    });
   }
 
   void downgradeResource(ResourceType type, double amount) {
-    print("downgradeResource ($amount)");
     if (amount <= 0) return;
 
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    resource.downgrade(amount);
-    _setData(data.copyWith(resources: resources));
+    _mutateResource(type, (resource) {
+      resource.downgrade(amount);
+    });
   }
 
-  void resetResource(ResourceType type, {bool amount =false, bool rate = false}) {
-    print("resetResource()");
-
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    resource.reset(amount, rate);
-    _setData(data.copyWith(resources: resources));
+  void resetResource(
+    ResourceType type, {
+    bool amount = false,
+    bool rate = false,
+  }) {
+    _mutateResource(type, (resource) {
+      resource.reset(amount, rate);
+    });
   }
 
   void updateResource(double dt) {
     if (dt <= 0) return;
 
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    for(final resource in resources.values) {
-      final generatedAmount = resource.generationRatePerSecond * dt;
+    var changed = false;
 
-      resource.add(generatedAmount.toDouble());
+    for (final resource in _currentData.resources.values) {
+      final generationRate = resource.generationRatePerSecond;
+
+      if (generationRate <= 0) {
+        continue;
+      }
+
+      resource.add(generationRate * dt);
+      changed = true;
     }
 
-    _setData(data.copyWith(resources: resources));
+    if (!changed) return;
+
+    _statePublishTimer += dt;
+
+    if (_statePublishTimer >= _statePublishInterval) {
+      _publish();
+    }
   }
 
-
   void toggleEncounter(ResourceType type, bool toggle) {
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
+    final resource = get(type);
+
+    if (resource.encounter == toggle) return;
 
     resource.toggleEncounter(toggle);
-
-    _setData(data.copyWith(resources: resources));
+    _publish();
   }
 
   void defeatEncounter(ResourceType type, double baseReward) {
-    final data = currentData;
-    final resources = currentData.resources.copyWith();
-    final resource = resources.putIfAbsent(type, () => Resource(type: type));
-
-    final reward = baseReward * 1;
-
-    resource.add(reward);
-    _setData(data.copyWith(resources: resources));
+    _mutateResource(type, (resource) {
+      final reward = baseReward * resource.enemyRewardMultiplier;
+      resource.add(reward);
+    });
   }
 }
 
 extension _ResourceMapCopy on Map<ResourceType, Resource> {
   Map<ResourceType, Resource> copyWith() {
-    return map(
-          (type, resource) => MapEntry(
-        type,
-        resource.copyWith(),
-      ),
-    );
+    return map((type, resource) => MapEntry(type, resource.copyWith()));
   }
 }

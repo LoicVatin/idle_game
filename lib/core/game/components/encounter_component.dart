@@ -3,22 +3,28 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:idle_game/core/game/IdleGame.dart';
+import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class EncounterComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
-  ResourceType type;
+  final ResourceType type;
+  final double radius;
   double health;
   final double reward;
   bool isAttacked = false;
   double attackedTimer = 0;
 
+  double _clickBoostTime = 0;
+  static const double _clickBoostDuration = 0.1;
+  static const double _clickBoostVelocity = 60;
+  static const double _attackedDuration = 0.15;
+
   EncounterComponent({
     required this.type,
     required this.health,
     required this.reward,
-    double radius = 24,
+    this.radius = 24,
     super.position,
     super.anchor,
   }) : super(
@@ -57,8 +63,6 @@ class EncounterComponent extends RectangleComponent
 
   @override
   void update(double dt) {
-    super.update(dt);
-
     if (isAttacked) {
       attackedTimer -= dt;
 
@@ -69,23 +73,34 @@ class EncounterComponent extends RectangleComponent
     }
 
     final resource = game.gameStateNotifier.get(type);
-    if(!resource.encounter) {
-      x -= resource.generationRatePerSecond *dt * 10;
-      if(x < -width) {
+    if (!resource.encounter) {
+      if (_clickBoostTime > 0) {
+        _clickBoostTime -= dt;
+      }
+
+      final clickVelocity = _clickBoostTime > 0 ? _clickBoostVelocity : 0.0;
+      final movement = resource.generationRatePerSecond * 10 + clickVelocity;
+
+      x -= movement * dt;
+
+      if (x < -width) {
         removeFromParent();
       }
     }
+
+    super.update(dt);
   }
 
   bool takeDamage(double amount) {
     health -= amount;
     isAttacked = true;
-    attackedTimer = 0.15;
+    attackedTimer = _attackedDuration;
     paint.color = Colors.orange;
-    if(health <= 0) {
-      return true;
-    }
 
-    return false;
+    return health <= 0;
+  }
+
+  void moveOnClick() {
+    _clickBoostTime = _clickBoostDuration;
   }
 }

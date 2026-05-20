@@ -1,12 +1,10 @@
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
-
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/resource_component.dart';
+import 'package:idle_game/core/game/components/scrollable_component_list.dart';
+import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
-
-import '../../data/models/resource_model.dart';
-import 'components/scrollable_component_list.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
@@ -37,20 +35,19 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    gameStateNotifier.updateResource(dt);
+  }
+
+  @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
     if (isLoaded) {
       _resourceList
-        ..position = Vector2.zero()
-        ..size = Vector2(size.x, size.y);
+        ..position.setZero()
+        ..size = size.clone();
     }
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    gameStateNotifier.updateResource(dt);
   }
 }

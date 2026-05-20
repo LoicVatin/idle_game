@@ -3,18 +3,19 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:idle_game/core/game/IdleGame.dart';
+import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/data/models/resource_model.dart';
-
-import 'encounter_component.dart';
 
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
-  ResourceType type;
+  final ResourceType type;
   bool isAttacking = false;
   double attackTimer = 0;
 
-  final double confrontationAttackInterval = 0.35;
+  static const double _attackDuration = 0.15;
+  static const double _confrontationAttackInterval = 0.35;
+
   EncounterComponent? confrontationTarget;
   double confrontationAttackTimer = 0;
 
@@ -83,18 +84,20 @@ class WorkerComponent extends RectangleComponent
 
   void attack() {
     isAttacking = true;
-    attackTimer = 0.15;
+    attackTimer = _attackDuration;
     paint.color = const Color(0xFFFFF176);
   }
 
   void updateConfrontation(double dt) {
-    final resource = game.gameStateNotifier.currentData.resources[type]!;
     final target = confrontationTarget;
-
-    if (!resource.encounter) return;
 
     if (target == null || target.isRemoved) {
       endConfrontation();
+      return;
+    }
+
+    final resource = game.gameStateNotifier.get(type);
+    if (!resource.encounter) {
       return;
     }
 
@@ -104,7 +107,7 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    confrontationAttackTimer = confrontationAttackInterval;
+    confrontationAttackTimer = _confrontationAttackInterval;
     attack();
 
     final defeated = target.takeDamage(resource.damage);
@@ -117,19 +120,20 @@ class WorkerComponent extends RectangleComponent
   }
 
   void startConfrontation(EncounterComponent enemy) {
-    print("startConfrontation");
-    final resource = game.gameStateNotifier.currentData.resources[type]!;
     if (confrontationTarget == enemy) {
       return;
     }
 
     confrontationTarget = enemy;
     confrontationAttackTimer = 0;
-    game.gameStateNotifier.toggleEncounter(type, true);
+    Future<void>(() {
+      if (isRemoved) return;
+
+      game.gameStateNotifier.toggleEncounter(type, true);
+    });
   }
 
   void endConfrontation() {
-    final resource = game.gameStateNotifier.currentData.resources[type]!;
     confrontationTarget = null;
     confrontationAttackTimer = 0;
     game.gameStateNotifier.toggleEncounter(type, false);

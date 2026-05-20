@@ -80,15 +80,11 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     double y = padding.top;
 
     for (final item in _items) {
-      item.position = Vector2(padding.left, y - _scrollOffset);
-
-      item.size = Vector2(size.x - padding.horizontal, item.size.y);
-
+      item.size.setValues(size.x - padding.horizontal, item.size.y);
       y += item.size.y + spacing;
     }
 
     _contentHeight = math.max(0, y - spacing + padding.bottom);
-
     _scrollOffset = _scrollOffset.clamp(0, maxScrollOffset);
 
     _updateItemPositions();
@@ -99,16 +95,16 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     double y = padding.top;
 
     for (final item in _items) {
-      item.position = Vector2(padding.left, y - _scrollOffset);
+      item.position.setValues(padding.left, y - _scrollOffset);
       y += item.size.y + spacing;
     }
   }
 
   void _updateScrollbarThumbIndicator() {
     _scrollbarBackground
-      ..position = Vector2(size.x, 0)
+      ..position.setValues(size.x, 0)
       ..anchor = Anchor.topRight
-      ..size = Vector2(padding.right, size.y);
+      ..size.setValues(padding.right, size.y);
 
     if (!_canScroll) {
       _scrollbarThumb.visible = false;
@@ -127,8 +123,8 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     final thumbY = padding.top + (trackHeight - thumbHeight) * scrollRatio;
 
     _scrollbarThumb
-      ..position = Vector2(size.x - (padding.right / 2), thumbY)
-      ..size = Vector2(6, thumbHeight);
+      ..position.setValues(size.x - (padding.right / 2), thumbY)
+      ..size.setValues(6, thumbHeight);
   }
 
   double get maxScrollOffset {

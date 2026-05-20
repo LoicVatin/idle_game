@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
-import 'package:idle_game/core/game/IdleGame.dart';
-import 'package:idle_game/core/game/components/encounter_component.dart';
+import 'package:idle_game/core/game/components/circle_button_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
+import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/core/game/components/worker_component.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
-import 'circle_button_component.dart';
-
-class ResourceComponent extends PositionComponent
-    with HasGameReference<IdleGame>, TapCallbacks {
+class ResourceComponent extends RectangleComponent
+    with HasGameReference<IdleGame> {
   final ResourceType _resourceType;
   double encounterTimer = 0;
   static const double _padding = 10.0;
+  static const double _encounterRadius = 24.0;
+  static const double _height = 150.0;
 
   ResourceComponent({required ResourceType type}) : _resourceType = type;
 
@@ -35,29 +35,47 @@ class ResourceComponent extends PositionComponent
 
   late WorkerComponent _workerComponent;
 
+  String? _lastTypeText;
+  String? _lastAmountText;
+  String? _lastRateText;
+  Vector2? _lastSize;
+
   @override
   FutureOr<void> onLoad() async {
-    size = Vector2(game.size.x, 150);
+    size = Vector2(200, _height);
     final resource = game.gameStateNotifier.get(_resourceType);
 
-    _typeComponent = TextComponent(text: resource.type.name, priority: 5);
+    paint = Paint()
+      ..color = switch (_resourceType) {
+        ResourceType.food => Colors.redAccent,
+        ResourceType.wood => Colors.brown,
+        ResourceType.stone => Colors.grey,
+      };
 
-    _amountComponent = TextComponent(
-      text: resource.amount.toStringAsFixed(2),
-      priority: 5,
-    );
+    _lastTypeText = resource.type.name;
+    _lastAmountText = _formatAmount(resource.amount);
+    _lastRateText = _formatRate(resource.generationRatePerSecond);
+
+    _typeComponent = TextComponent(text: _lastTypeText, priority: 5);
+
+    _amountComponent = TextComponent(text: _lastAmountText, priority: 5);
 
     _rateComponent = TextComponent(
       anchor: Anchor.bottomRight,
-      text: '(${resource.generationRatePerSecond.toStringAsFixed(2)}/s)',
-      position: Vector2(size.x - _padding, size.y - _padding),
+      text: _lastRateText,
+      position: Vector2(width - _padding, height - _padding),
       priority: 5,
     );
 
     _addButton = RectangleButtonComponent(
       icon: Icons.add_circle_outline,
       onPressed: () {
-        encounterTimer += 0.25;
+        final currentResource = game.gameStateNotifier.get(_resourceType);
+        encounterTimer += currentResource.encounterInterval / 10;
+        moveOnClick();
+        game.gameStateNotifier.add(_resourceType, 1.0);
+      },
+      onHold: () {
         game.gameStateNotifier.add(_resourceType, 1.0);
       },
     );
@@ -86,6 +104,7 @@ class ResourceComponent extends PositionComponent
     _resetButton = CircleButtonComponent(
       icon: Icons.restart_alt,
       onPressed: () {
+        resetEncounters();
         game.gameStateNotifier.resetResource(
           _resourceType,
           amount: true,
@@ -102,15 +121,25 @@ class ResourceComponent extends PositionComponent
     );
 
     _buttonsComponent = RowComponent(
-      position: Vector2(_padding, _padding),
-      size: Vector2(size.x - _padding * 2, size.y - _padding * 2),
+      anchor: Anchor.topRight,
+      position: Vector2(width - _padding, _padding),
       gap: 10.0,
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ColumnComponent(gap: 10, children: [_addButton, _subtractButton]),
-        ColumnComponent(gap: 10, children: [_upgradeButton, _downgradeButton]),
-        ColumnComponent(gap: 10, children: [_resetButton, _stopButton]),
+        RowComponent(
+          gap: 10.0,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ColumnComponent(gap: 10, children: [_addButton, _subtractButton]),
+            ColumnComponent(
+              gap: 10,
+              children: [_upgradeButton, _downgradeButton],
+            ),
+            ColumnComponent(gap: 10, children: [_resetButton, _stopButton]),
+          ],
+        ),
       ],
       priority: 5,
     );
@@ -128,77 +157,116 @@ class ResourceComponent extends PositionComponent
 
     _workerComponent = WorkerComponent(
       type: _resourceType,
-      position: Vector2(_padding, size.y - _padding),
+      position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
     );
     add(_workerComponent);
+
+    _updateResponsivePositions(force: true);
   }
 
   @override
   void update(double dt) {
-    final resource =
-        game.gameStateNotifier.currentData.resources[_resourceType];
+    final resource = game.gameStateNotifier.get(_resourceType);
 
-    _typeComponent.text = resource!.type.name;
+    _updateText(resource);
+    _updateResponsivePositions();
 
-    _amountComponent.text = resource.amount.toStringAsFixed(2);
-
-    _rateComponent
-      ..text = '(${resource.generationRatePerSecond.toStringAsFixed(2)}/s)'
-      ..position = Vector2(size.x - _padding, size.y - _padding);
-
-    _buttonsComponent.size = Vector2(
-      size.x - _padding * 2,
-      size.y - _padding * 2,
-    );
-
-    if (resource.generationRatePerSecond > 0) {
-      encounterTimer += dt;
+    if (resource.generationRatePerSecond > 0 && !resource.encounter) {
+      encounterTimer += dt * resource.generationRatePerSecond * 10;
     }
-    if (encounterTimer >=
-        (resource.encounterInterval - resource.generationRatePerSecond)) {
+
+    if (encounterTimer >= resource.encounterInterval) {
       encounterTimer = 0;
-      generateEncounter();
+      generateEncounter(resource);
+    }
+
+    super.update(dt);
+  }
+
+  void _updateText(Resource resource) {
+    final typeText = resource.type.name;
+    if (_lastTypeText != typeText) {
+      _lastTypeText = typeText;
+      _typeComponent.text = typeText;
+    }
+
+    final amountText = _formatAmount(resource.amount);
+    if (_lastAmountText != amountText) {
+      _lastAmountText = amountText;
+      _amountComponent.text = amountText;
+    }
+
+    final rateText = _formatRate(resource.generationRatePerSecond);
+    if (_lastRateText != rateText) {
+      _lastRateText = rateText;
+      _rateComponent.text = rateText;
     }
   }
 
-  @override
-  void render(Canvas canvas) {
-    Paint paint = Paint()
-      ..color = switch (_resourceType) {
-        ResourceType.food => Colors.redAccent,
-        ResourceType.wood => Colors.brown,
-        ResourceType.stone => Colors.grey,
-      };
-    canvas.drawRect(Rect.fromLTWH(0, 0, width, height), paint);
-  }
-
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    if (isLoaded) {
-      this.size = Vector2(game.size.x, 150);
-      _buttonsComponent.size = Vector2(
-        this.size.x - _padding * 2,
-        this.size.y - _padding * 2,
-      );
+  void _updateResponsivePositions({bool force = false}) {
+    if (!force && _lastSize?.x == width && _lastSize?.y == height) {
+      return;
     }
+
+    _lastSize = size.clone();
+
+    _rateComponent.position.setValues(width - _padding, height - _padding);
+    _buttonsComponent.position.setValues(width - _padding, _padding);
+    _workerComponent.position.setValues(_padding, height - _padding);
   }
 
-  @override
-  void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
-  }
+  String _formatAmount(double amount) => amount.toStringAsFixed(2);
 
-  void generateEncounter() {
+  String _formatRate(double rate) => '(${rate.toStringAsFixed(2)}/s)';
+
+  void generateEncounter([Resource? cachedResource]) {
+    final resource =
+        cachedResource ?? game.gameStateNotifier.get(_resourceType);
+
+    final defaultSpawnX = width + (_padding * 2);
+    final encounterWidth = _encounterRadius * 2;
+
+    var hasEncounters = false;
+    var maxEncounterX = double.negativeInfinity;
+
+    for (final encounter in children.whereType<EncounterComponent>()) {
+      hasEncounters = true;
+
+      if (encounter.x - encounterWidth > width) {
+        return;
+      }
+
+      if (encounter.x > maxEncounterX) {
+        maxEncounterX = encounter.x;
+      }
+    }
+
+    final spawnX = hasEncounters
+        ? maxEncounterX + encounterWidth + resource.encounterSpacing
+        : defaultSpawnX;
+
     final encounter = EncounterComponent(
       type: _resourceType,
       health: 3,
       reward: 5,
-      position: Vector2(size.x + (_padding * 2), size.y - _padding),
-      anchor: Anchor.bottomRight,
+      radius: _encounterRadius,
+      position: Vector2(spawnX, height - _padding),
+      anchor: Anchor.bottomLeft,
     );
 
     add(encounter);
+  }
+
+  void resetEncounters() {
+    for (final encounter in children.whereType<EncounterComponent>().toList()) {
+      encounter.removeFromParent();
+    }
+  }
+
+  void moveOnClick() {
+    for (final encounter in children.whereType<EncounterComponent>()) {
+      encounter.moveOnClick();
+    }
   }
 }

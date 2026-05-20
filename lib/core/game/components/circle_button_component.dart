@@ -1,61 +1,45 @@
 import 'package:flame/components.dart';
-import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/hold_button_component.dart';
 
-class CircleButtonComponent extends ButtonComponent {
-  final IconData icon;
-  final double radius;
-
+class CircleButtonComponent extends HoldableButtonComponent {
   CircleButtonComponent({
-    required this.icon,
-    required VoidCallback onPressed,
-    this.radius = 24,
+    required IconData icon,
+    super.onPressed,
+    super.onHold,
+    double radius = 24,
   }) : super(
          size: Vector2.all(radius * 2),
-         onPressed: onPressed,
-         button: CircleButtonFace(
+         defaultSkin: CircleButtonFace(
            icon: icon,
            color: Colors.deepPurple,
            radius: radius,
          ),
-         buttonDown: CircleButtonFace(
+         downSkin: CircleButtonFace(
            icon: icon,
            color: Colors.deepPurpleAccent,
+           radius: radius,
+         ),
+         disabledSkin: CircleButtonFace(
+           icon: icon,
+           color: Colors.blueGrey,
            radius: radius,
          ),
        );
 }
 
-class CircleButtonFace extends CircleComponent {
-  final IconData icon;
-  final Color color;
-
+class CircleButtonFace extends CircleComponent with IconButtonFaceMixin {
   CircleButtonFace({
-    required this.icon,
-    required this.color,
-    required super.radius,
-  }) : super(paint: Paint()..color = color);
+    required IconData icon,
+    required Color color,
+    required double radius,
+  }) : super(radius: radius, paint: Paint()..color = color) {
+    initializeIconPainter(icon: icon, radius: radius);
+  }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(icon.codePoint),
-        style: TextStyle(
-          fontSize: radius,
-          fontFamily: icon.fontFamily,
-          package: icon.fontPackage,
-          color: Colors.white,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    textPainter.paint(
-      canvas,
-      Offset(radius - textPainter.width / 2, radius - textPainter.height / 2),
-    );
+    renderIcon(canvas);
   }
 }
