@@ -88,6 +88,12 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     });
   }
 
+  void buyUpgradeResource(ResourceType type) {
+    _mutateResource(type, (resource) {
+      resource.buyUpgrade();
+    });
+  }
+
   void downgradeResource(ResourceType type, double amount) {
     if (amount <= 0) return;
 
@@ -104,31 +110,6 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     _mutateResource(type, (resource) {
       resource.reset(amount, rate);
     });
-  }
-
-  void updateResource(double dt) {
-    if (dt <= 0) return;
-
-    var changed = false;
-
-    for (final resource in _currentData.resources.values) {
-      final generationRate = resource.generationRatePerSecond;
-
-      if (generationRate <= 0) {
-        continue;
-      }
-
-      resource.add(generationRate * dt);
-      changed = true;
-    }
-
-    if (!changed) return;
-
-    _statePublishTimer += dt;
-
-    if (_statePublishTimer >= _statePublishInterval) {
-      _publish();
-    }
   }
 
   void toggleEncounter(ResourceType type, bool toggle) {

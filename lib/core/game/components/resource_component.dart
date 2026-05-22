@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/circle_button_component.dart';
@@ -11,7 +12,7 @@ import 'package:idle_game/core/game/components/worker_component.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class ResourceComponent extends RectangleComponent
-    with HasGameReference<IdleGame> {
+    with HasGameReference<IdleGame>, TapCallbacks {
   final ResourceType _resourceType;
   double encounterTimer = 0;
   static const double _padding = 10.0;
@@ -70,8 +71,6 @@ class ResourceComponent extends RectangleComponent
     _addButton = RectangleButtonComponent(
       icon: Icons.add_circle_outline,
       onPressed: () {
-        final currentResource = game.gameStateNotifier.get(_resourceType);
-        encounterTimer += currentResource.encounterInterval / 10;
         moveOnClick();
         game.gameStateNotifier.add(_resourceType, 1.0);
       },
@@ -90,7 +89,7 @@ class ResourceComponent extends RectangleComponent
     _upgradeButton = CircleButtonComponent(
       icon: Icons.trending_up,
       onPressed: () {
-        game.gameStateNotifier.upgradeResource(_resourceType, 0.1);
+        game.gameStateNotifier.buyUpgradeResource(_resourceType);
       },
     );
 
@@ -181,6 +180,11 @@ class ResourceComponent extends RectangleComponent
       generateEncounter(resource);
     }
 
+    _upgradeButton.isDisabled = !resource.canBuyUpgrade();
+    _resetButton.isDisabled =
+        resource.generationRatePerSecond == 0 && resource.amount == 0;
+    _stopButton.isDisabled = resource.generationRatePerSecond == 0;
+
     super.update(dt);
   }
 
@@ -219,6 +223,12 @@ class ResourceComponent extends RectangleComponent
   String _formatAmount(double amount) => amount.toStringAsFixed(2);
 
   String _formatRate(double rate) => '(${rate.toStringAsFixed(2)}/s)';
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
+    moveOnClick();
+  }
 
   void generateEncounter([Resource? cachedResource]) {
     final resource =
@@ -265,6 +275,9 @@ class ResourceComponent extends RectangleComponent
   }
 
   void moveOnClick() {
+    final currentResource = game.gameStateNotifier.get(_resourceType);
+    encounterTimer += currentResource.encounterInterval / 10;
+
     for (final encounter in children.whereType<EncounterComponent>()) {
       encounter.moveOnClick();
     }

@@ -35,12 +35,6 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   }
 
   @override
-  void update(double dt) {
-    super.update(dt);
-    gameStateNotifier.updateResource(dt);
-  }
-
-  @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 

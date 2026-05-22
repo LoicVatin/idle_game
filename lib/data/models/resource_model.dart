@@ -11,6 +11,9 @@ class Resource {
   double coinMultiplier;
   double movementSpeed;
   double enemyRewardMultiplier;
+  double upgradeAmount;
+  double upgradeCost;
+  double upgradeMultiplier;
 
   Resource({
     required this.type,
@@ -23,6 +26,9 @@ class Resource {
     this.coinMultiplier = 1,
     this.movementSpeed = 180,
     this.enemyRewardMultiplier = 1,
+    this.upgradeAmount = 0,
+    this.upgradeCost = 25,
+    this.upgradeMultiplier = 0.5,
   });
 
   Resource copyWith({
@@ -60,6 +66,16 @@ class Resource {
   }
 
   void upgrade(double value) => generationRatePerSecond += value;
+
+  void buyUpgrade() {
+    amount -= upgradeCost * (upgradeAmount + 1);
+    generationRatePerSecond += (upgradeMultiplier * (upgradeAmount + 1));
+    upgradeAmount++;
+  }
+
+  bool canBuyUpgrade() {
+    return amount >= upgradeCost * (upgradeAmount + 1);
+  }
 
   void downgrade(double value) {
     generationRatePerSecond = (generationRatePerSecond - value).clamp(
