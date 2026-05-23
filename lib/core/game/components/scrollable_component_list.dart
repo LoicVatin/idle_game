@@ -18,7 +18,8 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   final List<PositionComponent> _items = [];
 
   late final ScrollbarThumbIndicatorComponent _scrollbarThumb;
-  late final ScrollbarBackgroundComponent _scrollbarBackground;
+  late final BorderComponent _rightBorder;
+  late final BorderComponent _leftBorder;
 
   double _scrollOffset = 0;
   double _contentHeight = 0;
@@ -37,8 +38,12 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
       await add(item);
     }
 
-    if (!_scrollbarBackground.isMounted) {
-      await add(_scrollbarBackground);
+    if (!_rightBorder.isMounted) {
+      await add(_rightBorder);
+    }
+
+    if (!_leftBorder.isMounted) {
+      await add(_leftBorder);
     }
 
     if (!_scrollbarThumb.isMounted) {
@@ -52,7 +57,8 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    _scrollbarBackground = ScrollbarBackgroundComponent();
+    _rightBorder = BorderComponent();
+    _leftBorder = BorderComponent();
     _scrollbarThumb = ScrollbarThumbIndicatorComponent();
   }
 
@@ -87,6 +93,16 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     _contentHeight = math.max(0, y - spacing + padding.bottom);
     _scrollOffset = _scrollOffset.clamp(0, maxScrollOffset);
 
+    _rightBorder
+      ..position.setValues(size.x, 0)
+      ..anchor = Anchor.topRight
+      ..size.setValues(padding.right, size.y);
+
+    _leftBorder
+      ..position.setValues(0, 0)
+      ..anchor = Anchor.topLeft
+      ..size.setValues(padding.left, size.y);
+
     _updateItemPositions();
     _updateScrollbarThumbIndicator();
   }
@@ -101,11 +117,6 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   }
 
   void _updateScrollbarThumbIndicator() {
-    _scrollbarBackground
-      ..position.setValues(size.x, 0)
-      ..anchor = Anchor.topRight
-      ..size.setValues(padding.right, size.y);
-
     if (!_canScroll) {
       _scrollbarThumb.visible = false;
 
@@ -178,8 +189,8 @@ class ScrollbarThumbIndicatorComponent extends PositionComponent {
   }
 }
 
-class ScrollbarBackgroundComponent extends PositionComponent {
-  ScrollbarBackgroundComponent() : super(priority: 900);
+class BorderComponent extends PositionComponent {
+  BorderComponent() : super(priority: 900);
 
   final Paint _paint = Paint()..color = Colors.black;
 

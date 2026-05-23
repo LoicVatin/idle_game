@@ -1,8 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/resource_model.dart';
+import 'package:idle_game/data/models/playground_model.dart';
+import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/resource_model.dart';
 
 final gameStateProvider =
     AsyncNotifierProvider<GameStateNotifier, GameStateData>(
@@ -12,8 +15,9 @@ final gameStateProvider =
 @immutable
 class GameStateData {
   final Map<ResourceType, Resource> resources;
+  final Set<PlaygroundModel> playgrounds;
 
-  const GameStateData({required this.resources});
+  const GameStateData({required this.resources, required this.playgrounds});
 
   factory GameStateData.initial() {
     final resources = {
@@ -22,18 +26,119 @@ class GameStateData {
       ResourceType.food: Resource(type: ResourceType.food),
     };
 
-    return GameStateData(resources: resources);
+    final playgrounds = {
+      // Forest
+      PlaygroundModel(
+        id: 0,
+        name: "Forest",
+        backgroundColor: Colors.green,
+        upgradeCostType: ResourceType.wood,
+        worker: WorkerModel(
+          icon: Icons.hiking_outlined,
+          toolsIcon: Icons.carpenter_sharp,
+        ),
+        encounters: WeightedRandom({
+          EncounterModel(
+            type: ResourceType.wood,
+            health: 3,
+            reward: 5,
+            icon: Icons.park,
+          ): 1,
+          EncounterModel(
+            type: ResourceType.wood,
+            health: 12,
+            reward: 15,
+            icon: Icons.forest,
+          ): 0.1,
+          EncounterModel(
+            type: ResourceType.stone,
+            health: 5,
+            reward: 3,
+            icon: Icons.scatter_plot,
+          ): 0.2,
+        }),
+      ),
+
+      // Cave
+      PlaygroundModel(
+        id: 1,
+        name: "Cave",
+        backgroundColor: Colors.grey,
+        upgradeCostType: ResourceType.stone,
+        worker: WorkerModel(
+          icon: Icons.nordic_walking_outlined,
+          toolsIcon: Icons.gavel_sharp,
+        ),
+        encounters: WeightedRandom({
+          EncounterModel(
+            type: ResourceType.wood,
+            health: 25,
+            reward: 10,
+            icon: Icons.warehouse,
+          ): 0.1,
+          EncounterModel(
+            type: ResourceType.stone,
+            health: 4,
+            reward: 5,
+            icon: Icons.landslide,
+          ): 1,
+          EncounterModel(
+            type: ResourceType.food,
+            health: 3,
+            reward: 2,
+            icon: Icons.pest_control_rodent,
+          ): 0.2,
+        }),
+      ),
+
+      // Plain
+      PlaygroundModel(
+        id: 2,
+        name: "Plain",
+        backgroundColor: Colors.lightGreen,
+        upgradeCostType: ResourceType.food,
+        worker: WorkerModel(
+          icon: Icons.directions_walk_outlined,
+          toolsIcon: Icons.restaurant_menu_sharp,
+        ),
+        encounters: WeightedRandom({
+          EncounterModel(
+            type: ResourceType.food,
+            health: 3,
+            reward: 5,
+            icon: Icons.foggy,
+          ): 1,
+          EncounterModel(
+            type: ResourceType.wood,
+            health: 25,
+            reward: 10,
+            icon: Icons.cabin,
+          ): 0.2,
+          EncounterModel(
+            type: ResourceType.stone,
+            health: 3,
+            reward: 2,
+            icon: Icons.landslide,
+          ): 0.5,
+        }),
+      ),
+    };
+
+    return GameStateData(resources: resources, playgrounds: playgrounds);
   }
 
-  GameStateData copyWith({Map<ResourceType, Resource>? resources}) {
-    return GameStateData(resources: resources ?? this.resources);
+  GameStateData copyWith({
+    Map<ResourceType, Resource>? resources,
+    Set<PlaygroundModel>? playgrounds,
+  }) {
+    return GameStateData(
+      resources: resources ?? this.resources,
+      playgrounds: playgrounds ?? this.playgrounds,
+    );
   }
 }
 
 class GameStateNotifier extends AsyncNotifier<GameStateData> {
-  static const double _statePublishInterval = 0.25;
-
-  double _statePublishTimer = 0;
   late GameStateData _currentData;
 
   GameStateData get currentData => _currentData;
@@ -48,19 +153,33 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     state = AsyncData(
       _currentData.copyWith(resources: _currentData.resources.copyWith()),
     );
-    _statePublishTimer = 0;
   }
 
-  Resource get(ResourceType type) {
+  Resource getResourceByType(ResourceType type) {
     return _currentData.resources[type] ??= Resource(type: type);
+  }
+
+  PlaygroundModel getPlaygroundById(int id) {
+    return _currentData.playgrounds.firstWhere(
+      (playground) => playground.id == id,
+    );
   }
 
   void _mutateResource(
     ResourceType type,
     void Function(Resource resource) mutate,
   ) {
-    final resource = get(type);
+    final resource = getResourceByType(type);
     mutate(resource);
+    _publish();
+  }
+
+  void _mutatePlayground(
+    int id,
+    void Function(PlaygroundModel playground) mutate,
+  ) {
+    final playground = getPlaygroundById(id);
+    mutate(playground);
     _publish();
   }
 
@@ -80,50 +199,57 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     });
   }
 
-  void upgradeResource(ResourceType type, double amount) {
-    if (amount <= 0) return;
+  void buyPlaygroundUpgrade(int id) {
+    final playground = getPlaygroundById(id);
+    final resource = getResourceByType(playground.upgradeCostType);
 
-    _mutateResource(type, (resource) {
-      resource.upgrade(amount);
-    });
-  }
-
-  void buyUpgradeResource(ResourceType type) {
-    _mutateResource(type, (resource) {
-      resource.buyUpgrade();
-    });
-  }
-
-  void downgradeResource(ResourceType type, double amount) {
-    if (amount <= 0) return;
-
-    _mutateResource(type, (resource) {
-      resource.downgrade(amount);
-    });
-  }
-
-  void resetResource(
-    ResourceType type, {
-    bool amount = false,
-    bool rate = false,
-  }) {
-    _mutateResource(type, (resource) {
-      resource.reset(amount, rate);
-    });
-  }
-
-  void toggleEncounter(ResourceType type, bool toggle) {
-    final resource = get(type);
-
-    if (resource.encounter == toggle) return;
-
-    resource.toggleEncounter(toggle);
+    resource.amount -= playground.getUpgradeCost();
+    playground.buyUpgrade();
     _publish();
   }
 
-  void defeatEncounter(ResourceType type, double baseReward) {
+  void upgradePlayground(int type, double amount) {
+    if (amount <= 0) return;
+
+    _mutatePlayground(type, (playground) {
+      playground.upgrade(amount);
+    });
+  }
+
+  void downgradePlayground(int type, double amount) {
+    if (amount <= 0) return;
+
+    _mutatePlayground(type, (playground) {
+      playground.downgrade(amount);
+    });
+  }
+
+  void resetPlayground(int id) {
+    _mutatePlayground(id, (playground) {
+      playground.reset();
+    });
+  }
+
+  void resetResource(ResourceType type) {
     _mutateResource(type, (resource) {
-      final reward = baseReward * resource.enemyRewardMultiplier;
+      resource.reset();
+    });
+  }
+
+  void toggleEncounter(int id, bool toggle) {
+    final playground = getPlaygroundById(id);
+
+    if (playground.encounter == toggle) return;
+
+    playground.toggleEncounter(toggle);
+    _publish();
+  }
+
+  void defeatEncounter(int id, ResourceType type, double baseReward) {
+    final playground = getPlaygroundById(id);
+
+    _mutateResource(type, (resource) {
+      final reward = baseReward * playground.enemyRewardMultiplier;
       resource.add(reward);
     });
   }

@@ -5,11 +5,13 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
-import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/data/models/playground_model.dart';
+import 'package:idle_game/data/models/worker_model.dart';
 
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
-  final ResourceType type;
+  final PlaygroundModel playgroundModel;
+  final WorkerModel workerModel;
   bool isAttacking = false;
   double attackTimer = 0;
 
@@ -20,26 +22,23 @@ class WorkerComponent extends RectangleComponent
   double confrontationAttackTimer = 0;
 
   WorkerComponent({
-    required this.type,
+    required this.playgroundModel,
+    required this.workerModel,
     double radius = 24,
     super.position,
     super.anchor,
   }) : super(
          size: Vector2.all(radius * 2),
-         paint: Paint()..color = Colors.green,
+         paint: Paint()..color = Colors.blueAccent,
          children: [
            IconComponent(
-             icon: Icons.hiking_sharp,
+             icon: workerModel.icon,
              size: Vector2.all(radius),
              anchor: Anchor.bottomRight,
              position: Vector2.all(radius),
            ),
            IconComponent(
-             icon: switch (type) {
-               ResourceType.food => Icons.restaurant_menu_sharp,
-               ResourceType.wood => Icons.carpenter_sharp,
-               ResourceType.stone => Icons.gavel_sharp,
-             },
+             icon: workerModel.toolsIcon,
              size: Vector2.all(radius),
              anchor: Anchor.topLeft,
              position: Vector2.all(radius),
@@ -63,7 +62,7 @@ class WorkerComponent extends RectangleComponent
 
       if (attackTimer <= 0) {
         isAttacking = false;
-        paint.color = Colors.green;
+        paint.color = Colors.blueAccent;
       }
     }
 
@@ -85,7 +84,7 @@ class WorkerComponent extends RectangleComponent
   void attack() {
     isAttacking = true;
     attackTimer = _attackDuration;
-    paint.color = const Color(0xFFFFF176);
+    paint.color = Colors.yellow;
   }
 
   void updateConfrontation(double dt) {
@@ -96,8 +95,10 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    final resource = game.gameStateNotifier.get(type);
-    if (!resource.encounter) {
+    final playground = game.gameStateNotifier.getPlaygroundById(
+      playgroundModel.id,
+    );
+    if (!playground.encounter) {
       return;
     }
 
@@ -110,11 +111,10 @@ class WorkerComponent extends RectangleComponent
     confrontationAttackTimer = _confrontationAttackInterval;
     attack();
 
-    final defeated = target.takeDamage(resource.damage);
+    final defeated = target.takeDamage(workerModel.damage);
 
     if (defeated) {
-      target.removeFromParent();
-      game.gameStateNotifier.defeatEncounter(type, target.reward);
+      target.defeat();
       endConfrontation();
     }
   }
@@ -129,13 +129,13 @@ class WorkerComponent extends RectangleComponent
     Future<void>(() {
       if (isRemoved) return;
 
-      game.gameStateNotifier.toggleEncounter(type, true);
+      game.gameStateNotifier.toggleEncounter(playgroundModel.id, true);
     });
   }
 
   void endConfrontation() {
     confrontationTarget = null;
     confrontationAttackTimer = 0;
-    game.gameStateNotifier.toggleEncounter(type, false);
+    game.gameStateNotifier.toggleEncounter(playgroundModel.id, false);
   }
 }

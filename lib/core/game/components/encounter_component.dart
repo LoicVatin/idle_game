@@ -4,14 +4,15 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
-import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/playground_model.dart';
 
 class EncounterComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
-  final ResourceType type;
   final double radius;
-  double health;
-  final double reward;
+  PlaygroundModel playgroundModel;
+  EncounterModel encounterModel;
+  late double health;
   bool isAttacked = false;
   double attackedTimer = 0;
 
@@ -21,32 +22,24 @@ class EncounterComponent extends RectangleComponent
   static const double _attackedDuration = 0.15;
 
   EncounterComponent({
-    required this.type,
-    required this.health,
-    required this.reward,
+    required this.playgroundModel,
+    required this.encounterModel,
     this.radius = 24,
     super.position,
     super.anchor,
-  }) : super(
+  }) : health = encounterModel.health,
+       super(
          size: Vector2.all(radius * 2),
-         paint: Paint()..color = Colors.red,
+         paint: Paint()..color = encounterModel.type.color,
          children: [
            IconComponent(
-             icon: switch (type) {
-               ResourceType.food => Icons.grass_outlined,
-               ResourceType.wood => Icons.forest_outlined,
-               ResourceType.stone => Icons.landscape_outlined,
-             },
+             icon: encounterModel.type.icon,
              size: Vector2.all(radius),
              anchor: Anchor.bottomLeft,
              position: Vector2.all(radius),
            ),
            IconComponent(
-             icon: switch (type) {
-               ResourceType.food => Icons.pest_control_rodent_outlined,
-               ResourceType.wood => Icons.park_outlined,
-               ResourceType.stone => Icons.diamond_outlined,
-             },
+             icon: encounterModel.icon,
              size: Vector2.all(radius),
              anchor: Anchor.topRight,
              position: Vector2.all(radius),
@@ -68,18 +61,20 @@ class EncounterComponent extends RectangleComponent
 
       if (attackedTimer <= 0) {
         isAttacked = false;
-        paint.color = Colors.red;
+        paint.color = encounterModel.type.color;
       }
     }
 
-    final resource = game.gameStateNotifier.get(type);
-    if (!resource.encounter) {
+    final playground = game.gameStateNotifier.getPlaygroundById(
+      playgroundModel.id,
+    );
+    if (!playground.encounter) {
       if (_clickBoostTime > 0) {
         _clickBoostTime -= dt;
       }
 
       final clickVelocity = _clickBoostTime > 0 ? _clickBoostVelocity : 0.0;
-      final movement = resource.generationRatePerSecond * 10 + clickVelocity;
+      final movement = playground.generationRatePerSecond * 10 + clickVelocity;
 
       x -= movement * dt;
 
@@ -102,5 +97,14 @@ class EncounterComponent extends RectangleComponent
 
   void moveOnClick() {
     _clickBoostTime = _clickBoostDuration;
+  }
+
+  void defeat() {
+    game.gameStateNotifier.defeatEncounter(
+      playgroundModel.id,
+      encounterModel.type,
+      encounterModel.reward,
+    );
+    removeFromParent();
   }
 }
