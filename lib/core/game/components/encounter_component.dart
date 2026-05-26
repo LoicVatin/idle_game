@@ -5,12 +5,12 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
-import 'package:idle_game/data/models/playground_model.dart';
+import 'package:idle_game/data/models/scene_model.dart';
 
 class EncounterComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
   final double radius;
-  PlaygroundModel playgroundModel;
+  SceneModel sceneModel;
   EncounterModel encounterModel;
   late double health;
   bool isAttacked = false;
@@ -22,7 +22,7 @@ class EncounterComponent extends RectangleComponent
   static const double _attackedDuration = 0.15;
 
   EncounterComponent({
-    required this.playgroundModel,
+    required this.sceneModel,
     required this.encounterModel,
     this.radius = 24,
     super.position,
@@ -65,16 +65,16 @@ class EncounterComponent extends RectangleComponent
       }
     }
 
-    final playground = game.gameStateNotifier.getPlaygroundById(
-      playgroundModel.id,
+    final scene = game.gameStateNotifier.getSceneById(
+      sceneModel.id,
     );
-    if (!playground.encounter) {
+    if (!scene.encounter) {
       if (_clickBoostTime > 0) {
         _clickBoostTime -= dt;
       }
 
       final clickVelocity = _clickBoostTime > 0 ? _clickBoostVelocity : 0.0;
-      final movement = playground.generationRatePerSecond * 10 + clickVelocity;
+      final movement = scene.generationRatePerSecond * 10 + clickVelocity;
 
       x -= movement * dt;
 
@@ -101,7 +101,7 @@ class EncounterComponent extends RectangleComponent
 
   void defeat() {
     game.gameStateNotifier.defeatEncounter(
-      playgroundModel.id,
+      sceneModel.id,
       encounterModel.type,
       encounterModel.reward,
     );

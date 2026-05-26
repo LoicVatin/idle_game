@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/data/models/playground_model.dart';
+import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
@@ -27,100 +28,101 @@ class GameStateData {
     };
 
     final playgrounds = {
-      // Forest
       PlaygroundModel(
         id: 0,
-        name: "Forest",
-        backgroundColor: Colors.green,
-        upgradeCostType: ResourceType.wood,
+        name: "Playground",
         worker: WorkerModel(
           icon: Icons.hiking_outlined,
-          toolsIcon: Icons.carpenter_sharp,
-        ),
-        encounters: WeightedRandom({
-          EncounterModel(
-            type: ResourceType.wood,
-            health: 3,
-            reward: 5,
-            icon: Icons.park,
-          ): 1,
-          EncounterModel(
-            type: ResourceType.wood,
-            health: 12,
-            reward: 15,
-            icon: Icons.forest,
-          ): 0.1,
-          EncounterModel(
-            type: ResourceType.stone,
-            health: 5,
-            reward: 3,
-            icon: Icons.scatter_plot,
-          ): 0.2,
-        }),
-      ),
-
-      // Cave
-      PlaygroundModel(
-        id: 1,
-        name: "Cave",
-        backgroundColor: Colors.grey,
-        upgradeCostType: ResourceType.stone,
-        worker: WorkerModel(
-          icon: Icons.nordic_walking_outlined,
           toolsIcon: Icons.gavel_sharp,
         ),
-        encounters: WeightedRandom({
-          EncounterModel(
-            type: ResourceType.wood,
-            health: 25,
-            reward: 10,
-            icon: Icons.warehouse,
-          ): 0.1,
-          EncounterModel(
-            type: ResourceType.stone,
-            health: 4,
-            reward: 5,
-            icon: Icons.landslide,
-          ): 1,
-          EncounterModel(
-            type: ResourceType.food,
-            health: 3,
-            reward: 2,
-            icon: Icons.pest_control_rodent,
-          ): 0.2,
-        }),
-      ),
+        scenes: {
+          // Forest
+          SceneModel(
+            id: 0,
+            name: "Forest",
+            icon: Icons.forest,
+            backgroundColor: Colors.green,
+            upgradeCostType: ResourceType.wood,
+            encounters: WeightedRandom({
+              EncounterModel(
+                type: ResourceType.wood,
+                health: 3,
+                reward: 5,
+                icon: Icons.park,
+              ): 1,
+              EncounterModel(
+                type: ResourceType.wood,
+                health: 12,
+                reward: 15,
+                icon: Icons.forest,
+              ): 0.1,
+              EncounterModel(
+                type: ResourceType.stone,
+                health: 5,
+                reward: 3,
+                icon: Icons.scatter_plot,
+              ): 0.2,
+            }),
+          ),
 
-      // Plain
-      PlaygroundModel(
-        id: 2,
-        name: "Plain",
-        backgroundColor: Colors.lightGreen,
-        upgradeCostType: ResourceType.food,
-        worker: WorkerModel(
-          icon: Icons.directions_walk_outlined,
-          toolsIcon: Icons.restaurant_menu_sharp,
-        ),
-        encounters: WeightedRandom({
-          EncounterModel(
-            type: ResourceType.food,
-            health: 3,
-            reward: 5,
-            icon: Icons.foggy,
-          ): 1,
-          EncounterModel(
-            type: ResourceType.wood,
-            health: 25,
-            reward: 10,
-            icon: Icons.cabin,
-          ): 0.2,
-          EncounterModel(
-            type: ResourceType.stone,
-            health: 3,
-            reward: 2,
-            icon: Icons.landslide,
-          ): 0.5,
-        }),
+          // Cave
+          SceneModel(
+            id: 1,
+            name: "Cave",
+            icon: Icons.warehouse,
+            backgroundColor: Colors.grey,
+            upgradeCostType: ResourceType.stone,
+            encounters: WeightedRandom({
+              EncounterModel(
+                type: ResourceType.wood,
+                health: 25,
+                reward: 10,
+                icon: Icons.inventory,
+              ): 0.1,
+              EncounterModel(
+                type: ResourceType.stone,
+                health: 4,
+                reward: 5,
+                icon: Icons.landslide,
+              ): 1,
+              EncounterModel(
+                type: ResourceType.food,
+                health: 3,
+                reward: 2,
+                icon: Icons.pest_control_rodent,
+              ): 0.2,
+            }),
+          ),
+
+          // Plain
+          SceneModel(
+            id: 2,
+            name: "Plain",
+            icon: Icons.wb_twilight,
+            backgroundColor: Colors.lightGreen,
+            upgradeCostType: ResourceType.food,
+            encounters: WeightedRandom({
+              EncounterModel(
+                type: ResourceType.food,
+                health: 3,
+                reward: 5,
+                icon: Icons.foggy,
+              ): 1,
+              EncounterModel(
+                type: ResourceType.wood,
+                health: 25,
+                reward: 10,
+                icon: Icons.cabin,
+              ): 0.2,
+              EncounterModel(
+                type: ResourceType.stone,
+                health: 3,
+                reward: 2,
+                icon: Icons.landslide,
+              ): 0.5,
+            }),
+          ),
+        },
       ),
     };
 
@@ -165,6 +167,14 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     );
   }
 
+  SceneModel getSceneById(int id) {
+    for (final playground in _currentData.playgrounds) {
+      final scene = playground.getSceneById(id);
+      if (scene != null) return scene;
+    }
+    throw StateError('Scene with id $id not found in any Playground');
+  }
+
   void _mutateResource(
     ResourceType type,
     void Function(Resource resource) mutate,
@@ -180,6 +190,12 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   ) {
     final playground = getPlaygroundById(id);
     mutate(playground);
+    _publish();
+  }
+
+  void _mutateScene(int id, void Function(SceneModel scene) mutate) {
+    final scene = getSceneById(id);
+    mutate(scene);
     _publish();
   }
 
@@ -199,33 +215,33 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     });
   }
 
-  void buyPlaygroundUpgrade(int id) {
-    final playground = getPlaygroundById(id);
-    final resource = getResourceByType(playground.upgradeCostType);
+  void buySceneUpgrade(int id) {
+    final scene = getPlaygroundById(id).activeScene;
+    final resource = getResourceByType(scene.upgradeCostType);
 
-    resource.amount -= playground.getUpgradeCost();
-    playground.buyUpgrade();
+    resource.amount -= scene.getUpgradeCost();
+    scene.buyUpgrade();
     _publish();
   }
 
-  void upgradePlayground(int type, double amount) {
+  void upgradeScene(int id, double amount) {
     if (amount <= 0) return;
 
-    _mutatePlayground(type, (playground) {
+    _mutateScene(id, (playground) {
       playground.upgrade(amount);
     });
   }
 
-  void downgradePlayground(int type, double amount) {
+  void downgradeScene(int id, double amount) {
     if (amount <= 0) return;
 
-    _mutatePlayground(type, (playground) {
+    _mutateScene(id, (playground) {
       playground.downgrade(amount);
     });
   }
 
-  void resetPlayground(int id) {
-    _mutatePlayground(id, (playground) {
+  void resetScene(int id) {
+    _mutateScene(id, (playground) {
       playground.reset();
     });
   }
@@ -237,20 +253,28 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   }
 
   void toggleEncounter(int id, bool toggle) {
-    final playground = getPlaygroundById(id);
+    final scene = getSceneById(id);
 
-    if (playground.encounter == toggle) return;
+    if (scene.encounter == toggle) return;
 
-    playground.toggleEncounter(toggle);
+    scene.toggleEncounter(toggle);
     _publish();
   }
 
   void defeatEncounter(int id, ResourceType type, double baseReward) {
-    final playground = getPlaygroundById(id);
+    final scene = getSceneById(id);
 
     _mutateResource(type, (resource) {
-      final reward = baseReward * playground.enemyRewardMultiplier;
+      final reward = baseReward * scene.enemyRewardMultiplier;
       resource.add(reward);
+    });
+  }
+
+  void switchActiveScene(int playgroundId, int sceneId) {
+    if (getPlaygroundById(playgroundId).activeSceneId == sceneId) return;
+
+    _mutatePlayground(playgroundId, (playground) {
+      playground.setActiveScene(sceneId);
     });
   }
 }

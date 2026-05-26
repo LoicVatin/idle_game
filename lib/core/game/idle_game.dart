@@ -36,7 +36,6 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     await _playgroundList.setItems([
       ...gameStateNotifier.currentData.playgrounds.map((playground) {
         return PlaygroundComponent(
-          type: playground.upgradeCostType,
           playground: playground,
         );
       }),
