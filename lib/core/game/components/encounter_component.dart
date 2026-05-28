@@ -20,6 +20,11 @@ class EncounterComponent extends RectangleComponent
   static const double _clickBoostDuration = 0.1;
   static const double _clickBoostVelocity = 60;
   static const double _attackedDuration = 0.15;
+  static const double _healthBarWidth = 42;
+  static const double _healthBarHeight = 5;
+
+  late final RectangleComponent healthBarBackground;
+  late final RectangleComponent healthBarFill;
 
   EncounterComponent({
     required this.sceneModel,
@@ -32,6 +37,22 @@ class EncounterComponent extends RectangleComponent
          size: Vector2.all(radius * 2),
          paint: Paint()..color = encounterModel.type.color,
          children: [
+           RectangleComponent(
+             size: Vector2(_healthBarWidth, _healthBarHeight),
+             position: Vector2(
+               radius - (_healthBarWidth / 2),
+               -_healthBarHeight - 4,
+             ),
+             paint: Paint()..color = Colors.black54,
+           ),
+           RectangleComponent(
+             size: Vector2(_healthBarWidth, _healthBarHeight),
+             position: Vector2(
+               radius - (_healthBarWidth / 2),
+               -_healthBarHeight - 4,
+             ),
+             paint: Paint()..color = Colors.greenAccent,
+           ),
            IconComponent(
              icon: encounterModel.type.icon,
              size: Vector2.all(radius),
@@ -45,13 +66,17 @@ class EncounterComponent extends RectangleComponent
              position: Vector2.all(radius),
            ),
          ],
-       );
+       ) {
+    healthBarBackground = children.whereType<RectangleComponent>().first;
+    healthBarFill = children.whereType<RectangleComponent>().skip(1).first;
+  }
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
 
     add(RectangleHitbox(collisionType: CollisionType.passive));
+    updateHealthBar();
   }
 
   @override
@@ -65,9 +90,7 @@ class EncounterComponent extends RectangleComponent
       }
     }
 
-    final scene = game.gameStateNotifier.getSceneById(
-      sceneModel.id,
-    );
+    final scene = game.gameStateNotifier.getSceneById(sceneModel.id);
     if (!scene.encounter) {
       if (_clickBoostTime > 0) {
         _clickBoostTime -= dt;
@@ -87,12 +110,21 @@ class EncounterComponent extends RectangleComponent
   }
 
   bool takeDamage(double amount) {
-    health -= amount;
+    health = (health - amount).clamp(0.0, encounterModel.health);
     isAttacked = true;
     attackedTimer = _attackedDuration;
     paint.color = Colors.orange;
+    updateHealthBar();
 
     return health <= 0;
+  }
+
+  void updateHealthBar() {
+    final healthPercent = encounterModel.health <= 0
+        ? 0.0
+        : (health / encounterModel.health).clamp(0.0, 1.0);
+
+    healthBarFill.size.x = _healthBarWidth * healthPercent;
   }
 
   void moveOnClick() {

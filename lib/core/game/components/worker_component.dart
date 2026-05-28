@@ -20,6 +20,14 @@ class WorkerComponent extends RectangleComponent
 
   EncounterComponent? confrontationTarget;
   double confrontationAttackTimer = 0;
+  static const double _statusBarWidth = 42;
+  static const double _statusBarHeight = 5;
+  static const double _statusBarGap = 3;
+
+  late final RectangleComponent healthBarBackground;
+  late final RectangleComponent healthBarFill;
+  late final RectangleComponent staminaBarBackground;
+  late final RectangleComponent staminaBarFill;
 
   WorkerComponent({
     required this.sceneModel,
@@ -31,6 +39,38 @@ class WorkerComponent extends RectangleComponent
          size: Vector2.all(radius * 2),
          paint: Paint()..color = Colors.blueAccent,
          children: [
+           RectangleComponent(
+             size: Vector2(_statusBarWidth, _statusBarHeight),
+             position: Vector2(
+               radius - (_statusBarWidth / 2),
+               -(_statusBarHeight * 2) - _statusBarGap - 4,
+             ),
+             paint: Paint()..color = Colors.black54,
+           ),
+           RectangleComponent(
+             size: Vector2(_statusBarWidth, _statusBarHeight),
+             position: Vector2(
+               radius - (_statusBarWidth / 2),
+               -(_statusBarHeight * 2) - _statusBarGap - 4,
+             ),
+             paint: Paint()..color = Colors.greenAccent,
+           ),
+           RectangleComponent(
+             size: Vector2(_statusBarWidth, _statusBarHeight),
+             position: Vector2(
+               radius - (_statusBarWidth / 2),
+               -_statusBarHeight - 4,
+             ),
+             paint: Paint()..color = Colors.black54,
+           ),
+           RectangleComponent(
+             size: Vector2(_statusBarWidth, _statusBarHeight),
+             position: Vector2(
+               radius - (_statusBarWidth / 2),
+               -_statusBarHeight - 4,
+             ),
+             paint: Paint()..color = Colors.orangeAccent,
+           ),
            IconComponent(
              icon: workerModel.icon,
              size: Vector2.all(radius),
@@ -44,13 +84,22 @@ class WorkerComponent extends RectangleComponent
              position: Vector2.all(radius),
            ),
          ],
-       );
+       ) {
+    final statusBars = children.whereType<RectangleComponent>().toList();
+
+    healthBarBackground = statusBars[0];
+    healthBarFill = statusBars[1];
+    staminaBarBackground = statusBars[2];
+    staminaBarFill = statusBars[3];
+  }
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
 
     add(RectangleHitbox());
+    updateHealthBar();
+    updateStaminaBar();
   }
 
   @override
@@ -66,6 +115,8 @@ class WorkerComponent extends RectangleComponent
       }
     }
 
+    updateHealthBar();
+    updateStaminaBar();
     updateConfrontation(dt);
   }
 
@@ -82,9 +133,29 @@ class WorkerComponent extends RectangleComponent
   }
 
   void attack() {
+    if (!workerModel.spendAttackStamina()) {
+      return;
+    }
     isAttacking = true;
     attackTimer = _attackDuration;
     paint.color = Colors.yellow;
+    updateStaminaBar();
+  }
+
+  void updateHealthBar() {
+    final healthPercent = workerModel.maxHealth <= 0
+        ? 0.0
+        : (workerModel.health / workerModel.maxHealth).clamp(0.0, 1.0);
+
+    healthBarFill.size.x = _statusBarWidth * healthPercent;
+  }
+
+  void updateStaminaBar() {
+    final staminaPercent = workerModel.maxStamina <= 0
+        ? 0.0
+        : (workerModel.stamina / workerModel.maxStamina).clamp(0.0, 1.0);
+
+    staminaBarFill.size.x = _statusBarWidth * staminaPercent;
   }
 
   void updateConfrontation(double dt) {
@@ -95,9 +166,7 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    final playground = game.gameStateNotifier.getSceneById(
-      sceneModel.id,
-    );
+    final playground = game.gameStateNotifier.getSceneById(sceneModel.id);
     if (!playground.encounter) {
       return;
     }
@@ -105,6 +174,10 @@ class WorkerComponent extends RectangleComponent
     confrontationAttackTimer -= dt;
 
     if (confrontationAttackTimer > 0) {
+      return;
+    }
+
+    if (!workerModel.canAttack) {
       return;
     }
 
