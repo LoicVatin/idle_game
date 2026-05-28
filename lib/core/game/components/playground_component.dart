@@ -13,6 +13,7 @@ import 'package:idle_game/core/game/components/worker_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/data/models/resting_spot_model.dart';
 
 class PlaygroundComponent extends RectangleComponent
     with HasGameReference<IdleGame>, TapCallbacks {
@@ -173,7 +174,7 @@ class PlaygroundComponent extends RectangleComponent
     );
 
     _workerComponent = WorkerComponent(
-      sceneModel: _playground.activeScene,
+      playgroundModel: _playground,
       workerModel: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
@@ -216,13 +217,24 @@ class PlaygroundComponent extends RectangleComponent
     _updateScene(scene);
     _updateResponsivePositions();
 
-    if (scene.generationRatePerSecond > 0 && !scene.encounter) {
-      encounterTimer += dt * scene.generationRatePerSecond * 10;
-    }
-
-    if (encounterTimer >= scene.encounterInterval) {
+    if (scene is RestingSpotModel) {
+      playground.worker.restoreHealth(
+        scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
+      );
+      playground.worker.restoreStamina(
+        scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
+      );
+      resetEncounters();
       encounterTimer = 0;
-      generateEncounter(scene);
+    } else {
+      if (scene.generationRatePerSecond > 0 && !scene.encounter) {
+        encounterTimer += dt * scene.generationRatePerSecond * 10;
+      }
+
+      if (encounterTimer >= scene.encounterInterval) {
+        encounterTimer = 0;
+        generateEncounter(scene);
+      }
     }
 
     _upgradeButton.isDisabled = !scene.canBuyUpgrade(resource.amount);
@@ -300,6 +312,10 @@ class PlaygroundComponent extends RectangleComponent
         cachedScene ??
         game.gameStateNotifier.getPlaygroundById(_playground.id).activeScene;
 
+    if (scene is RestingSpotModel) {
+      return;
+    }
+
     final defaultSpawnX = width + (_padding * 2);
     final encounterWidth = _encounterRadius * 2;
 
@@ -340,13 +356,25 @@ class PlaygroundComponent extends RectangleComponent
   }
 
   void moveOnClick() {
-    final scene = game.gameStateNotifier
-        .getPlaygroundById(_playground.id)
-        .activeScene;
-    encounterTimer += scene.encounterInterval / 10;
+    final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
+    final scene = playground.activeScene;
 
-    for (final encounter in children.whereType<EncounterComponent>()) {
-      encounter.moveOnClick();
+    if (scene is RestingSpotModel) {
+      RestingSpotModel restingSpotModel = scene;
+      playground.worker.restoreHealth(
+        restingSpotModel.generationRatePerSecond *
+            restingSpotModel.healthRegenPerSecond,
+      );
+      playground.worker.restoreStamina(
+        restingSpotModel.generationRatePerSecond *
+            restingSpotModel.staminaRegenPerSecond,
+      );
+    } else {
+      encounterTimer += scene.encounterInterval / 10;
+
+      for (final encounter in children.whereType<EncounterComponent>()) {
+        encounter.moveOnClick();
+      }
     }
   }
 

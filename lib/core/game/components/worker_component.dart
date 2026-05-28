@@ -5,12 +5,12 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
-import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
-  final SceneModel sceneModel;
+  final PlaygroundModel playgroundModel;
   final WorkerModel workerModel;
   bool isAttacking = false;
   double attackTimer = 0;
@@ -30,7 +30,7 @@ class WorkerComponent extends RectangleComponent
   late final RectangleComponent staminaBarFill;
 
   WorkerComponent({
-    required this.sceneModel,
+    required this.playgroundModel,
     required this.workerModel,
     double radius = 24,
     super.position,
@@ -166,8 +166,8 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    final playground = game.gameStateNotifier.getSceneById(sceneModel.id);
-    if (!playground.encounter) {
+    final scene = game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeScene;
+    if (!scene.encounter) {
       return;
     }
 
@@ -202,13 +202,13 @@ class WorkerComponent extends RectangleComponent
     Future<void>(() {
       if (isRemoved) return;
 
-      game.gameStateNotifier.toggleEncounter(sceneModel.id, true);
+      game.gameStateNotifier.toggleEncounter(game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeSceneId, true);
     });
   }
 
   void endConfrontation() {
     confrontationTarget = null;
     confrontationAttackTimer = 0;
-    game.gameStateNotifier.toggleEncounter(sceneModel.id, false);
+    game.gameStateNotifier.toggleEncounter(game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeSceneId, false);
   }
 }

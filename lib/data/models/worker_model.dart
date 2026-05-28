@@ -33,8 +33,22 @@ class WorkerModel {
     return true;
   }
 
+  void restoreHealth(double amount) {
+    if (amount <= 0) return;
+
+    health = (health + amount).clamp(0.0, maxHealth);
+  }
+
+  void restoreStamina(double amount) {
+    if (amount <= 0) return;
+
+    stamina = (stamina + amount).clamp(0.0, maxStamina);
+  }
+
   WorkerModel copyWith({
     double? damage,
+    double? maxHealth,
+    double? health,
     double? maxStamina,
     double? staminaCostPerAttack,
     double? stamina,
@@ -43,8 +57,10 @@ class WorkerModel {
   }) {
     return WorkerModel(
       damage: damage ?? this.damage,
+      maxHealth: maxHealth ?? this.maxHealth,
       maxStamina: maxStamina ?? this.maxStamina,
       staminaCostPerAttack: staminaCostPerAttack ?? this.staminaCostPerAttack,
+      health: health ?? this.health,
       stamina: stamina ?? this.stamina,
       icon: icon ?? this.icon,
       toolsIcon: toolsIcon ?? this.toolsIcon,

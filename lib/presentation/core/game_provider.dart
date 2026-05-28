@@ -7,6 +7,7 @@ import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/data/models/resting_spot_model.dart';
 
 final gameStateProvider =
     AsyncNotifierProvider<GameStateNotifier, GameStateData>(
@@ -95,7 +96,7 @@ class GameStateData {
           ),
 
           // Plain
-          SceneModel(
+          /*SceneModel(
             id: 2,
             name: "Plain",
             icon: Icons.wb_twilight,
@@ -121,6 +122,16 @@ class GameStateData {
                 icon: Icons.landslide,
               ): 0.5,
             }),
+          ),*/
+          // Resting Spot
+          RestingSpotModel(
+            id: 2,
+            name: "Camp",
+            icon: Icons.fireplace_outlined,
+            backgroundColor: Colors.lightBlue,
+            upgradeCostType: ResourceType.food,
+            healthRegenPerSecond: 5,
+            staminaRegenPerSecond: 10,
           ),
         },
       ),
@@ -227,22 +238,22 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   void upgradeScene(int id, double amount) {
     if (amount <= 0) return;
 
-    _mutateScene(id, (playground) {
-      playground.upgrade(amount);
+    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
+      scene.upgrade(amount);
     });
   }
 
   void downgradeScene(int id, double amount) {
     if (amount <= 0) return;
 
-    _mutateScene(id, (playground) {
-      playground.downgrade(amount);
+    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
+      scene.downgrade(amount);
     });
   }
 
   void resetScene(int id) {
-    _mutateScene(id, (playground) {
-      playground.reset();
+    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
+      scene.reset();
     });
   }
 
