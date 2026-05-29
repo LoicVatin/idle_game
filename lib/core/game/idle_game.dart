@@ -15,6 +15,9 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   late final ResourcePanelComponent _resourcePanelComponent;
   late final ScrollableComponentList _playgroundList;
 
+  static const String upgradeOverlay = 'upgrade_overlay';
+  int? upgradeOverlayPlaygroundId;
+
   @override
   Color backgroundColor() => Colors.indigo;
 
@@ -35,9 +38,7 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
 
     await _playgroundList.setItems([
       ...gameStateNotifier.currentData.playgrounds.map((playground) {
-        return PlaygroundComponent(
-          playground: playground,
-        );
+        return PlaygroundComponent(playground: playground);
       }),
     ]);
 
@@ -56,5 +57,15 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
         ..position.setValues(0, 24 + 8 + 8 + 16 + 16)
         ..size.setValues(size.x, size.y - (24 + 8 + 8 + 16 + 16));
     }
+  }
+
+  void displayUpgradeOverlay(int id) {
+    upgradeOverlayPlaygroundId = id;
+    overlays.add(IdleGame.upgradeOverlay);
+  }
+
+  void dismissUpgradeOverlay() {
+    upgradeOverlayPlaygroundId = null;
+    overlays.remove(IdleGame.upgradeOverlay);
   }
 }

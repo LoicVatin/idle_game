@@ -227,6 +227,15 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   }
 
   void buySceneUpgrade(int id) {
+    final scene = getSceneById(id);
+    final resource = getResourceByType(scene.upgradeCostType);
+
+    resource.amount -= scene.getUpgradeCost();
+    scene.buyUpgrade();
+    _publish();
+  }
+
+  void buyActiveSceneUpgrade(int id) {
     final scene = getPlaygroundById(id).activeScene;
     final resource = getResourceByType(scene.upgradeCostType);
 

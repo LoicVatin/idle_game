@@ -21,7 +21,7 @@ class PlaygroundComponent extends RectangleComponent
   double encounterTimer = 0;
   static const double _padding = 10.0;
   static const double _encounterRadius = 24.0;
-  static const double _height = 150.0;
+  static const double _height = 200.0;
 
   PlaygroundComponent({required PlaygroundModel playground})
     : _playground = playground;
@@ -107,7 +107,7 @@ class PlaygroundComponent extends RectangleComponent
     _upgradeButton = CircleButtonComponent(
       icon: Icons.trending_up,
       onPressed: () {
-        game.gameStateNotifier.buySceneUpgrade(_playground.id);
+        game.gameStateNotifier.buyActiveSceneUpgrade(_playground.id);
       },
     );
 
@@ -199,6 +199,12 @@ class PlaygroundComponent extends RectangleComponent
           _switchSceneButtons[scene.id] = button;
           return button;
         }),
+        RectangleButtonComponent(
+          icon: Icons.settings,
+          onPressed: () {
+            game.displayUpgradeOverlay(playground.id);
+          },
+        ),
       ],
     );
     add(_switchSceneComponent);

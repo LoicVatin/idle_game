@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
+import 'package:idle_game/presentation/home/upgrade_overlay_widget.dart';
 
 import '../../generated/intl/app_localizations.dart';
 
@@ -18,16 +19,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _game ??= IdleGame(
-      gameStateNotifier: ref.read(gameStateProvider.notifier),
-    );
+    _game ??= IdleGame(gameStateNotifier: ref.read(gameStateProvider.notifier));
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(AppLocalizations.of(context)!.app_name),
       ),
-      body: GameWidget(game: _game!),
+      body: GameWidget(
+        game: _game!,
+        overlayBuilderMap: {
+          IdleGame.upgradeOverlay: (context, game) {
+            return UpgradeOverlay(
+              game: game as IdleGame,
+              onClose: () {
+                game.dismissUpgradeOverlay();
+              },
+            );
+          },
+        },
+      ),
     );
   }
 }
