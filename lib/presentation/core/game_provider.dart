@@ -63,6 +63,13 @@ class GameStateData {
                 reward: 3,
                 icon: Icons.scatter_plot,
               ): 0.2,
+              EncounterModel(
+                type: ResourceType.food,
+                health: 3,
+                damage: 10,
+                reward: 5,
+                icon: Icons.pest_control_rodent,
+              ): 0.2,
             }),
           ),
 
@@ -89,9 +96,19 @@ class GameStateData {
               EncounterModel(
                 type: ResourceType.food,
                 health: 3,
+                damage: 1,
                 reward: 2,
                 icon: Icons.pest_control_rodent,
               ): 0.2,
+              // TODO Encounter kill test
+              EncounterModel(
+                type: ResourceType.food,
+                health: 3,
+                damage: 100,
+                reward: 2,
+                icon: Icons.heart_broken,
+              ): 1,
+              // TODO END
             }),
           ),
 

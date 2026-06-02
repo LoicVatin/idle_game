@@ -24,6 +24,8 @@ class WorkerModel {
 
   bool get canAttack => stamina >= staminaCostPerAttack;
 
+  bool get isAlive => health > 0;
+
   bool spendAttackStamina() {
     if (!canAttack) {
       return false;
@@ -31,6 +33,12 @@ class WorkerModel {
 
     stamina = (stamina - staminaCostPerAttack).clamp(0.0, maxStamina);
     return true;
+  }
+
+  void takeDamage(double amount) {
+    if (amount <= 0) return;
+
+    health = (health - amount).clamp(0.0, maxHealth);
   }
 
   void restoreHealth(double amount) {

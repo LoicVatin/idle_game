@@ -14,6 +14,7 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/resting_spot_model.dart';
+import 'package:idle_game/data/models/worker_model.dart';
 
 class PlaygroundComponent extends RectangleComponent
     with HasGameReference<IdleGame>, TapCallbacks {
@@ -22,13 +23,24 @@ class PlaygroundComponent extends RectangleComponent
   static const double _padding = 10.0;
   static const double _encounterRadius = 24.0;
   static const double _height = 200.0;
+  static const double _sceneSwitchRecoveryHealthPercent = 0.25;
+  static const double _sceneTransitionDuration = 0.4;
 
   PlaygroundComponent({required PlaygroundModel playground})
     : _playground = playground;
 
   late RowComponent _buttonsComponent;
   late ColumnComponent _switchSceneComponent;
+  late RectangleComponent _sceneFadeComponent;
+  late RectangleComponent _defeatFadeComponent;
   final Map<int, RectangleButtonComponent> _switchSceneButtons = {};
+  bool _switchScenesLockedUntilRecovered = false;
+  bool _isSceneTransitioning = false;
+  double _sceneTransitionElapsed = 0;
+  int? _sceneTransitionTargetId;
+  bool _isDefeatTransitioning = false;
+  double _defeatTransitionElapsed = 0;
+  int? _defeatRestSceneId;
 
   late TextComponent _nameComponent;
   late IconComponent _upgradeCostTypeComponent;
@@ -83,7 +95,7 @@ class PlaygroundComponent extends RectangleComponent
       anchor: Anchor.bottomRight,
       text: _lastRateText,
       position: Vector2(width - _padding - 24 * 2, height - _padding),
-      priority: 5,
+      priority: 10,
     );
 
     _addButton = RectangleButtonComponent(
@@ -154,7 +166,7 @@ class PlaygroundComponent extends RectangleComponent
           ],
         ),
       ],
-      priority: 5,
+      priority: 100,
     );
 
     add(_buttonsComponent);
@@ -164,7 +176,7 @@ class PlaygroundComponent extends RectangleComponent
       RowComponent(
         position: Vector2(_padding, _padding),
         gap: 10,
-        priority: 5,
+        priority: 10,
         children: [
           _nameComponent,
           _upgradeCostTypeComponent,
@@ -178,6 +190,7 @@ class PlaygroundComponent extends RectangleComponent
       workerModel: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
+      onDefeated: _handleWorkerDefeated,
     );
     add(_workerComponent);
 
@@ -186,16 +199,19 @@ class PlaygroundComponent extends RectangleComponent
       anchor: Anchor.topRight,
       position: Vector2(x, 0),
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      priority: 10,
+      priority: 100,
       children: [
         ...playground.scenes.map((scene) {
-          final button = RectangleButtonComponent(
-            icon: scene.icon,
-            onPressed: () {
-              resetEncounterHealth(scene.id);
-              game.gameStateNotifier.switchActiveScene(playground.id, scene.id);
-            },
-          )..isDisabled = scene.id == _activeSceneId;
+          final button =
+              RectangleButtonComponent(
+                  icon: scene.icon,
+                  onPressed: () {
+                    _startSceneTransition(playground.id, scene.id);
+                  },
+                )
+                ..isDisabled =
+                    (scene.id == _activeSceneId &&
+                    _switchScenesLockedUntilRecovered);
           _switchSceneButtons[scene.id] = button;
           return button;
         }),
@@ -209,6 +225,20 @@ class PlaygroundComponent extends RectangleComponent
     );
     add(_switchSceneComponent);
 
+    _sceneFadeComponent = RectangleComponent(
+      size: size.clone(),
+      paint: Paint()..color = Colors.black.withOpacity(0),
+      priority: 25,
+    );
+    add(_sceneFadeComponent);
+
+    _defeatFadeComponent = RectangleComponent(
+      size: size.clone(),
+      paint: Paint()..color = Colors.red.withOpacity(0),
+      priority: 75,
+    );
+    add(_defeatFadeComponent);
+
     _updateResponsivePositions(force: true);
   }
 
@@ -220,6 +250,9 @@ class PlaygroundComponent extends RectangleComponent
       scene.upgradeCostType,
     );
 
+    _updateSceneTransition(dt);
+    _updateDefeatTransition(dt);
+    _updateSceneSwitchLock(playground.worker);
     _updateScene(scene);
     _updateResponsivePositions();
 
@@ -242,6 +275,7 @@ class PlaygroundComponent extends RectangleComponent
       }
     }
 
+    _updateSceneSwitchLock(playground.worker);
     _upgradeButton.isDisabled = !scene.canBuyUpgrade(resource.amount);
     _resetButton.isDisabled =
         scene.generationRatePerSecond == 0 && resource.amount == 0;
@@ -256,6 +290,7 @@ class PlaygroundComponent extends RectangleComponent
       paint = Paint()..color = scene.backgroundColor;
       _activeSceneId = sceneId;
 
+      _updateSwitchSceneButtons();
       for (final buttonEntry in _switchSceneButtons.entries) {
         buttonEntry.value.isDisabled = buttonEntry.key == sceneId;
       }
@@ -292,6 +327,143 @@ class PlaygroundComponent extends RectangleComponent
     }
   }
 
+  void _updateSceneSwitchLock(WorkerModel worker) {
+    final recoveryHealth = worker.maxHealth * _sceneSwitchRecoveryHealthPercent;
+
+    if (worker.health <= 0) {
+      _switchScenesLockedUntilRecovered = true;
+    } else if (_switchScenesLockedUntilRecovered &&
+        worker.health >= recoveryHealth) {
+      _switchScenesLockedUntilRecovered = false;
+    }
+
+    _updateSwitchSceneButtons();
+  }
+
+  void _startSceneTransition(int playgroundId, int sceneId) {
+    if (_isSceneTransitioning || sceneId == _activeSceneId) {
+      return;
+    }
+
+    resetEncounterHealth(sceneId);
+    _isSceneTransitioning = true;
+    _sceneTransitionElapsed = 0;
+    _sceneTransitionTargetId = sceneId;
+    _setSceneFadeOpacity(0);
+    _updateSwitchSceneButtons();
+  }
+
+  void _updateSceneTransition(double dt) {
+    if (!_isSceneTransitioning) {
+      return;
+    }
+
+    _sceneTransitionElapsed += dt;
+
+    final halfDuration = _sceneTransitionDuration / 2;
+    final targetSceneId = _sceneTransitionTargetId;
+
+    if (_sceneTransitionElapsed < halfDuration) {
+      _setSceneFadeOpacity(_sceneTransitionElapsed / halfDuration);
+      return;
+    }
+
+    if (targetSceneId != null) {
+      game.gameStateNotifier.switchActiveScene(_playground.id, targetSceneId);
+      _sceneTransitionTargetId = null;
+    }
+
+    final fadeOutProgress =
+        ((_sceneTransitionElapsed - halfDuration) / halfDuration).clamp(
+          0.0,
+          1.0,
+        );
+    _setSceneFadeOpacity(1 - fadeOutProgress);
+
+    if (_sceneTransitionElapsed >= _sceneTransitionDuration) {
+      _isSceneTransitioning = false;
+      _sceneTransitionElapsed = 0;
+      _setSceneFadeOpacity(0);
+      _updateSwitchSceneButtons();
+    }
+  }
+
+  void _setSceneFadeOpacity(double opacity) {
+    _sceneFadeComponent.paint = Paint()
+      ..color = Colors.black.withOpacity(opacity.clamp(0.0, 1.0));
+  }
+
+  void _handleWorkerDefeated() {
+    if (_isDefeatTransitioning) {
+      return;
+    }
+
+    resetEncounters();
+
+    final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
+    final restScene = playground.scenes
+        .whereType<RestingSpotModel>()
+        .firstOrNull;
+
+    if (restScene == null) {
+      return;
+    }
+
+    _isDefeatTransitioning = true;
+    _defeatTransitionElapsed = 0;
+    _defeatRestSceneId = restScene.id;
+    _setDefeatFadeOpacity(0);
+    _updateSwitchSceneButtons();
+  }
+
+  void _updateDefeatTransition(double dt) {
+    if (!_isDefeatTransitioning) {
+      return;
+    }
+
+    _defeatTransitionElapsed += dt;
+
+    final halfDuration = _sceneTransitionDuration / 2;
+    final restSceneId = _defeatRestSceneId;
+
+    if (_defeatTransitionElapsed < halfDuration) {
+      _setDefeatFadeOpacity(_defeatTransitionElapsed / halfDuration);
+      return;
+    }
+
+    if (restSceneId != null) {
+      game.gameStateNotifier.switchActiveScene(_playground.id, restSceneId);
+      _defeatRestSceneId = null;
+    }
+
+    final fadeOutProgress =
+        ((_defeatTransitionElapsed - halfDuration) / halfDuration).clamp(
+          0.0,
+          1.0,
+        );
+    _setDefeatFadeOpacity(1 - fadeOutProgress);
+
+    if (_defeatTransitionElapsed >= _sceneTransitionDuration) {
+      _isDefeatTransitioning = false;
+      _defeatTransitionElapsed = 0;
+      _setDefeatFadeOpacity(0);
+      _updateSwitchSceneButtons();
+    }
+  }
+
+  void _setDefeatFadeOpacity(double opacity) {
+    _defeatFadeComponent.paint = Paint()
+      ..color = Colors.red.withOpacity(opacity.clamp(0.0, 1.0));
+  }
+
+  void _updateSwitchSceneButtons() {
+    for (final buttonEntry in _switchSceneButtons.entries) {
+      buttonEntry.value.isDisabled =
+          _switchScenesLockedUntilRecovered ||
+          buttonEntry.key == _activeSceneId;
+    }
+  }
+
   void _updateResponsivePositions({bool force = false}) {
     if (!force && _lastSize?.x == width && _lastSize?.y == height) {
       return;
@@ -306,6 +478,8 @@ class PlaygroundComponent extends RectangleComponent
     _buttonsComponent.position.setValues(width - _padding - 24 * 2, _padding);
     _workerComponent.position.setValues(_padding, height - _padding);
     _switchSceneComponent.position.setValues(width, 0);
+    _sceneFadeComponent.size = size.clone();
+    _defeatFadeComponent.size = size.clone();
   }
 
   String _formatUpgradeCost(double cost) => cost.toStringAsExponential(2);
@@ -333,9 +507,9 @@ class PlaygroundComponent extends RectangleComponent
     var hasEncounters = false;
     var maxEncounterX = double.negativeInfinity;
 
-    for (final encounter in children
-        .whereType<EncounterComponent>()
-        .where((encounter) => encounter.sceneModel.id == scene.id)) {
+    for (final encounter in children.whereType<EncounterComponent>().where(
+      (encounter) => encounter.sceneModel.id == scene.id,
+    )) {
       hasEncounters = true;
 
       if (encounter.x - encounterWidth > width) {
@@ -369,9 +543,9 @@ class PlaygroundComponent extends RectangleComponent
   }
 
   void resetEncounterHealth(int sceneId) {
-    for (final encounter in children
-        .whereType<EncounterComponent>()
-        .where((encounter) => encounter.sceneModel.id != sceneId)) {
+    for (final encounter in children.whereType<EncounterComponent>().where(
+      (encounter) => encounter.sceneModel.id != sceneId,
+    )) {
       encounter.resetHealth();
     }
   }
@@ -393,9 +567,9 @@ class PlaygroundComponent extends RectangleComponent
     } else {
       encounterTimer += scene.encounterInterval / 10;
 
-      for (final encounter in children
-          .whereType<EncounterComponent>()
-          .where((encounter) => encounter.sceneModel.id == scene.id)) {
+      for (final encounter in children.whereType<EncounterComponent>().where(
+        (encounter) => encounter.sceneModel.id == scene.id,
+      )) {
         encounter.moveOnClick();
       }
     }

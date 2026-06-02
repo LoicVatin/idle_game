@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
+import 'package:idle_game/data/models/resting_spot_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
   final PlaygroundModel playgroundModel;
   final WorkerModel workerModel;
+  final VoidCallback? onDefeated;
   bool isAttacking = false;
   double attackTimer = 0;
 
@@ -32,9 +34,11 @@ class WorkerComponent extends RectangleComponent
   WorkerComponent({
     required this.playgroundModel,
     required this.workerModel,
+    this.onDefeated,
     double radius = 24,
     super.position,
     super.anchor,
+    super.priority = 50
   }) : super(
          size: Vector2.all(radius * 2),
          paint: Paint()..color = Colors.blueAccent,
@@ -177,7 +181,7 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    if (!workerModel.canAttack) {
+    if (!workerModel.canAttack || !workerModel.isAlive) {
       return;
     }
 
@@ -185,6 +189,15 @@ class WorkerComponent extends RectangleComponent
     attack();
 
     final defeated = target.takeDamage(workerModel.damage);
+    workerModel.takeDamage(target.encounterModel.damage);
+    updateHealthBar();
+
+    if (!workerModel.isAlive) {
+      endConfrontation();
+      onDefeated?.call();
+      switchToRestingScene();
+      return;
+    }
 
     if (defeated) {
       target.defeat();
@@ -210,5 +223,16 @@ class WorkerComponent extends RectangleComponent
     confrontationTarget = null;
     confrontationAttackTimer = 0;
     game.gameStateNotifier.toggleEncounter(game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeSceneId, false);
+  }
+
+  void switchToRestingScene() {
+    final playground = game.gameStateNotifier.getPlaygroundById(playgroundModel.id);
+    final restingScene = playground.scenes.whereType<RestingSpotModel>().firstOrNull;
+
+    if (restingScene == null) {
+      return;
+    }
+
+    game.gameStateNotifier.switchActiveScene(playground.id, restingScene.id);
   }
 }
