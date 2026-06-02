@@ -192,7 +192,7 @@ class PlaygroundComponent extends RectangleComponent
           final button = RectangleButtonComponent(
             icon: scene.icon,
             onPressed: () {
-              resetEncounters();
+              resetEncounterHealth(scene.id);
               game.gameStateNotifier.switchActiveScene(playground.id, scene.id);
             },
           )..isDisabled = scene.id == _activeSceneId;
@@ -230,7 +230,6 @@ class PlaygroundComponent extends RectangleComponent
       playground.worker.restoreStamina(
         scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
       );
-      resetEncounters();
       encounterTimer = 0;
     } else {
       if (scene.generationRatePerSecond > 0 && !scene.encounter) {
@@ -260,6 +259,12 @@ class PlaygroundComponent extends RectangleComponent
       for (final buttonEntry in _switchSceneButtons.entries) {
         buttonEntry.value.isDisabled = buttonEntry.key == sceneId;
       }
+    }
+
+    for (final encounter in children.whereType<EncounterComponent>()) {
+      final isActiveEncounter = encounter.sceneModel.id == sceneId;
+      encounter.isSceneActive = isActiveEncounter;
+      encounter.isVisible = isActiveEncounter;
     }
 
     final sceneName = scene.name;
@@ -328,7 +333,9 @@ class PlaygroundComponent extends RectangleComponent
     var hasEncounters = false;
     var maxEncounterX = double.negativeInfinity;
 
-    for (final encounter in children.whereType<EncounterComponent>()) {
+    for (final encounter in children
+        .whereType<EncounterComponent>()
+        .where((encounter) => encounter.sceneModel.id == scene.id)) {
       hasEncounters = true;
 
       if (encounter.x - encounterWidth > width) {
@@ -361,6 +368,14 @@ class PlaygroundComponent extends RectangleComponent
     }
   }
 
+  void resetEncounterHealth(int sceneId) {
+    for (final encounter in children
+        .whereType<EncounterComponent>()
+        .where((encounter) => encounter.sceneModel.id != sceneId)) {
+      encounter.resetHealth();
+    }
+  }
+
   void moveOnClick() {
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
     final scene = playground.activeScene;
@@ -378,20 +393,11 @@ class PlaygroundComponent extends RectangleComponent
     } else {
       encounterTimer += scene.encounterInterval / 10;
 
-      for (final encounter in children.whereType<EncounterComponent>()) {
+      for (final encounter in children
+          .whereType<EncounterComponent>()
+          .where((encounter) => encounter.sceneModel.id == scene.id)) {
         encounter.moveOnClick();
       }
     }
-  }
-
-  void switchScene() {
-    final previousScene = game.gameStateNotifier
-        .getPlaygroundById(_playground.id)
-        .activeScene;
-
-    resetEncounters();
-    paint = Paint()..color = previousScene.backgroundColor;
-
-    //_renderedActiveSceneId =
   }
 }

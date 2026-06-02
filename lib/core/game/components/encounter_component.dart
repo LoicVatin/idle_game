@@ -8,13 +8,14 @@ import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 
 class EncounterComponent extends RectangleComponent
-    with HasGameReference<IdleGame>, CollisionCallbacks {
+    with HasGameReference<IdleGame>, CollisionCallbacks, HasVisibility {
   final double radius;
   SceneModel sceneModel;
   EncounterModel encounterModel;
   late double health;
   bool isAttacked = false;
   double attackedTimer = 0;
+  bool isSceneActive = true;
 
   double _clickBoostTime = 0;
   static const double _clickBoostDuration = 0.1;
@@ -81,6 +82,11 @@ class EncounterComponent extends RectangleComponent
 
   @override
   void update(double dt) {
+    if(!isSceneActive) {
+      super.update(dt);
+      return;
+    }
+
     if (isAttacked) {
       attackedTimer -= dt;
 
@@ -129,6 +135,14 @@ class EncounterComponent extends RectangleComponent
 
   void moveOnClick() {
     _clickBoostTime = _clickBoostDuration;
+  }
+
+  void resetHealth() {
+    health = encounterModel.health;
+    isAttacked = false;
+    attackedTimer = 0;
+    paint.color = encounterModel.type.color;
+    updateHealthBar();
   }
 
   void defeat() {
