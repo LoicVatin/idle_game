@@ -6,8 +6,9 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
-import 'package:idle_game/data/models/resting_spot_model.dart';
+import 'package:idle_game/data/models/rest_scene_model.dart';
 
 final gameStateProvider =
     AsyncNotifierProvider<GameStateNotifier, GameStateData>(
@@ -38,7 +39,7 @@ class GameStateData {
         ),
         scenes: {
           // Forest
-          SceneModel(
+          EncounterSceneModel(
             id: 0,
             name: "Forest",
             icon: Icons.forest,
@@ -74,7 +75,7 @@ class GameStateData {
           ),
 
           // Cave
-          SceneModel(
+          EncounterSceneModel(
             id: 1,
             name: "Cave",
             icon: Icons.warehouse,
@@ -141,7 +142,7 @@ class GameStateData {
             }),
           ),*/
           // Resting Spot
-          RestingSpotModel(
+          RestSceneModel(
             id: 2,
             name: "Camp",
             icon: Icons.fireplace_outlined,
@@ -292,19 +293,23 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   void toggleEncounter(int id, bool toggle) {
     final scene = getSceneById(id);
 
-    if (scene.encounter == toggle) return;
+    if (scene is EncounterSceneModel) {
+      if (scene.encounter == toggle) return;
 
-    scene.toggleEncounter(toggle);
-    _publish();
+      scene.toggleEncounter(toggle);
+      _publish();
+    }
   }
 
   void defeatEncounter(int id, ResourceType type, double baseReward) {
     final scene = getSceneById(id);
 
-    _mutateResource(type, (resource) {
-      final reward = baseReward * scene.enemyRewardMultiplier;
-      resource.add(reward);
-    });
+    if (scene is EncounterSceneModel) {
+      _mutateResource(type, (resource) {
+        final reward = baseReward * scene.enemyRewardMultiplier;
+        resource.add(reward);
+      });
+    }
   }
 
   void switchActiveScene(int playgroundId, int sceneId) {

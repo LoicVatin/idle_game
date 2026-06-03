@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
+import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 
@@ -24,7 +26,12 @@ class PlaygroundModel {
              toolsIcon: Icons.waving_hand_outlined,
            ),
        scenes =
-           scenes ?? {SceneModel(id: 0), SceneModel(id: 1), SceneModel(id: 2)};
+           scenes ??
+           {
+             EncounterSceneModel(id: 0),
+             EncounterSceneModel(id: 1),
+             RestSceneModel(id: 2),
+           };
 
   PlaygroundModel copyWith({
     int? id,

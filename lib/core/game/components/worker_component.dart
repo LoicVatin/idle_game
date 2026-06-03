@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
-import 'package:idle_game/data/models/resting_spot_model.dart';
+import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 
 class WorkerComponent extends RectangleComponent
@@ -132,7 +133,7 @@ class WorkerComponent extends RectangleComponent
     healthBar.updateStatusBar(
       workerModel.health,
       workerModel.maxHealth,
-      alwaysVisible: scene is RestingSpotModel,
+      alwaysVisible: scene is RestSceneModel,
     );
   }
 
@@ -144,7 +145,7 @@ class WorkerComponent extends RectangleComponent
     staminaBar.updateStatusBar(
       workerModel.stamina,
       workerModel.maxStamina,
-      alwaysVisible: scene is RestingSpotModel,
+      alwaysVisible: scene is RestSceneModel,
     );
   }
 
@@ -159,7 +160,8 @@ class WorkerComponent extends RectangleComponent
     final scene = game.gameStateNotifier
         .getPlaygroundById(playgroundModel.id)
         .activeScene;
-    if (!scene.encounter) {
+    if (scene is RestSceneModel ||
+        (scene is EncounterSceneModel && !scene.encounter)) {
       return;
     }
 
@@ -228,7 +230,7 @@ class WorkerComponent extends RectangleComponent
       playgroundModel.id,
     );
     final restingScene = playground.scenes
-        .whereType<RestingSpotModel>()
+        .whereType<RestSceneModel>()
         .firstOrNull;
 
     if (restingScene == null) {

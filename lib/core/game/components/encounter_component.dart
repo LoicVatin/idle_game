@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 
 class EncounterComponent extends RectangleComponent
@@ -85,7 +86,7 @@ class EncounterComponent extends RectangleComponent
     }
 
     final scene = game.gameStateNotifier.getSceneById(sceneModel.id);
-    if (!scene.encounter) {
+    if (scene is EncounterSceneModel && !scene.encounter) {
       if (_clickBoostTime > 0) {
         _clickBoostTime -= dt;
       }

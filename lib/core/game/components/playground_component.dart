@@ -10,10 +10,11 @@ import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/core/game/components/worker_component.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
-import 'package:idle_game/data/models/resting_spot_model.dart';
+import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 
 class PlaygroundComponent extends RectangleComponent
@@ -256,7 +257,7 @@ class PlaygroundComponent extends RectangleComponent
     _updateScene(scene);
     _updateResponsivePositions();
 
-    if (scene is RestingSpotModel) {
+    if (scene is RestSceneModel) {
       playground.worker.restoreHealth(
         scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
       );
@@ -264,7 +265,7 @@ class PlaygroundComponent extends RectangleComponent
         scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
       );
       encounterTimer = 0;
-    } else {
+    } else if (scene is EncounterSceneModel) {
       if (scene.generationRatePerSecond > 0 && !scene.encounter) {
         encounterTimer += dt * scene.generationRatePerSecond * 10;
       }
@@ -402,7 +403,7 @@ class PlaygroundComponent extends RectangleComponent
 
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
     final restScene = playground.scenes
-        .whereType<RestingSpotModel>()
+        .whereType<RestSceneModel>()
         .firstOrNull;
 
     if (restScene == null) {
@@ -497,43 +498,45 @@ class PlaygroundComponent extends RectangleComponent
         cachedScene ??
         game.gameStateNotifier.getPlaygroundById(_playground.id).activeScene;
 
-    if (scene is RestingSpotModel) {
+    if (scene is RestSceneModel) {
       return;
     }
 
-    final defaultSpawnX = width + (_padding * 2);
-    final encounterWidth = _encounterRadius * 2;
+    if (scene is EncounterSceneModel) {
+      final defaultSpawnX = width + (_padding * 2);
+      final encounterWidth = _encounterRadius * 2;
 
-    var hasEncounters = false;
-    var maxEncounterX = double.negativeInfinity;
+      var hasEncounters = false;
+      var maxEncounterX = double.negativeInfinity;
 
-    for (final encounter in children.whereType<EncounterComponent>().where(
-      (encounter) => encounter.sceneModel.id == scene.id,
-    )) {
-      hasEncounters = true;
+      for (final encounter in children.whereType<EncounterComponent>().where(
+        (encounter) => encounter.sceneModel.id == scene.id,
+      )) {
+        hasEncounters = true;
 
-      if (encounter.x - encounterWidth > width) {
-        return;
+        if (encounter.x - encounterWidth > width) {
+          return;
+        }
+
+        if (encounter.x > maxEncounterX) {
+          maxEncounterX = encounter.x;
+        }
       }
 
-      if (encounter.x > maxEncounterX) {
-        maxEncounterX = encounter.x;
-      }
+      final spawnX = hasEncounters
+          ? maxEncounterX + encounterWidth + scene.encounterSpacing
+          : defaultSpawnX;
+
+      final encounter = EncounterComponent(
+        sceneModel: scene,
+        encounterModel: scene.encounters.getNext(),
+        radius: _encounterRadius,
+        position: Vector2(spawnX, height - _padding),
+        anchor: Anchor.bottomLeft,
+      );
+
+      add(encounter);
     }
-
-    final spawnX = hasEncounters
-        ? maxEncounterX + encounterWidth + scene.encounterSpacing
-        : defaultSpawnX;
-
-    final encounter = EncounterComponent(
-      sceneModel: scene,
-      encounterModel: scene.encounters.getNext(),
-      radius: _encounterRadius,
-      position: Vector2(spawnX, height - _padding),
-      anchor: Anchor.bottomLeft,
-    );
-
-    add(encounter);
   }
 
   void resetEncounters() {
@@ -554,8 +557,8 @@ class PlaygroundComponent extends RectangleComponent
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
     final scene = playground.activeScene;
 
-    if (scene is RestingSpotModel) {
-      RestingSpotModel restingSpotModel = scene;
+    if (scene is RestSceneModel) {
+      RestSceneModel restingSpotModel = scene;
       playground.worker.restoreHealth(
         restingSpotModel.generationRatePerSecond *
             restingSpotModel.healthRegenPerSecond,
@@ -564,7 +567,7 @@ class PlaygroundComponent extends RectangleComponent
         restingSpotModel.generationRatePerSecond *
             restingSpotModel.staminaRegenPerSecond,
       );
-    } else {
+    } else if (scene is EncounterSceneModel) {
       encounterTimer += scene.encounterInterval / 10;
 
       for (final encounter in children.whereType<EncounterComponent>().where(
