@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
@@ -22,14 +23,9 @@ class WorkerComponent extends RectangleComponent
 
   EncounterComponent? confrontationTarget;
   double confrontationAttackTimer = 0;
-  static const double _statusBarWidth = 42;
-  static const double _statusBarHeight = 5;
-  static const double _statusBarGap = 3;
 
-  late final RectangleComponent healthBarBackground;
-  late final RectangleComponent healthBarFill;
-  late final RectangleComponent staminaBarBackground;
-  late final RectangleComponent staminaBarFill;
+  late final StatusBarComponent healthBar;
+  late final StatusBarComponent staminaBar;
 
   WorkerComponent({
     required this.playgroundModel,
@@ -38,42 +34,26 @@ class WorkerComponent extends RectangleComponent
     double radius = 24,
     super.position,
     super.anchor,
-    super.priority = 50
+    super.priority = 50,
   }) : super(
          size: Vector2.all(radius * 2),
          paint: Paint()..color = Colors.blueAccent,
          children: [
-           RectangleComponent(
-             size: Vector2(_statusBarWidth, _statusBarHeight),
+           StatusBarComponent(
              position: Vector2(
-               radius - (_statusBarWidth / 2),
-               -(_statusBarHeight * 2) - _statusBarGap - 4,
+               radius - (StatusBarComponent.statusBarWidth / 2),
+               -(StatusBarComponent.statusBarHeight * 2) -
+                   StatusBarComponent.statusBarGap -
+                   4,
              ),
-             paint: Paint()..color = Colors.black54,
+             fillColor: Colors.greenAccent,
            ),
-           RectangleComponent(
-             size: Vector2(_statusBarWidth, _statusBarHeight),
+           StatusBarComponent(
              position: Vector2(
-               radius - (_statusBarWidth / 2),
-               -(_statusBarHeight * 2) - _statusBarGap - 4,
+               radius - (StatusBarComponent.statusBarWidth / 2),
+               -StatusBarComponent.statusBarHeight - 4,
              ),
-             paint: Paint()..color = Colors.greenAccent,
-           ),
-           RectangleComponent(
-             size: Vector2(_statusBarWidth, _statusBarHeight),
-             position: Vector2(
-               radius - (_statusBarWidth / 2),
-               -_statusBarHeight - 4,
-             ),
-             paint: Paint()..color = Colors.black54,
-           ),
-           RectangleComponent(
-             size: Vector2(_statusBarWidth, _statusBarHeight),
-             position: Vector2(
-               radius - (_statusBarWidth / 2),
-               -_statusBarHeight - 4,
-             ),
-             paint: Paint()..color = Colors.orangeAccent,
+             fillColor: Colors.orangeAccent,
            ),
            IconComponent(
              icon: workerModel.icon,
@@ -89,12 +69,10 @@ class WorkerComponent extends RectangleComponent
            ),
          ],
        ) {
-    final statusBars = children.whereType<RectangleComponent>().toList();
+    final statusBars = children.whereType<StatusBarComponent>().toList();
 
-    healthBarBackground = statusBars[0];
-    healthBarFill = statusBars[1];
-    staminaBarBackground = statusBars[2];
-    staminaBarFill = statusBars[3];
+    healthBar = statusBars[0];
+    staminaBar = statusBars[1];
   }
 
   @override
@@ -147,19 +125,27 @@ class WorkerComponent extends RectangleComponent
   }
 
   void updateHealthBar() {
-    final healthPercent = workerModel.maxHealth <= 0
-        ? 0.0
-        : (workerModel.health / workerModel.maxHealth).clamp(0.0, 1.0);
+    final scene = game.gameStateNotifier
+        .getPlaygroundById(playgroundModel.id)
+        .activeScene;
 
-    healthBarFill.size.x = _statusBarWidth * healthPercent;
+    healthBar.updateStatusBar(
+      workerModel.health,
+      workerModel.maxHealth,
+      alwaysVisible: scene is RestingSpotModel,
+    );
   }
 
   void updateStaminaBar() {
-    final staminaPercent = workerModel.maxStamina <= 0
-        ? 0.0
-        : (workerModel.stamina / workerModel.maxStamina).clamp(0.0, 1.0);
+    final scene = game.gameStateNotifier
+        .getPlaygroundById(playgroundModel.id)
+        .activeScene;
 
-    staminaBarFill.size.x = _statusBarWidth * staminaPercent;
+    staminaBar.updateStatusBar(
+      workerModel.stamina,
+      workerModel.maxStamina,
+      alwaysVisible: scene is RestingSpotModel,
+    );
   }
 
   void updateConfrontation(double dt) {
@@ -170,7 +156,9 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    final scene = game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeScene;
+    final scene = game.gameStateNotifier
+        .getPlaygroundById(playgroundModel.id)
+        .activeScene;
     if (!scene.encounter) {
       return;
     }
@@ -215,19 +203,33 @@ class WorkerComponent extends RectangleComponent
     Future<void>(() {
       if (isRemoved) return;
 
-      game.gameStateNotifier.toggleEncounter(game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeSceneId, true);
+      game.gameStateNotifier.toggleEncounter(
+        game.gameStateNotifier
+            .getPlaygroundById(playgroundModel.id)
+            .activeSceneId,
+        true,
+      );
     });
   }
 
   void endConfrontation() {
     confrontationTarget = null;
     confrontationAttackTimer = 0;
-    game.gameStateNotifier.toggleEncounter(game.gameStateNotifier.getPlaygroundById(playgroundModel.id).activeSceneId, false);
+    game.gameStateNotifier.toggleEncounter(
+      game.gameStateNotifier
+          .getPlaygroundById(playgroundModel.id)
+          .activeSceneId,
+      false,
+    );
   }
 
   void switchToRestingScene() {
-    final playground = game.gameStateNotifier.getPlaygroundById(playgroundModel.id);
-    final restingScene = playground.scenes.whereType<RestingSpotModel>().firstOrNull;
+    final playground = game.gameStateNotifier.getPlaygroundById(
+      playgroundModel.id,
+    );
+    final restingScene = playground.scenes
+        .whereType<RestingSpotModel>()
+        .firstOrNull;
 
     if (restingScene == null) {
       return;

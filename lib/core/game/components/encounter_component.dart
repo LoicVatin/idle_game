@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
@@ -21,11 +22,8 @@ class EncounterComponent extends RectangleComponent
   static const double _clickBoostDuration = 0.1;
   static const double _clickBoostVelocity = 60;
   static const double _attackedDuration = 0.15;
-  static const double _healthBarWidth = 42;
-  static const double _healthBarHeight = 5;
 
-  late final RectangleComponent healthBarBackground;
-  late final RectangleComponent healthBarFill;
+  late final StatusBarComponent healthBar;
 
   EncounterComponent({
     required this.sceneModel,
@@ -38,21 +36,12 @@ class EncounterComponent extends RectangleComponent
          size: Vector2.all(radius * 2),
          paint: Paint()..color = encounterModel.type.color,
          children: [
-           RectangleComponent(
-             size: Vector2(_healthBarWidth, _healthBarHeight),
+           StatusBarComponent(
              position: Vector2(
-               radius - (_healthBarWidth / 2),
-               -_healthBarHeight - 4,
+               radius - (StatusBarComponent.statusBarWidth / 2),
+               -StatusBarComponent.statusBarHeight - 4,
              ),
-             paint: Paint()..color = Colors.black54,
-           ),
-           RectangleComponent(
-             size: Vector2(_healthBarWidth, _healthBarHeight),
-             position: Vector2(
-               radius - (_healthBarWidth / 2),
-               -_healthBarHeight - 4,
-             ),
-             paint: Paint()..color = Colors.greenAccent,
+             fillColor: Colors.greenAccent,
            ),
            IconComponent(
              icon: encounterModel.type.icon,
@@ -68,8 +57,7 @@ class EncounterComponent extends RectangleComponent
            ),
          ],
        ) {
-    healthBarBackground = children.whereType<RectangleComponent>().first;
-    healthBarFill = children.whereType<RectangleComponent>().skip(1).first;
+    healthBar = children.whereType<StatusBarComponent>().first;
   }
 
   @override
@@ -82,7 +70,7 @@ class EncounterComponent extends RectangleComponent
 
   @override
   void update(double dt) {
-    if(!isSceneActive) {
+    if (!isSceneActive) {
       super.update(dt);
       return;
     }
@@ -126,11 +114,7 @@ class EncounterComponent extends RectangleComponent
   }
 
   void updateHealthBar() {
-    final healthPercent = encounterModel.health <= 0
-        ? 0.0
-        : (health / encounterModel.health).clamp(0.0, 1.0);
-
-    healthBarFill.size.x = _healthBarWidth * healthPercent;
+    healthBar.updateStatusBar(health, encounterModel.health);
   }
 
   void moveOnClick() {
