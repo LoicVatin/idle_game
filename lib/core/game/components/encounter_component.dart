@@ -85,7 +85,7 @@ class EncounterComponent extends RectangleComponent
       }
     }
 
-    final scene = game.gameStateNotifier.getSceneById(sceneModel.id);
+    final scene = sceneModel;
     if (scene is EncounterSceneModel && !scene.encounter) {
       if (_clickBoostTime > 0) {
         _clickBoostTime -= dt;

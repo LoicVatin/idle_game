@@ -38,6 +38,23 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
       await add(item);
     }
 
+    await _ensureBordersMounted();
+
+    _layoutItems();
+  }
+
+  Future<void> addItem(PositionComponent item) async {
+    _items.add(item);
+
+    item.priority = 0;
+    await add(item);
+
+    await _ensureBordersMounted();
+
+    _layoutItems();
+  }
+
+  Future<void> _ensureBordersMounted() async {
     if (!_rightBorder.isMounted) {
       await add(_rightBorder);
     }
@@ -49,8 +66,6 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     if (!_scrollbarThumb.isMounted) {
       await add(_scrollbarThumb);
     }
-
-    _layoutItems();
   }
 
   @override

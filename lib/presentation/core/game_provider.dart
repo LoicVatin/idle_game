@@ -37,12 +37,13 @@ class GameStateData {
           icon: Icons.hiking_outlined,
           toolsIcon: Icons.gavel_sharp,
         ),
+        activeSceneId: 0,
         scenes: {
           // Forest
           EncounterSceneModel(
             id: 0,
             name: "Forest",
-            icon: Icons.forest,
+            icon: Icons.forest_outlined,
             backgroundColor: Colors.green,
             upgradeCostType: ResourceType.wood,
             encounters: WeightedRandom({
@@ -67,7 +68,7 @@ class GameStateData {
               EncounterModel(
                 type: ResourceType.food,
                 health: 3,
-                damage: 10,
+                damage: 1,
                 reward: 5,
                 icon: Icons.pest_control_rodent,
               ): 0.2,
@@ -77,39 +78,36 @@ class GameStateData {
           // Cave
           EncounterSceneModel(
             id: 1,
-            name: "Cave",
-            icon: Icons.warehouse,
-            backgroundColor: Colors.grey,
+            name: "Deep Forest",
+            icon: Icons.forest,
+            backgroundColor: Colors.green.shade900,
             upgradeCostType: ResourceType.stone,
             encounters: WeightedRandom({
+              EncounterModel(
+                type: ResourceType.wood,
+                health: 3,
+                reward: 5,
+                icon: Icons.park,
+              ): 1,
+              EncounterModel(
+                type: ResourceType.stone,
+                health: 4,
+                reward: 5,
+                icon: Icons.landslide,
+              ): 0.5,
+              EncounterModel(
+                type: ResourceType.food,
+                health: 5,
+                damage: 3,
+                reward: 4,
+                icon: Icons.savings,
+              ): 0.5,
               EncounterModel(
                 type: ResourceType.wood,
                 health: 25,
                 reward: 10,
                 icon: Icons.inventory,
               ): 0.1,
-              EncounterModel(
-                type: ResourceType.stone,
-                health: 4,
-                reward: 5,
-                icon: Icons.landslide,
-              ): 1,
-              EncounterModel(
-                type: ResourceType.food,
-                health: 3,
-                damage: 1,
-                reward: 2,
-                icon: Icons.pest_control_rodent,
-              ): 0.2,
-              // TODO Encounter kill test
-              EncounterModel(
-                type: ResourceType.food,
-                health: 3,
-                damage: 100,
-                reward: 2,
-                icon: Icons.heart_broken,
-              ): 1,
-              // TODO END
             }),
           ),
 
@@ -144,9 +142,9 @@ class GameStateData {
           // Resting Spot
           RestSceneModel(
             id: 2,
-            name: "Camp",
+            name: "Camp fire",
             icon: Icons.fireplace_outlined,
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.green.shade600,
             upgradeCostType: ResourceType.food,
             healthRegenPerSecond: 5,
             staminaRegenPerSecond: 10,
@@ -182,7 +180,10 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
 
   void _publish() {
     state = AsyncData(
-      _currentData.copyWith(resources: _currentData.resources.copyWith()),
+      _currentData.copyWith(
+        resources: Map.from(_currentData.resources),
+        playgrounds: Set.from(_currentData.playgrounds),
+      ),
     );
   }
 
@@ -319,10 +320,106 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
       playground.setActiveScene(sceneId);
     });
   }
-}
 
-extension _ResourceMapCopy on Map<ResourceType, Resource> {
-  Map<ResourceType, Resource> copyWith() {
-    return map((type, resource) => MapEntry(type, resource.copyWith()));
+  PlaygroundModel addPlayground() {
+    final increment = _currentData.playgrounds.last.id + 10;
+
+    final playground = PlaygroundModel(
+      id: increment + 0,
+      name: "Playground",
+      worker: WorkerModel(
+        icon: Icons.hiking_outlined,
+        toolsIcon: Icons.gavel_sharp,
+      ),
+      scenes: {
+        // Forest
+        EncounterSceneModel(
+          id: increment + 0,
+          name: "Forest",
+          icon: Icons.forest_outlined,
+          backgroundColor: Colors.green,
+          upgradeCostType: ResourceType.wood,
+          encounters: WeightedRandom({
+            EncounterModel(
+              type: ResourceType.wood,
+              health: 3,
+              reward: 5,
+              icon: Icons.park,
+            ): 1,
+            EncounterModel(
+              type: ResourceType.wood,
+              health: 12,
+              reward: 15,
+              icon: Icons.forest,
+            ): 0.1,
+            EncounterModel(
+              type: ResourceType.stone,
+              health: 5,
+              reward: 3,
+              icon: Icons.scatter_plot,
+            ): 0.2,
+            EncounterModel(
+              type: ResourceType.food,
+              health: 3,
+              damage: 1,
+              reward: 5,
+              icon: Icons.pest_control_rodent,
+            ): 0.2,
+          }),
+        ),
+
+        // Cave
+        EncounterSceneModel(
+          id: increment + 1,
+          name: "Deep Forest",
+          icon: Icons.forest,
+          backgroundColor: Colors.green.shade900,
+          upgradeCostType: ResourceType.stone,
+          encounters: WeightedRandom({
+            EncounterModel(
+              type: ResourceType.wood,
+              health: 3,
+              reward: 5,
+              icon: Icons.park,
+            ): 1,
+            EncounterModel(
+              type: ResourceType.stone,
+              health: 4,
+              reward: 5,
+              icon: Icons.landslide,
+            ): 0.5,
+            EncounterModel(
+              type: ResourceType.food,
+              health: 5,
+              damage: 3,
+              reward: 4,
+              icon: Icons.savings,
+            ): 0.5,
+            EncounterModel(
+              type: ResourceType.wood,
+              health: 25,
+              reward: 10,
+              icon: Icons.inventory,
+            ): 0.1,
+          }),
+        ),
+        // Resting Spot
+        RestSceneModel(
+          id: increment + 2,
+          name: "Camp fire",
+          icon: Icons.fireplace_outlined,
+          backgroundColor: Colors.green.shade600,
+          upgradeCostType: ResourceType.food,
+          healthRegenPerSecond: 5,
+          staminaRegenPerSecond: 10,
+        ),
+      },
+    );
+    playground.activeSceneId = playground.scenes.first.id;
+
+    _currentData.playgrounds.add(playground);
+    _publish();
+
+    return playground;
   }
 }

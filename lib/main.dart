@@ -22,7 +22,7 @@ class IdleApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const HomeScreen(),
+      home: SafeArea(top: false, child: const HomeScreen()),
     );
   }
 }

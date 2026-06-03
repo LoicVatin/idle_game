@@ -126,9 +126,7 @@ class WorkerComponent extends RectangleComponent
   }
 
   void updateHealthBar() {
-    final scene = game.gameStateNotifier
-        .getPlaygroundById(playgroundModel.id)
-        .activeScene;
+    final scene = playgroundModel.activeScene;
 
     healthBar.updateStatusBar(
       workerModel.health,
@@ -138,9 +136,7 @@ class WorkerComponent extends RectangleComponent
   }
 
   void updateStaminaBar() {
-    final scene = game.gameStateNotifier
-        .getPlaygroundById(playgroundModel.id)
-        .activeScene;
+    final scene = playgroundModel.activeScene;
 
     staminaBar.updateStatusBar(
       workerModel.stamina,
@@ -157,9 +153,7 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    final scene = game.gameStateNotifier
-        .getPlaygroundById(playgroundModel.id)
-        .activeScene;
+    final scene = playgroundModel.activeScene;
     if (scene is RestSceneModel ||
         (scene is EncounterSceneModel && !scene.encounter)) {
       return;
@@ -206,9 +200,7 @@ class WorkerComponent extends RectangleComponent
       if (isRemoved) return;
 
       game.gameStateNotifier.toggleEncounter(
-        game.gameStateNotifier
-            .getPlaygroundById(playgroundModel.id)
-            .activeSceneId,
+        playgroundModel.activeSceneId,
         true,
       );
     });
@@ -218,9 +210,7 @@ class WorkerComponent extends RectangleComponent
     confrontationTarget = null;
     confrontationAttackTimer = 0;
     game.gameStateNotifier.toggleEncounter(
-      game.gameStateNotifier
-          .getPlaygroundById(playgroundModel.id)
-          .activeSceneId,
+      playgroundModel.activeSceneId,
       false,
     );
   }

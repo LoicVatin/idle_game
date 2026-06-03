@@ -9,6 +9,8 @@ abstract class HoldableButtonComponent extends AdvancedButtonComponent {
     required super.defaultSkin,
     required super.downSkin,
     required super.disabledSkin,
+    super.anchor,
+    super.position,
     this.onHold,
   });
 

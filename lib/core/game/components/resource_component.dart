@@ -10,11 +10,16 @@ class ResourceComponent extends RectangleComponent {
 
   final EdgeInsets padding;
 
+  double _lastAmount = -1;
+
   Resource get resource => _resource;
 
   set resource(Resource value) {
     _resource = value;
-    _amountTextComponent.text = _formatAmount(value.amount);
+    if (_lastAmount != value.amount) {
+      _lastAmount = value.amount;
+      _amountTextComponent.text = _formatAmount(value.amount);
+    }
   }
 
   ResourceComponent({

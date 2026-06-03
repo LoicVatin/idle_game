@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/circle_button_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
@@ -12,7 +11,6 @@ import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/core/game/components/worker_component.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
-import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
@@ -44,8 +42,6 @@ class PlaygroundComponent extends RectangleComponent
   int? _defeatRestSceneId;
 
   late TextComponent _nameComponent;
-  late IconComponent _upgradeCostTypeComponent;
-  late TextComponent _upgradeCostComponent;
   late TextComponent _rateComponent;
 
   late RectangleButtonComponent _addButton;
@@ -59,9 +55,7 @@ class PlaygroundComponent extends RectangleComponent
 
   int? _activeSceneId;
   String? _lastSceneName;
-  String? _lastUpgradeCostText;
   String? _lastRateText;
-  ResourceType _lastUpgradeCostType = ResourceType.wood;
   Vector2? _lastSize;
 
   @override
@@ -74,22 +68,12 @@ class PlaygroundComponent extends RectangleComponent
 
     _activeSceneId = scene.id;
     _lastSceneName = scene.name;
-    _lastUpgradeCostText = _formatUpgradeCost(scene.getUpgradeCost());
     _lastRateText = _formatRate(scene.generationRatePerSecond);
-    _lastUpgradeCostType = scene.upgradeCostType;
 
-    _nameComponent = TextComponent(text: _lastSceneName);
-
-    _upgradeCostTypeComponent = IconComponent(
-      icon: _lastUpgradeCostType.icon,
-      size: Vector2.all(12),
-    );
-
-    _upgradeCostComponent = TextComponent(
-      text: _lastUpgradeCostText,
-      textRenderer: TextPaint(
-        style: TextStyle(fontSize: 12.0, color: BasicPalette.white.color),
-      ),
+    _nameComponent = TextComponent(
+      text: _lastSceneName,
+      position: Vector2(_padding, _padding),
+      priority: 10,
     );
 
     _rateComponent = TextComponent(
@@ -103,17 +87,17 @@ class PlaygroundComponent extends RectangleComponent
       icon: Icons.add_circle_outline,
       onPressed: () {
         moveOnClick();
-        game.gameStateNotifier.add(_lastUpgradeCostType, 1.0);
+        addResource();
       },
       onHold: () {
-        game.gameStateNotifier.add(_lastUpgradeCostType, 1.0);
+        addResource();
       },
     );
 
     _subtractButton = RectangleButtonComponent(
       icon: Icons.remove_circle_outline,
       onPressed: () {
-        game.gameStateNotifier.subtract(_lastUpgradeCostType, 1.0);
+        subtractResource();
       },
     );
 
@@ -135,7 +119,7 @@ class PlaygroundComponent extends RectangleComponent
       icon: Icons.restart_alt,
       onPressed: () {
         resetEncounters();
-        game.gameStateNotifier.resetResource(_lastUpgradeCostType);
+        resetResource();
       },
     );
 
@@ -171,20 +155,8 @@ class PlaygroundComponent extends RectangleComponent
     );
 
     add(_buttonsComponent);
+    add(_nameComponent);
     add(_rateComponent);
-
-    add(
-      RowComponent(
-        position: Vector2(_padding, _padding),
-        gap: 10,
-        priority: 10,
-        children: [
-          _nameComponent,
-          _upgradeCostTypeComponent,
-          _upgradeCostComponent,
-        ],
-      ),
-    );
 
     _workerComponent = WorkerComponent(
       playgroundModel: _playground,
@@ -245,23 +217,22 @@ class PlaygroundComponent extends RectangleComponent
 
   @override
   void update(double dt) {
-    final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final scene = playground.activeScene;
+    final scene = _playground.activeScene;
     final resource = game.gameStateNotifier.getResourceByType(
       scene.upgradeCostType,
     );
 
     _updateSceneTransition(dt);
     _updateDefeatTransition(dt);
-    _updateSceneSwitchLock(playground.worker);
+    _updateSceneSwitchLock(_playground.worker);
     _updateScene(scene);
     _updateResponsivePositions();
 
     if (scene is RestSceneModel) {
-      playground.worker.restoreHealth(
+      _playground.worker.restoreHealth(
         scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
       );
-      playground.worker.restoreStamina(
+      _playground.worker.restoreStamina(
         scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
       );
       encounterTimer = 0;
@@ -276,7 +247,7 @@ class PlaygroundComponent extends RectangleComponent
       }
     }
 
-    _updateSceneSwitchLock(playground.worker);
+    _updateSceneSwitchLock(_playground.worker);
     _upgradeButton.isDisabled = !scene.canBuyUpgrade(resource.amount);
     _resetButton.isDisabled =
         scene.generationRatePerSecond == 0 && resource.amount == 0;
@@ -307,18 +278,6 @@ class PlaygroundComponent extends RectangleComponent
     if (_lastSceneName != sceneName) {
       _lastSceneName = sceneName;
       _nameComponent.text = sceneName;
-    }
-
-    final upgradeCostText = _formatUpgradeCost(scene.getUpgradeCost());
-    if (_lastUpgradeCostText != upgradeCostText) {
-      _lastUpgradeCostText = upgradeCostText;
-      _upgradeCostComponent.text = upgradeCostText;
-    }
-
-    final upgradeCostType = scene.upgradeCostType;
-    if (_lastUpgradeCostType != upgradeCostType) {
-      _upgradeCostTypeComponent.icon = upgradeCostType.icon;
-      _lastUpgradeCostType = upgradeCostType;
     }
 
     final rateText = _formatRate(scene.generationRatePerSecond);
@@ -402,9 +361,7 @@ class PlaygroundComponent extends RectangleComponent
     resetEncounters();
 
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final restScene = playground.scenes
-        .whereType<RestSceneModel>()
-        .firstOrNull;
+    final restScene = playground.scenes.whereType<RestSceneModel>().firstOrNull;
 
     if (restScene == null) {
       return;
@@ -482,8 +439,6 @@ class PlaygroundComponent extends RectangleComponent
     _sceneFadeComponent.size = size.clone();
     _defeatFadeComponent.size = size.clone();
   }
-
-  String _formatUpgradeCost(double cost) => cost.toStringAsExponential(2);
 
   String _formatRate(double rate) => '(${rate.toStringAsExponential(2)}/s)';
 
@@ -576,5 +531,20 @@ class PlaygroundComponent extends RectangleComponent
         encounter.moveOnClick();
       }
     }
+  }
+
+  void addResource() {
+    final scene = _playground.activeScene;
+    game.gameStateNotifier.add(scene.upgradeCostType, 1.0);
+  }
+
+  void subtractResource() {
+    final scene = _playground.activeScene;
+    game.gameStateNotifier.subtract(scene.upgradeCostType, 1.0);
+  }
+
+  void resetResource() {
+    final scene = _playground.activeScene;
+    game.gameStateNotifier.resetResource(scene.upgradeCostType);
   }
 }
