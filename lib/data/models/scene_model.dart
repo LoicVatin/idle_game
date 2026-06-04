@@ -5,6 +5,7 @@ import 'package:idle_game/data/models/resource_model.dart';
 
 abstract class SceneModel {
   int id;
+  int playgroundId;
   String name;
   IconData icon;
   Color backgroundColor;
@@ -16,6 +17,7 @@ abstract class SceneModel {
 
   SceneModel({
     required this.id,
+    required this.playgroundId,
     this.name = "Scene",
     this.icon = Icons.map_outlined,
     this.backgroundColor = Colors.grey,

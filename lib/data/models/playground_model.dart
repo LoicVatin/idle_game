@@ -28,9 +28,9 @@ class PlaygroundModel {
        scenes =
            scenes ??
            {
-             EncounterSceneModel(id: 0),
-             EncounterSceneModel(id: 1),
-             RestSceneModel(id: 2),
+             EncounterSceneModel(id: 0, playgroundId: id),
+             EncounterSceneModel(id: 1, playgroundId: id),
+             RestSceneModel(id: 2, playgroundId: id),
            };
 
   PlaygroundModel copyWith({
@@ -60,5 +60,9 @@ class PlaygroundModel {
 
   void setActiveScene(int id) {
     if (getSceneById(id) != null) activeSceneId = id;
+  }
+
+  void addExperience(double baseReward) {
+    worker.addExperience(baseReward);
   }
 }

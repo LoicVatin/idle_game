@@ -6,6 +6,7 @@ import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/circle_button_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
+import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/core/game/components/worker_component.dart';
@@ -29,6 +30,7 @@ class PlaygroundComponent extends RectangleComponent
     : _playground = playground;
 
   late RowComponent _buttonsComponent;
+  late ColumnComponent _headerComponent;
   late ColumnComponent _switchSceneComponent;
   late RectangleComponent _sceneFadeComponent;
   late RectangleComponent _defeatFadeComponent;
@@ -52,11 +54,16 @@ class PlaygroundComponent extends RectangleComponent
   late CircleButtonComponent _stopButton;
 
   late WorkerComponent _workerComponent;
+  late TextComponent _workerLevelComponent;
+  late StatusBarComponent _workerExperienceComponent;
 
   int? _activeSceneId;
   String? _lastSceneName;
   String? _lastRateText;
   Vector2? _lastSize;
+  double? _resourceAmount;
+  double? _experienceRequired;
+  int? _currentLevel;
 
   @override
   FutureOr<void> onLoad() async {
@@ -69,12 +76,13 @@ class PlaygroundComponent extends RectangleComponent
     _activeSceneId = scene.id;
     _lastSceneName = scene.name;
     _lastRateText = _formatRate(scene.generationRatePerSecond);
+    _currentLevel = playground.worker.level;
 
-    _nameComponent = TextComponent(
-      text: _lastSceneName,
-      position: Vector2(_padding, _padding),
-      priority: 10,
-    );
+    _nameComponent = TextComponent(text: _lastSceneName);
+
+    _workerLevelComponent = TextComponent(text: "Lvl. $_currentLevel");
+
+    _workerExperienceComponent = StatusBarComponent();
 
     _rateComponent = TextComponent(
       anchor: Anchor.bottomRight,
@@ -154,8 +162,17 @@ class PlaygroundComponent extends RectangleComponent
       priority: 100,
     );
 
+    _headerComponent = ColumnComponent(
+      position: Vector2.all(_padding),
+      children: [
+        _nameComponent,
+        _workerLevelComponent,
+        _workerExperienceComponent,
+      ], priority: 10
+    );
+
     add(_buttonsComponent);
-    add(_nameComponent);
+    add(_headerComponent);
     add(_rateComponent);
 
     _workerComponent = WorkerComponent(
@@ -284,6 +301,27 @@ class PlaygroundComponent extends RectangleComponent
     if (_lastRateText != rateText) {
       _lastRateText = rateText;
       _rateComponent.text = rateText;
+    }
+
+    final level = _playground.worker.level;
+    if (_currentLevel != level) {
+      _currentLevel = level;
+      _workerLevelComponent.text = "Lvl. $level";
+    }
+
+    final xpRequired = _playground.worker.experienceNeeded;
+    if (_experienceRequired != xpRequired) {
+      _experienceRequired = xpRequired.toDouble();
+    }
+
+    final resource = _playground.worker.experience;
+    if (_resourceAmount != resource) {
+      _resourceAmount = resource;
+      _workerExperienceComponent.updateStatusBar(
+        _resourceAmount ?? 0.0,
+        _experienceRequired ?? 0.0,
+        alwaysVisible: true,
+      );
     }
   }
 

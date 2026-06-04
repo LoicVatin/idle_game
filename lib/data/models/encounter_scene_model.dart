@@ -12,6 +12,7 @@ class EncounterSceneModel extends SceneModel {
 
   EncounterSceneModel({
     required super.id,
+    required super.playgroundId,
     super.name = "Encounter Scene",
     super.icon = Icons.forest_outlined,
     super.backgroundColor = Colors.green,

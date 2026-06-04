@@ -1,11 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 
 class WorkerModel {
-  final double damage;
-  final double maxStamina;
-  final double maxHealth;
+  double damage;
+  double maxStamina;
+  double maxHealth;
   double health;
   double stamina;
+  double experience;
+  int level;
+  final int maxLevel;
+  final double x = 0.1;
+  final double y = 2.0;
   final double staminaCostPerAttack;
   final IconData icon;
   final IconData toolsIcon;
@@ -14,13 +21,17 @@ class WorkerModel {
     this.damage = 1,
     this.maxHealth = 100,
     this.maxStamina = 50,
+    this.level = 1,
+    this.maxLevel = 100,
     this.staminaCostPerAttack = 1,
     double? health,
     double? stamina,
+    double? experience,
     required this.icon,
     required this.toolsIcon,
   }) : health = health ?? maxHealth,
-       stamina = stamina ?? maxStamina;
+       stamina = stamina ?? maxStamina,
+       experience = experience ?? 0;
 
   bool get canAttack => stamina >= staminaCostPerAttack;
 
@@ -51,6 +62,39 @@ class WorkerModel {
     if (amount <= 0) return;
 
     stamina = (stamina + amount).clamp(0.0, maxStamina);
+  }
+
+  num get experienceNeeded => pow((level.toDouble() / x), y);
+
+  bool canLevelUp() {
+    return experience >= experienceNeeded && level < maxLevel;
+  }
+
+  void levelUp() {
+    experience -= experienceNeeded;
+    level++;
+    damage += 1;
+    maxHealth += 25;
+    maxStamina += 10;
+  }
+
+  void levelDown() {
+    experience = 0;
+    level--;
+    damage -= 1;
+    maxHealth -= 25;
+    maxStamina -= 10;
+  }
+
+  void addExperience(double baseReward) {
+    experience += baseReward;
+    if (canLevelUp()) {
+      levelUp();
+    }
+  }
+
+  void resetExperience() {
+    experience = 0;
   }
 
   WorkerModel copyWith({

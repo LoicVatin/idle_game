@@ -42,6 +42,7 @@ class GameStateData {
           // Forest
           EncounterSceneModel(
             id: 0,
+            playgroundId: 0,
             name: "Forest",
             icon: Icons.forest_outlined,
             backgroundColor: Colors.green,
@@ -78,6 +79,7 @@ class GameStateData {
           // Cave
           EncounterSceneModel(
             id: 1,
+            playgroundId: 0,
             name: "Deep Forest",
             icon: Icons.forest,
             backgroundColor: Colors.green.shade900,
@@ -142,6 +144,7 @@ class GameStateData {
           // Resting Spot
           RestSceneModel(
             id: 2,
+            playgroundId: 0,
             name: "Camp fire",
             icon: Icons.fireplace_outlined,
             backgroundColor: Colors.green.shade600,
@@ -310,6 +313,10 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         final reward = baseReward * scene.enemyRewardMultiplier;
         resource.add(reward);
       });
+
+      _mutatePlayground(scene.playgroundId, (playground) {
+        playground.addExperience(baseReward);
+      });
     }
   }
 
@@ -335,6 +342,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         // Forest
         EncounterSceneModel(
           id: increment + 0,
+          playgroundId: increment + 0,
           name: "Forest",
           icon: Icons.forest_outlined,
           backgroundColor: Colors.green,
@@ -371,6 +379,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         // Cave
         EncounterSceneModel(
           id: increment + 1,
+          playgroundId: increment + 0,
           name: "Deep Forest",
           icon: Icons.forest,
           backgroundColor: Colors.green.shade900,
@@ -406,6 +415,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         // Resting Spot
         RestSceneModel(
           id: increment + 2,
+          playgroundId: increment + 0,
           name: "Camp fire",
           icon: Icons.fireplace_outlined,
           backgroundColor: Colors.green.shade600,

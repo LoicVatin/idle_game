@@ -8,6 +8,7 @@ class RestSceneModel extends SceneModel {
 
   RestSceneModel({
     required super.id,
+    required super.playgroundId,
     super.name = 'Resting Spot',
     super.icon = Icons.fireplace_outlined,
     super.backgroundColor = Colors.lightBlue,

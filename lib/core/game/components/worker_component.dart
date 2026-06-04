@@ -178,6 +178,7 @@ class WorkerComponent extends RectangleComponent
 
     if (!workerModel.isAlive) {
       endConfrontation();
+      workerModel.resetExperience();
       onDefeated?.call();
       switchToRestingScene();
       return;
