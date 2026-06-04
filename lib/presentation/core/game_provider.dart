@@ -34,6 +34,7 @@ class GameStateData {
         id: 0,
         name: "Playground",
         worker: WorkerModel(
+          name: "Explorer",
           icon: Icons.hiking_outlined,
           toolsIcon: Icons.gavel_sharp,
         ),
@@ -46,7 +47,7 @@ class GameStateData {
             name: "Forest",
             icon: Icons.forest_outlined,
             backgroundColor: Colors.green,
-            upgradeCostType: ResourceType.wood,
+            generationRateUpgradeCostType: ResourceType.wood,
             encounters: WeightedRandom({
               EncounterModel(
                 type: ResourceType.wood,
@@ -83,7 +84,7 @@ class GameStateData {
             name: "Deep Forest",
             icon: Icons.forest,
             backgroundColor: Colors.green.shade900,
-            upgradeCostType: ResourceType.stone,
+            generationRateUpgradeCostType: ResourceType.stone,
             encounters: WeightedRandom({
               EncounterModel(
                 type: ResourceType.wood,
@@ -148,7 +149,7 @@ class GameStateData {
             name: "Camp fire",
             icon: Icons.fireplace_outlined,
             backgroundColor: Colors.green.shade600,
-            upgradeCostType: ResourceType.food,
+            generationRateUpgradeCostType: ResourceType.food,
             healthRegenPerSecond: 5,
             staminaRegenPerSecond: 10,
           ),
@@ -250,28 +251,16 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
 
   void buySceneUpgrade(int id) {
     final scene = getSceneById(id);
-    final resource = getResourceByType(scene.upgradeCostType);
+    final resource = getResourceByType(scene.generationRateUpgradeCostType);
 
-    resource.amount -= scene.getUpgradeCost();
-    scene.buyUpgrade();
+    resource.amount -= scene.generationRateUpgradeCost;
+    scene.levelUpGenerationRate();
     _publish();
   }
 
   void buyActiveSceneUpgrade(int id) {
     final scene = getPlaygroundById(id).activeScene;
-    final resource = getResourceByType(scene.upgradeCostType);
-
-    resource.amount -= scene.getUpgradeCost();
-    scene.buyUpgrade();
-    _publish();
-  }
-
-  void upgradeScene(int id, double amount) {
-    if (amount <= 0) return;
-
-    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
-      scene.upgrade(amount);
-    });
+    buySceneUpgrade(scene.id);
   }
 
   void downgradeScene(int id, double amount) {
@@ -333,8 +322,9 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
 
     final playground = PlaygroundModel(
       id: increment + 0,
-      name: "Playground",
+      name: "Playground $increment",
       worker: WorkerModel(
+        name: "Explorer $increment",
         icon: Icons.hiking_outlined,
         toolsIcon: Icons.gavel_sharp,
       ),
@@ -346,7 +336,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
           name: "Forest",
           icon: Icons.forest_outlined,
           backgroundColor: Colors.green,
-          upgradeCostType: ResourceType.wood,
+          generationRateUpgradeCostType: ResourceType.wood,
           encounters: WeightedRandom({
             EncounterModel(
               type: ResourceType.wood,
@@ -383,7 +373,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
           name: "Deep Forest",
           icon: Icons.forest,
           backgroundColor: Colors.green.shade900,
-          upgradeCostType: ResourceType.stone,
+          generationRateUpgradeCostType: ResourceType.stone,
           encounters: WeightedRandom({
             EncounterModel(
               type: ResourceType.wood,
@@ -419,7 +409,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
           name: "Camp fire",
           icon: Icons.fireplace_outlined,
           backgroundColor: Colors.green.shade600,
-          upgradeCostType: ResourceType.food,
+          generationRateUpgradeCostType: ResourceType.food,
           healthRegenPerSecond: 5,
           staminaRegenPerSecond: 10,
         ),

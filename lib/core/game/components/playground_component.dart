@@ -168,7 +168,8 @@ class PlaygroundComponent extends RectangleComponent
         _nameComponent,
         _workerLevelComponent,
         _workerExperienceComponent,
-      ], priority: 10
+      ],
+      priority: 10,
     );
 
     add(_buttonsComponent);
@@ -236,7 +237,7 @@ class PlaygroundComponent extends RectangleComponent
   void update(double dt) {
     final scene = _playground.activeScene;
     final resource = game.gameStateNotifier.getResourceByType(
-      scene.upgradeCostType,
+      scene.generationRateUpgradeCostType,
     );
 
     _updateSceneTransition(dt);
@@ -265,7 +266,9 @@ class PlaygroundComponent extends RectangleComponent
     }
 
     _updateSceneSwitchLock(_playground.worker);
-    _upgradeButton.isDisabled = !scene.canBuyUpgrade(resource.amount);
+    _upgradeButton.isDisabled = !scene.canLevelUpGenerationRate(
+      resource.amount,
+    );
     _resetButton.isDisabled =
         scene.generationRatePerSecond == 0 && resource.amount == 0;
     _stopButton.isDisabled = scene.generationRatePerSecond == 0;
@@ -573,16 +576,16 @@ class PlaygroundComponent extends RectangleComponent
 
   void addResource() {
     final scene = _playground.activeScene;
-    game.gameStateNotifier.add(scene.upgradeCostType, 1.0);
+    game.gameStateNotifier.add(scene.generationRateUpgradeCostType, 1.0);
   }
 
   void subtractResource() {
     final scene = _playground.activeScene;
-    game.gameStateNotifier.subtract(scene.upgradeCostType, 1.0);
+    game.gameStateNotifier.subtract(scene.generationRateUpgradeCostType, 1.0);
   }
 
   void resetResource() {
     final scene = _playground.activeScene;
-    game.gameStateNotifier.resetResource(scene.upgradeCostType);
+    game.gameStateNotifier.resetResource(scene.generationRateUpgradeCostType);
   }
 }

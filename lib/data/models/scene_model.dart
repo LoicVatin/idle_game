@@ -9,11 +9,13 @@ abstract class SceneModel {
   String name;
   IconData icon;
   Color backgroundColor;
+  final double x = 0.1;
+  final double y = 2.0;
+  int generationRateLevel;
+  final int generationRateMaxLevel;
+  double generationRateUpgradeAmount;
   double generationRatePerSecond;
-  double upgradeAmount;
-  double upgradeCost;
-  ResourceType upgradeCostType;
-  double upgradeMultiplier;
+  ResourceType generationRateUpgradeCostType;
 
   SceneModel({
     required this.id,
@@ -21,26 +23,31 @@ abstract class SceneModel {
     this.name = "Scene",
     this.icon = Icons.map_outlined,
     this.backgroundColor = Colors.grey,
+    this.generationRateLevel = 0,
     this.generationRatePerSecond = 0.0,
-    this.upgradeAmount = 0,
-    this.upgradeCost = 25,
-    this.upgradeCostType = ResourceType.wood,
-    this.upgradeMultiplier = 0.5,
+    this.generationRateMaxLevel = 5,
+    this.generationRateUpgradeAmount = 1.0,
+    this.generationRateUpgradeCostType = ResourceType.wood,
   });
 
-  void upgrade(double value) => generationRatePerSecond += value;
+  num get generationRateUpgradeCost =>
+      pow((generationRateLevel.toDouble() + 1 / x), y);
 
-  void buyUpgrade() {
-    generationRatePerSecond += (upgradeMultiplier * (upgradeAmount + 1));
-    upgradeAmount++;
+  bool get isMaxLevelGenerationRate => generationRateLevel == generationRateMaxLevel;
+
+  bool canLevelUpGenerationRate(double amount) {
+    return amount >= generationRateUpgradeCost &&
+        generationRateLevel < generationRateMaxLevel;
   }
 
-  double getUpgradeCost() {
-    return upgradeCost * (upgradeAmount + 1);
+  void levelUpGenerationRate() {
+    generationRateLevel++;
+    generationRatePerSecond += generationRateUpgradeAmount;
   }
 
-  bool canBuyUpgrade(double amount) {
-    return amount >= getUpgradeCost();
+  void levelDownGenerationRate() {
+    generationRateLevel--;
+    generationRatePerSecond -= generationRateUpgradeAmount;
   }
 
   void downgrade(double value) {
@@ -52,7 +59,7 @@ abstract class SceneModel {
 
   void reset() {
     generationRatePerSecond = 0.0;
-    upgradeAmount = 0.0;
+    generationRateLevel = 0;
   }
 }
 

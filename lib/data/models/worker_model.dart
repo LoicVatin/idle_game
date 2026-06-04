@@ -14,6 +14,7 @@ class WorkerModel {
   final double x = 0.1;
   final double y = 2.0;
   final double staminaCostPerAttack;
+  final String name;
   final IconData icon;
   final IconData toolsIcon;
 
@@ -27,6 +28,7 @@ class WorkerModel {
     double? health,
     double? stamina,
     double? experience,
+    required this.name,
     required this.icon,
     required this.toolsIcon,
   }) : health = health ?? maxHealth,
@@ -98,6 +100,7 @@ class WorkerModel {
   }
 
   WorkerModel copyWith({
+    String? name,
     double? damage,
     double? maxHealth,
     double? health,
@@ -108,6 +111,7 @@ class WorkerModel {
     IconData? toolsIcon,
   }) {
     return WorkerModel(
+      name: name ?? this.name,
       damage: damage ?? this.damage,
       maxHealth: maxHealth ?? this.maxHealth,
       maxStamina: maxStamina ?? this.maxStamina,

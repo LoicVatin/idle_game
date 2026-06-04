@@ -21,6 +21,7 @@ class PlaygroundModel {
   }) : worker =
            worker ??
            WorkerModel(
+             name: "Worker",
              damage: 1,
              icon: Icons.man_outlined,
              toolsIcon: Icons.waving_hand_outlined,

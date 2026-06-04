@@ -12,8 +12,13 @@ class RestSceneModel extends SceneModel {
     super.name = 'Resting Spot',
     super.icon = Icons.fireplace_outlined,
     super.backgroundColor = Colors.lightBlue,
-    super.upgradeCostType = ResourceType.food,
+    super.generationRateUpgradeCostType = ResourceType.food,
     this.healthRegenPerSecond = 5,
     this.staminaRegenPerSecond = 10,
-  }) : super(generationRatePerSecond: 0.1);
+  }) : super(
+         generationRatePerSecond: 0.1,
+         generationRateUpgradeAmount: 0.1,
+         generationRateLevel: 1,
+         generationRateMaxLevel: 10,
+       );
 }
