@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/adventure_model.dart';
 import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
@@ -336,22 +337,24 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   PlaygroundModel addPlayground() {
     final increment = _currentData.playgrounds.last.id + 10;
 
+    final adventure = Adventure.randomAdventure();
+
     final playground = PlaygroundModel(
       id: increment + 0,
-      name: "Playground $increment",
+      name: "${adventure.name} $increment",
       worker: WorkerModel(
-        name: "Explorer $increment",
-        icon: Icons.hiking_outlined,
-        toolsIcon: Icons.gavel_sharp,
+        name: "${adventure.workerName} $increment",
+        icon: adventure.workerIcon,
+        toolsIcon: adventure.workerTool,
       ),
       scenes: {
         // Forest
         EncounterSceneModel(
           id: increment + 0,
           playgroundId: increment + 0,
-          name: "Forest",
-          icon: Icons.forest_outlined,
-          backgroundColor: Colors.green,
+          name: adventure.encounterOneName,
+          icon: adventure.encounterOneIcon,
+          backgroundColor: adventure.encounterOneColor,
           generationRateUpgradeCostType: ResourceType.wood,
           encounters: WeightedRandom({
             EncounterModel(
@@ -386,9 +389,9 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         EncounterSceneModel(
           id: increment + 1,
           playgroundId: increment + 0,
-          name: "Deep Forest",
-          icon: Icons.forest,
-          backgroundColor: Colors.green.shade900,
+          name: adventure.encounterTwoName,
+          icon: adventure.encounterTwoIcon,
+          backgroundColor: adventure.encounterTwoColor,
           generationRateUpgradeCostType: ResourceType.stone,
           encounters: WeightedRandom({
             EncounterModel(
@@ -422,9 +425,9 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         RestSceneModel(
           id: increment + 2,
           playgroundId: increment + 0,
-          name: "Camp fire",
-          icon: Icons.fireplace_outlined,
-          backgroundColor: Colors.green.shade600,
+          name: adventure.restName,
+          icon: adventure.restIcon,
+          backgroundColor: adventure.restColor,
           generationRateUpgradeCostType: ResourceType.food,
           healthRegenPerSecond: 5,
           staminaRegenPerSecond: 10,
