@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:idle_game/core/game/components/circle_button_component.dart';
+import 'package:idle_game/core/game/components/bottom_panel_component.dart';
 import 'package:idle_game/core/game/components/resource_panel_component.dart';
 import 'package:idle_game/core/game/components/scrollable_component_list.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
@@ -16,7 +16,7 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
 
   late final ResourcePanelComponent _resourcePanelComponent;
   late final ScrollableComponentList _playgroundList;
-  late final CircleButtonComponent _button;
+  late final BottomPanelComponent _bottomPanelComponent;
 
   static const String upgradeOverlay = 'upgrade_overlay';
   int? upgradeOverlayPlaygroundId;
@@ -34,7 +34,7 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
 
     _playgroundList = ScrollableComponentList(
       position: Vector2(0, 50),
-      size: Vector2(size.x, size.y - 50),
+      size: Vector2(size.x, size.y - 100),
     );
 
     await add(_playgroundList);
@@ -45,15 +45,13 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       }),
     ]);
 
-    _button = CircleButtonComponent(
+    _bottomPanelComponent = BottomPanelComponent(
       anchor: Anchor.bottomRight,
-      position: Vector2(size.x - 100, size.y - 50),
-      icon: Icons.add,
-      onPressed: () {
-        addPlayground();
-      },
+      position: Vector2(size.x, size.y),
+      size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
+      onPressed: addPlayground,
     );
-    add(_button);
+    add(_bottomPanelComponent);
 
     return super.onLoad();
   }
@@ -68,15 +66,11 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
         ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
       _playgroundList
         ..position.setValues(0, 24 + 8 + 8 + 16 + 16)
-        ..size.setValues(size.x, size.y - (24 + 8 + 8 + 16 + 16));
-      _button.position.setValues(size.x - 100, size.y - 50);
+        ..size.setValues(size.x, size.y - (24 + 8 + 8 + 16 + 16) * 2);
+      _bottomPanelComponent
+        ..position.setValues(size.x, size.y)
+        ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
     }
-  }
-
-  @override
-  void update(double dt) {
-    _button.isDisabled = gameStateNotifier.currentData.playgrounds.length == 5;
-    super.update(dt);
   }
 
   void displayUpgradeOverlay(int id) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -317,6 +318,21 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     });
   }
 
+  final double x = 0.1;
+  final double y = 2.0;
+
+  num get playgroundCost => pow((_currentData.playgrounds.length) / x, y);
+
+  bool get canBuyPlayground {
+    for (final resource in _currentData.resources.values) {
+      if (resource.amount < playgroundCost.toDouble()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   PlaygroundModel addPlayground() {
     final increment = _currentData.playgrounds.last.id + 10;
 
@@ -416,6 +432,10 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
       },
     );
     playground.activeSceneId = playground.scenes.first.id;
+
+    for (final resource in _currentData.resources.values) {
+      resource.subtract(playgroundCost.toDouble());
+    }
 
     _currentData.playgrounds.add(playground);
     _publish();

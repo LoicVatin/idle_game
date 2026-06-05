@@ -7,6 +7,8 @@ class RectangleButtonComponent extends HoldableButtonComponent {
     required IconData icon,
     super.onPressed,
     super.onHold,
+    super.anchor,
+    super.position,
     double radius = 24,
   }) : super(
          size: Vector2.all(radius * 2),
