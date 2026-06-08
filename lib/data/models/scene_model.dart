@@ -33,7 +33,8 @@ abstract class SceneModel {
   num get generationRateUpgradeCost =>
       pow((generationRateLevel.toDouble() + 1 / x), y);
 
-  bool get isMaxLevelGenerationRate => generationRateLevel == generationRateMaxLevel;
+  bool get isMaxLevelGenerationRate =>
+      generationRateLevel == generationRateMaxLevel;
 
   bool canLevelUpGenerationRate(double amount) {
     return amount >= generationRateUpgradeCost &&

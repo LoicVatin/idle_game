@@ -27,6 +27,34 @@ class BottomPanelComponent extends PositionComponent
   final Map<ResourceType, ResourceCostComponent> _resourceTexts = {};
 
   final VoidCallback? onPressed;
+  StreamSubscription? _subscription;
+
+  @override
+  void onMount() {
+    super.onMount();
+    _subscription = game.gameStateNotifier.onUpdate.listen(
+      (_) => _updateState(),
+    );
+    _updateState();
+  }
+
+  @override
+  void onRemove() {
+    _subscription?.cancel();
+    super.onRemove();
+  }
+
+  void _updateState() {
+    final gameStateNotifier = game.gameStateNotifier;
+
+    for (final entry in gameStateNotifier.currentData.resources.entries) {
+      _resourceTexts[entry.key]?.resource = entry.value;
+      _resourceTexts[entry.key]?.upgradeCost = gameStateNotifier.playgroundCost
+          .toDouble();
+    }
+
+    _button.isDisabled = !gameStateNotifier.canBuyPlayground;
+  }
 
   @override
   FutureOr<void> onLoad() async {
@@ -63,27 +91,11 @@ class BottomPanelComponent extends PositionComponent
       mainAxisAlignment: MainAxisAlignment.end,
       gap: 16,
       children: [
-        TextComponent(text: "Cost"),
         ColumnComponent(gap: 2, children: _resourceTexts.values.toList()),
         _button,
       ],
     );
     add(_resourceAmountsRow);
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    final gameStateNotifier = game.gameStateNotifier;
-
-    for (final entry in gameStateNotifier.currentData.resources.entries) {
-      _resourceTexts[entry.key]?.resource = entry.value;
-      _resourceTexts[entry.key]?.upgradeCost = gameStateNotifier.playgroundCost
-          .toDouble();
-    }
-
-    _button.isDisabled = !gameStateNotifier.canBuyPlayground;
   }
 
   @override

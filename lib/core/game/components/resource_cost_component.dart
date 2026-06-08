@@ -1,16 +1,18 @@
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
-class ResourceCostComponent extends PositionComponent {
+class ResourceCostComponent extends PositionComponent
+    with HasGameReference<IdleGame> {
   Resource _resource;
   double _upgradeCost;
-  late final TextComponent _amountTextComponent;
+  final TextComponent _amountTextComponent = TextComponent();
 
   double _lastAmount = -1;
   double _lastUpgradeCost = -1;
+  Color? _originalColor;
 
   Resource get resource => _resource;
 
@@ -18,7 +20,7 @@ class ResourceCostComponent extends PositionComponent {
     _resource = value;
     if (_lastAmount != value.amount) {
       _lastAmount = value.amount;
-      //_amountTextComponent.text = _formatAmount(value.amount);
+      _updateStyle();
     }
   }
 
@@ -27,6 +29,23 @@ class ResourceCostComponent extends PositionComponent {
     if (_lastUpgradeCost != value.toDouble()) {
       _lastUpgradeCost = value.toDouble();
       _amountTextComponent.text = _formatAmount(value.toDouble());
+      _updateStyle();
+    }
+  }
+
+  void _updateStyle() {
+    if (_amountTextComponent.textRenderer is TextPaint) {
+      final textPaint = _amountTextComponent.textRenderer as TextPaint;
+      _originalColor ??= textPaint.style.color;
+
+      final canAfford = _resource.amount >= _upgradeCost;
+      final targetColor = canAfford ? _originalColor : Colors.red;
+
+      if (textPaint.style.color != targetColor) {
+        _amountTextComponent.textRenderer = TextPaint(
+          style: textPaint.style.copyWith(color: targetColor),
+        );
+      }
     }
   }
 
@@ -35,17 +54,14 @@ class ResourceCostComponent extends PositionComponent {
     required double upgradeCost,
   }) : _resource = resource,
        _upgradeCost = upgradeCost,
-       super(size: Vector2(60, 12));
+       super(size: Vector2(80, 12));
 
   @override
   Future<void> onLoad() async {
-    _amountTextComponent = TextComponent(
-      text: _formatAmount(_upgradeCost),
-      size: Vector2(50, 12),
-      textRenderer: TextPaint(
-        style: TextStyle(fontSize: 16.0, color: BasicPalette.white.color),
-      ),
-    );
+    _amountTextComponent
+      ..text = _formatAmount(_upgradeCost)
+      ..size = Vector2(80, 12)
+      ..textRenderer = TextPaint(style: game.textTheme.bodyLarge);
 
     add(
       RowComponent(
@@ -54,8 +70,8 @@ class ResourceCostComponent extends PositionComponent {
         gap: 8,
         size: Vector2(size.x, 12),
         children: [
-          IconComponent(icon: _resource.type.icon, size: Vector2.all(12)),
           _amountTextComponent,
+          IconComponent(icon: _resource.type.icon, size: Vector2.all(12)),
         ],
       ),
     );

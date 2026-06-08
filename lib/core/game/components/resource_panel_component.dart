@@ -21,6 +21,29 @@ class ResourcePanelComponent extends PositionComponent
   late final RectangleComponent _resourceAmountsBackground;
   late final RowComponent _resourceAmountsRow;
   final Map<ResourceType, ResourceComponent> _resourceTexts = {};
+  StreamSubscription? _subscription;
+
+  @override
+  void onMount() {
+    super.onMount();
+    _subscription = game.gameStateNotifier.onUpdate.listen(
+      (_) => _updateState(),
+    );
+    _updateState();
+  }
+
+  @override
+  void onRemove() {
+    _subscription?.cancel();
+    super.onRemove();
+  }
+
+  void _updateState() {
+    final gameStateNotifier = game.gameStateNotifier;
+    for (final entry in gameStateNotifier.currentData.resources.entries) {
+      _resourceTexts[entry.key]?.resource = entry.value;
+    }
+  }
 
   @override
   FutureOr<void> onLoad() async {
@@ -50,16 +73,6 @@ class ResourcePanelComponent extends PositionComponent
       children: _resourceTexts.values.toList(),
     );
     add(_resourceAmountsRow);
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    final gameStateNotifier = game.gameStateNotifier;
-    for (final entry in gameStateNotifier.currentData.resources.entries) {
-      _resourceTexts[entry.key]?.resource = entry.value;
-    }
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/worker_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
+import 'package:idle_game/utils/build_context_helper.dart';
 
 class UpgradeOverlay extends ConsumerWidget {
   const UpgradeOverlay({super.key, required this.game, required this.onClose});
@@ -154,14 +155,20 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.health_and_safety_outlined),
                 Expanded(
                   child: Text(
-                    "${worker.health.toStringAsPrecision(3)} / ${worker.maxHealth.toStringAsPrecision(3)}",
+                    context.text.worker_health_indicator(
+                      worker.health.toStringAsPrecision(3),
+                      worker.maxHealth.toStringAsPrecision(3),
+                    ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
                 Icon(Icons.energy_savings_leaf_outlined),
                 Expanded(
                   child: Text(
-                    "${worker.stamina.toStringAsPrecision(3)} / ${worker.maxStamina.toStringAsPrecision(3)}",
+                    context.text.worker_stamina_indicator(
+                      worker.stamina.toStringAsPrecision(3),
+                      worker.maxStamina.toStringAsPrecision(3),
+                    ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -174,14 +181,16 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.handyman_outlined),
                 Expanded(
                   child: Text(
-                    "${worker.toolsIcon.codePoint}",
+                    worker.toolsIcon.codePoint.toString(),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
                 Icon(Icons.gavel_outlined),
                 Expanded(
                   child: Text(
-                    "${worker.damage.toStringAsPrecision(3)} dmg",
+                    context.text.worker_damage_indicator(
+                      worker.damage.toStringAsPrecision(3),
+                    ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -220,7 +229,9 @@ class UpgradeOverlay extends ConsumerWidget {
                 ),
                 Icon(Icons.run_circle_outlined),
                 Text(
-                  '${scene.generationRatePerSecond.toStringAsExponential(2)}/s',
+                  context.text.per_second_indicator(
+                    scene.generationRatePerSecond.toStringAsPrecision(3),
+                  ),
                 ),
               ],
             ),
@@ -230,7 +241,7 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.directions_run),
                 Expanded(
                   child: Text(
-                    '+${scene.generationRateUpgradeAmount.toStringAsExponential(2)}/s',
+                    '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
                   ),
                 ),
                 _upgradeProgressionBar(
@@ -244,7 +255,7 @@ class UpgradeOverlay extends ConsumerWidget {
               spacing: 8,
               children: [
                 Icon(scene.generationRateUpgradeCostType.icon),
-                Expanded(child: Text(upgradeCost.toStringAsExponential(2))),
+                Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
                 FilledButton.icon(
                   onPressed: canUpgrade
                       ? () {
@@ -253,7 +264,9 @@ class UpgradeOverlay extends ConsumerWidget {
                       : null,
                   icon: const Icon(Icons.trending_up),
                   label: Text(
-                    scene.isMaxLevelGenerationRate ? 'Maxed out' : 'Upgrade',
+                    scene.isMaxLevelGenerationRate
+                        ? context.text.upgrade_maxed_button
+                        : context.text.upgrade_button,
                   ),
                 ),
               ],
@@ -291,7 +304,9 @@ class UpgradeOverlay extends ConsumerWidget {
                 ),
                 Icon(Icons.healing),
                 Text(
-                  '${scene.generationRatePerSecond.toStringAsExponential(2)}/s',
+                  context.text.per_second_indicator(
+                    scene.generationRatePerSecond.toStringAsPrecision(3),
+                  ),
                 ),
               ],
             ),
@@ -301,7 +316,7 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.monitor_heart),
                 Expanded(
                   child: Text(
-                    '+${scene.generationRateUpgradeAmount.toStringAsExponential(2)}/s',
+                    '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
                   ),
                 ),
                 _upgradeHalfProgressionBar(
@@ -315,7 +330,7 @@ class UpgradeOverlay extends ConsumerWidget {
               spacing: 8,
               children: [
                 Icon(scene.generationRateUpgradeCostType.icon),
-                Expanded(child: Text(upgradeCost.toStringAsExponential(2))),
+                Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
                 FilledButton.icon(
                   onPressed: canUpgrade
                       ? () {

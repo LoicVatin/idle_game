@@ -25,6 +25,10 @@ class WorkerComponent extends RectangleComponent
   EncounterComponent? confrontationTarget;
   double confrontationAttackTimer = 0;
 
+  double _lastHealth = -1;
+  double _lastStamina = -1;
+  int? _lastActiveSceneId;
+
   late final StatusBarComponent healthBar;
   late final StatusBarComponent staminaBar;
 
@@ -128,6 +132,12 @@ class WorkerComponent extends RectangleComponent
   void updateHealthBar() {
     final scene = playgroundModel.activeScene;
 
+    if (_lastHealth == workerModel.health && _lastActiveSceneId == scene.id) {
+      return;
+    }
+    _lastHealth = workerModel.health;
+    _lastActiveSceneId = scene.id;
+
     healthBar.updateStatusBar(
       workerModel.health,
       workerModel.maxHealth,
@@ -137,6 +147,12 @@ class WorkerComponent extends RectangleComponent
 
   void updateStaminaBar() {
     final scene = playgroundModel.activeScene;
+
+    if (_lastStamina == workerModel.stamina && _lastActiveSceneId == scene.id) {
+      return;
+    }
+    _lastStamina = workerModel.stamina;
+    _lastActiveSceneId = scene.id;
 
     staminaBar.updateStatusBar(
       workerModel.stamina,

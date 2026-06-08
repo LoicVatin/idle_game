@@ -20,8 +20,25 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(damage) => "${damage}/s";
+
+  static String m1(damage) => "${damage} Dmg.";
+
+  static String m2(current, maximum) => "${current} / ${maximum} HP";
+
+  static String m3(level) => "Lvl. ${level}";
+
+  static String m4(current, maximum) => "${current} / ${maximum} SP";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "app_name": MessageLookupByLibrary.simpleMessage("Idle Game"),
+    "per_second_indicator": m0,
+    "upgrade_button": MessageLookupByLibrary.simpleMessage("Upgrade"),
+    "upgrade_maxed_button": MessageLookupByLibrary.simpleMessage("Maxed out"),
+    "worker_damage_indicator": m1,
+    "worker_health_indicator": m2,
+    "worker_level_indicator": m3,
+    "worker_stamina_indicator": m4,
   };
 }

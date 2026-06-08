@@ -115,35 +115,6 @@ class GameStateData {
               ): 0.1,
             }),
           ),
-
-          // Plain
-          /*SceneModel(
-            id: 2,
-            name: "Plain",
-            icon: Icons.wb_twilight,
-            backgroundColor: Colors.lightGreen,
-            upgradeCostType: ResourceType.food,
-            encounters: WeightedRandom({
-              EncounterModel(
-                type: ResourceType.food,
-                health: 3,
-                reward: 5,
-                icon: Icons.foggy,
-              ): 1,
-              EncounterModel(
-                type: ResourceType.wood,
-                health: 25,
-                reward: 10,
-                icon: Icons.cabin,
-              ): 0.2,
-              EncounterModel(
-                type: ResourceType.stone,
-                health: 3,
-                reward: 2,
-                icon: Icons.landslide,
-              ): 0.5,
-            }),
-          ),*/
           // Resting Spot
           RestSceneModel(
             id: 2,
@@ -178,6 +149,10 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
 
   GameStateData get currentData => _currentData;
 
+  final _updateController = StreamController<void>.broadcast();
+
+  Stream<void> get onUpdate => _updateController.stream;
+
   @override
   FutureOr<GameStateData> build() {
     _currentData = GameStateData.initial();
@@ -185,12 +160,12 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   }
 
   void _publish() {
-    state = AsyncData(
-      _currentData.copyWith(
-        resources: Map.from(_currentData.resources),
-        playgrounds: Set.from(_currentData.playgrounds),
-      ),
+    _currentData = _currentData.copyWith(
+      resources: Map.from(_currentData.resources),
+      playgrounds: Set.from(_currentData.playgrounds),
     );
+    state = AsyncData(_currentData);
+    _updateController.add(null);
   }
 
   Resource getResourceByType(ResourceType type) {

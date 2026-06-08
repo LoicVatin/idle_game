@@ -10,4 +10,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get app_name => 'Idle Game';
+
+  @override
+  String get upgrade_button => 'Upgrade';
+
+  @override
+  String get upgrade_maxed_button => 'Maxed out';
+
+  @override
+  String worker_level_indicator(num level) {
+    return 'Lvl. $level';
+  }
+
+  @override
+  String worker_damage_indicator(String damage) {
+    return '$damage Dmg.';
+  }
+
+  @override
+  String worker_health_indicator(String current, String maximum) {
+    return '$current / $maximum HP';
+  }
+
+  @override
+  String worker_stamina_indicator(String current, String maximum) {
+    return '$current / $maximum SP';
+  }
+
+  @override
+  String per_second_indicator(String damage) {
+    return '$damage/s';
+  }
 }

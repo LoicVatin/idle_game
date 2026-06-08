@@ -1,12 +1,13 @@
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
-class ResourceComponent extends RectangleComponent {
+class ResourceComponent extends RectangleComponent
+    with HasGameReference<IdleGame> {
   Resource _resource;
-  late final TextComponent _amountTextComponent;
+  final TextComponent _amountTextComponent = TextComponent();
 
   final EdgeInsets padding;
 
@@ -27,19 +28,16 @@ class ResourceComponent extends RectangleComponent {
     this.padding = const EdgeInsets.all(8),
   }) : _resource = resource,
        super(
-         size: Vector2(100, 24 + padding.vertical),
+         size: Vector2(120, 24 + padding.vertical),
          paint: Paint()..color = resource.type.color,
        );
 
   @override
   Future<void> onLoad() async {
-    _amountTextComponent = TextComponent(
-      text: _formatAmount(_resource.amount),
-      size: Vector2(50, 24),
-      textRenderer: TextPaint(
-        style: TextStyle(fontSize: 16.0, color: BasicPalette.white.color),
-      ),
-    );
+    _amountTextComponent
+      ..text = _formatAmount(_resource.amount)
+      ..size = Vector2(50, 24)
+      ..textRenderer = TextPaint(style: game.textTheme.bodyLarge);
 
     add(
       RowComponent(
@@ -58,5 +56,5 @@ class ResourceComponent extends RectangleComponent {
     return super.onLoad();
   }
 
-  String _formatAmount(double amount) => amount.toStringAsExponential(2);
+  String _formatAmount(double amount) => amount.toStringAsPrecision(3);
 }

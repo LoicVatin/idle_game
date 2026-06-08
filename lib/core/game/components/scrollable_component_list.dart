@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/playground_component.dart';
 
 class ScrollableComponentList extends PositionComponent with DragCallbacks {
   ScrollableComponentList({
@@ -15,16 +16,14 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   final double spacing;
   final EdgeInsets padding;
 
-  final List<PositionComponent> _items = [];
+  final List<PlaygroundComponent> _items = [];
 
   late final ScrollbarThumbIndicatorComponent _scrollbarThumb;
-  late final BorderComponent _rightBorder;
-  late final BorderComponent _leftBorder;
 
   double _scrollOffset = 0;
   double _contentHeight = 0;
 
-  Future<void> setItems(List<PositionComponent> items) async {
+  Future<void> setItems(List<PlaygroundComponent> items) async {
     for (final item in _items) {
       item.removeFromParent();
     }
@@ -43,7 +42,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     _layoutItems();
   }
 
-  Future<void> addItem(PositionComponent item) async {
+  Future<void> addItem(PlaygroundComponent item) async {
     _items.add(item);
 
     item.priority = 0;
@@ -55,14 +54,6 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   }
 
   Future<void> _ensureBordersMounted() async {
-    if (!_rightBorder.isMounted) {
-      await add(_rightBorder);
-    }
-
-    if (!_leftBorder.isMounted) {
-      await add(_leftBorder);
-    }
-
     if (!_scrollbarThumb.isMounted) {
       await add(_scrollbarThumb);
     }
@@ -71,9 +62,6 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-
-    _rightBorder = BorderComponent();
-    _leftBorder = BorderComponent();
     _scrollbarThumb = ScrollbarThumbIndicatorComponent();
   }
 
@@ -107,17 +95,6 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
 
     _contentHeight = math.max(0, y - spacing + padding.bottom);
     _scrollOffset = _scrollOffset.clamp(0, maxScrollOffset);
-
-    _rightBorder
-      ..position.setValues(size.x, 0)
-      ..anchor = Anchor.topRight
-      ..size.setValues(padding.right, size.y);
-
-    _leftBorder
-      ..position.setValues(0, 0)
-      ..anchor = Anchor.topLeft
-      ..size.setValues(padding.left, size.y);
-
     _updateItemPositions();
     _updateScrollbarThumbIndicator();
   }
@@ -126,7 +103,9 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     double y = padding.top;
 
     for (final item in _items) {
-      item.position.setValues(padding.left, y - _scrollOffset);
+      final itemY = y - _scrollOffset;
+      item.position.setValues(padding.left, itemY);
+      item.isVisible = itemY + item.size.y > 0 && itemY < size.y;
       y += item.size.y + spacing;
     }
   }
@@ -198,19 +177,6 @@ class ScrollbarThumbIndicatorComponent extends PositionComponent {
       return;
     }
 
-    final rect = Rect.fromLTWH(0, 0, size.x, size.y);
-
-    canvas.drawRect(rect, _paint);
-  }
-}
-
-class BorderComponent extends PositionComponent {
-  BorderComponent() : super(priority: 900);
-
-  final Paint _paint = Paint()..color = Colors.black;
-
-  @override
-  void render(Canvas canvas) {
     final rect = Rect.fromLTWH(0, 0, size.x, size.y);
 
     canvas.drawRect(rect, _paint);

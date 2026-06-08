@@ -11,8 +11,9 @@ import 'components/playground_component.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
+  final TextTheme textTheme;
 
-  IdleGame({required this.gameStateNotifier});
+  IdleGame({required this.gameStateNotifier, required this.textTheme});
 
   late final ResourcePanelComponent _resourcePanelComponent;
   late final ScrollableComponentList _playgroundList;
