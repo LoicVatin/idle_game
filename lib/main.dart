@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/presentation/home/home_screen.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
+import 'package:idle_game/utils/logger_helper.dart';
 import 'generated/intl/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -17,6 +18,7 @@ class IdleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    appLogger.d("IdleApp.build()");
     return MaterialApp(
       title: context.text.app_name,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

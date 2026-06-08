@@ -11,6 +11,7 @@ import 'package:idle_game/data/models/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
+import 'package:idle_game/utils/logger_helper.dart';
 
 final gameStateProvider =
     AsyncNotifierProvider<GameStateNotifier, GameStateData>(
@@ -25,6 +26,7 @@ class GameStateData {
   const GameStateData({required this.resources, required this.playgrounds});
 
   factory GameStateData.initial() {
+    appLogger.d("GameStateData.initial()");
     final resources = {
       ResourceType.wood: Resource(type: ResourceType.wood),
       ResourceType.stone: Resource(type: ResourceType.stone),

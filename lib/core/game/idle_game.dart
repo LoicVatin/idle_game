@@ -6,6 +6,7 @@ import 'package:idle_game/core/game/components/bottom_panel_component.dart';
 import 'package:idle_game/core/game/components/resource_panel_component.dart';
 import 'package:idle_game/core/game/components/scrollable_component_list.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
+import 'package:idle_game/utils/logger_helper.dart';
 
 import 'components/playground_component.dart';
 
@@ -27,6 +28,7 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
+    appLogger.d("IdleGame.onLoad()");
     _resourcePanelComponent = ResourcePanelComponent(
       position: Vector2.zero(),
       size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
