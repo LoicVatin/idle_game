@@ -99,6 +99,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Idle Game'**
   String get app_name;
+
+  /// No description provided for @upgrade_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get upgrade_button;
+
+  /// No description provided for @upgrade_maxed_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Maxed out'**
+  String get upgrade_maxed_button;
+
+  /// No description provided for @worker_level_indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Lvl. {level}'**
+  String worker_level_indicator(num level);
+
+  /// No description provided for @worker_damage_indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'{damage} Dmg.'**
+  String worker_damage_indicator(String damage);
+
+  /// No description provided for @worker_health_indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {maximum} HP'**
+  String worker_health_indicator(String current, String maximum);
+
+  /// No description provided for @worker_stamina_indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {maximum} SP'**
+  String worker_stamina_indicator(String current, String maximum);
+
+  /// No description provided for @per_second_indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'{damage}/s'**
+  String per_second_indicator(String damage);
 }
 
 class _AppLocalizationsDelegate

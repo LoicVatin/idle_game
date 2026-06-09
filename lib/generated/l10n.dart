@@ -58,6 +58,71 @@ class S {
   String get app_name {
     return Intl.message('Idle Game', name: 'app_name', desc: '', args: []);
   }
+
+  /// `Upgrade`
+  String get upgrade_button {
+    return Intl.message('Upgrade', name: 'upgrade_button', desc: '', args: []);
+  }
+
+  /// `Maxed out`
+  String get upgrade_maxed_button {
+    return Intl.message(
+      'Maxed out',
+      name: 'upgrade_maxed_button',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lvl. {level}`
+  String worker_level_indicator(num level) {
+    return Intl.message(
+      'Lvl. $level',
+      name: 'worker_level_indicator',
+      desc: '',
+      args: [level],
+    );
+  }
+
+  /// `{damage} Dmg.`
+  String worker_damage_indicator(String damage) {
+    return Intl.message(
+      '$damage Dmg.',
+      name: 'worker_damage_indicator',
+      desc: '',
+      args: [damage],
+    );
+  }
+
+  /// `{current} / {maximum} HP`
+  String worker_health_indicator(String current, String maximum) {
+    return Intl.message(
+      '$current / $maximum HP',
+      name: 'worker_health_indicator',
+      desc: '',
+      args: [current, maximum],
+    );
+  }
+
+  /// `{current} / {maximum} SP`
+  String worker_stamina_indicator(String current, String maximum) {
+    return Intl.message(
+      '$current / $maximum SP',
+      name: 'worker_stamina_indicator',
+      desc: '',
+      args: [current, maximum],
+    );
+  }
+
+  /// `{damage}/s`
+  String per_second_indicator(String damage) {
+    return Intl.message(
+      '$damage/s',
+      name: 'per_second_indicator',
+      desc: '',
+      args: [damage],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -1,4 +1,59 @@
 {
   "@@locale": "en",
-  "app_name": "Idle Game"
+  "app_name": "Idle Game",
+  "upgrade_button": "Upgrade",
+  "upgrade_maxed_button": "Maxed out",
+  "worker_level_indicator": "Lvl. {level}",
+  "@worker_level_indicator": {
+    "placeholders": {
+      "level": {
+        "type": "num",
+        "content": "1"
+      }
+    }
+  },
+  "worker_damage_indicator": "{damage} Dmg.",
+  "@worker_damage_indicator": {
+    "placeholders": {
+      "damage": {
+        "type": "String",
+        "content": "0.00"
+      }
+    }
+  },
+  "worker_health_indicator": "{current} / {maximum} HP",
+  "@worker_health_indicator": {
+    "placeholders": {
+      "current": {
+        "type": "String",
+        "content": "0.00"
+      },
+      "maximum": {
+        "type": "String",
+        "content": "0.00"
+      }
+    }
+  },
+  "worker_stamina_indicator": "{current} / {maximum} SP",
+  "@worker_stamina_indicator": {
+    "placeholders": {
+      "current": {
+        "type": "String",
+        "content": "0.00"
+      },
+      "maximum": {
+        "type": "String",
+        "content": "0.00"
+      }
+    }
+  },
+  "per_second_indicator": "{damage}/s",
+  "@per_second_indicator": {
+    "placeholders": {
+      "damage": {
+        "type": "String",
+        "content": "0.00"
+      }
+    }
+  }
 }
