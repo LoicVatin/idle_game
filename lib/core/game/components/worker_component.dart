@@ -27,7 +27,10 @@ class WorkerComponent extends RectangleComponent
 
   double _lastHealth = -1;
   double _lastStamina = -1;
-  int? _lastActiveSceneId;
+  int? _lastHealthSceneId;
+  int? _lastStaminaSceneId;
+  bool? _lastHealthAlwaysVisible;
+  bool? _lastStaminaAlwaysVisible;
 
   late final StatusBarComponent healthBar;
   late final StatusBarComponent staminaBar;
@@ -131,33 +134,41 @@ class WorkerComponent extends RectangleComponent
 
   void updateHealthBar() {
     final scene = playgroundModel.activeScene;
+    final alwaysVisible = scene is RestSceneModel;
 
-    if (_lastHealth == workerModel.health && _lastActiveSceneId == scene.id) {
+    if (_lastHealth == workerModel.health &&
+        _lastHealthSceneId == scene.id &&
+        _lastHealthAlwaysVisible == alwaysVisible) {
       return;
     }
     _lastHealth = workerModel.health;
-    _lastActiveSceneId = scene.id;
+    _lastHealthSceneId = scene.id;
+    _lastHealthAlwaysVisible = alwaysVisible;
 
     healthBar.updateStatusBar(
       workerModel.health,
       workerModel.maxHealth,
-      alwaysVisible: scene is RestSceneModel,
+      alwaysVisible: alwaysVisible,
     );
   }
 
   void updateStaminaBar() {
     final scene = playgroundModel.activeScene;
+    final alwaysVisible = scene is RestSceneModel;
 
-    if (_lastStamina == workerModel.stamina && _lastActiveSceneId == scene.id) {
+    if (_lastStamina == workerModel.stamina &&
+        _lastStaminaSceneId == scene.id &&
+        _lastStaminaAlwaysVisible == alwaysVisible) {
       return;
     }
     _lastStamina = workerModel.stamina;
-    _lastActiveSceneId = scene.id;
+    _lastStaminaSceneId = scene.id;
+    _lastStaminaAlwaysVisible = alwaysVisible;
 
     staminaBar.updateStatusBar(
       workerModel.stamina,
       workerModel.maxStamina,
-      alwaysVisible: scene is RestSceneModel,
+      alwaysVisible: alwaysVisible,
     );
   }
 

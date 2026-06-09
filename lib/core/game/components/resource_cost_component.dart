@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
+import 'package:flame/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
@@ -70,7 +71,7 @@ class ResourceCostComponent extends PositionComponent
         gap: 8,
         size: Vector2(size.x, 12),
         children: [
-          _amountTextComponent,
+          AlignComponent(alignment: Anchor.center, child: _amountTextComponent),
           IconComponent(icon: _resource.type.icon, size: Vector2.all(12)),
         ],
       ),
