@@ -16,12 +16,20 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
 
   IdleGame({required this.gameStateNotifier, required this.textTheme});
 
-  late final ResourcePanelComponent _resourcePanelComponent;
+  late final ResourcePanelComponent resourcePanelComponent;
   late final ScrollableComponentList _playgroundList;
-  late final BottomPanelComponent _bottomPanelComponent;
+  late final BottomPanelComponent bottomPanelComponent;
 
   static const String upgradeOverlay = 'upgrade_overlay';
+  static const String tutorialOverlay = 'tutorial_overlay';
   int? upgradeOverlayPlaygroundId;
+
+  PlaygroundComponent? get firstPlaygroundComponent => children
+      .whereType<ScrollableComponentList>()
+      .firstOrNull
+      ?.children
+      .whereType<PlaygroundComponent>()
+      .firstOrNull;
 
   @override
   Color backgroundColor() => Colors.indigo;
@@ -29,11 +37,11 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     appLogger.d("IdleGame.onLoad()");
-    _resourcePanelComponent = ResourcePanelComponent(
+    resourcePanelComponent = ResourcePanelComponent(
       position: Vector2.zero(),
       size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
     );
-    add(_resourcePanelComponent);
+    add(resourcePanelComponent);
 
     _playgroundList = ScrollableComponentList(
       position: Vector2(0, 50),
@@ -48,13 +56,13 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       }),
     ]);
 
-    _bottomPanelComponent = BottomPanelComponent(
+    bottomPanelComponent = BottomPanelComponent(
       anchor: Anchor.bottomRight,
       position: Vector2(size.x, size.y),
       size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
       onPressed: addPlayground,
     );
-    add(_bottomPanelComponent);
+    add(bottomPanelComponent);
 
     return super.onLoad();
   }
@@ -64,13 +72,13 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     super.onGameResize(size);
 
     if (isLoaded) {
-      _resourcePanelComponent
+      resourcePanelComponent
         ..position.setZero()
         ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
       _playgroundList
         ..position.setValues(0, 24 + 8 + 8 + 16 + 16)
         ..size.setValues(size.x, size.y - (24 + 8 + 8 + 16 + 16) * 2);
-      _bottomPanelComponent
+      bottomPanelComponent
         ..position.setValues(size.x, size.y)
         ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
     }
@@ -84,6 +92,10 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   void dismissUpgradeOverlay() {
     upgradeOverlayPlaygroundId = null;
     overlays.remove(IdleGame.upgradeOverlay);
+  }
+
+  void dismissTutorialOverlay() {
+    overlays.remove(IdleGame.tutorialOverlay);
   }
 
   Future<void> addPlayground() async {

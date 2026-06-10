@@ -4,7 +4,6 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
-import 'package:idle_game/core/game/components/circle_button_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
@@ -30,13 +29,12 @@ class PlaygroundComponent extends RectangleComponent
   PlaygroundComponent({required PlaygroundModel playground})
     : _playground = playground;
 
-  late RowComponent _buttonsComponent;
-  late ColumnComponent _headerComponent;
+  late ColumnComponent headerComponent;
   late RectangleComponent _borderComponent;
-  late RectangleComponent _switchSceneComponent;
+  RectangleComponent switchSceneComponent = RectangleComponent();
   late RectangleComponent _sceneFadeComponent;
   late RectangleComponent _defeatFadeComponent;
-  final Map<int, RectangleButtonComponent> _switchSceneButtons = {};
+  final Map<int, RectangleButtonComponent> switchSceneButtons = {};
   bool _switchScenesLockedUntilRecovered = false;
   bool _isSceneTransitioning = false;
   double _sceneTransitionElapsed = 0;
@@ -46,16 +44,11 @@ class PlaygroundComponent extends RectangleComponent
   int? _defeatRestSceneId;
 
   late TextComponent _nameComponent;
-  late TextComponent _rateComponent;
+  late TextComponent rateComponent;
 
-  late RectangleButtonComponent _addButton;
-  late RectangleButtonComponent _subtractButton;
-  late CircleButtonComponent _upgradeButton;
-  late CircleButtonComponent _downgradeButton;
-  late CircleButtonComponent _resetButton;
-  late CircleButtonComponent _stopButton;
+  late RectangleButtonComponent upgradeButton;
 
-  late WorkerComponent _workerComponent;
+  late WorkerComponent workerComponent;
   late TextComponent _workerLevelComponent;
   late StatusBarComponent _workerExperienceComponent;
 
@@ -78,19 +71,9 @@ class PlaygroundComponent extends RectangleComponent
 
   void _updateState() {
     final scene = _playground.activeScene;
-    final resource = game.gameStateNotifier.getResourceByType(
-      scene.generationRateUpgradeCostType,
-    );
 
     _updateSceneSwitchLock(_playground.worker);
     _updateScene(scene);
-
-    _upgradeButton.isDisabled = !scene.canLevelUpGenerationRate(
-      resource.amount,
-    );
-    _resetButton.isDisabled =
-        scene.generationRatePerSecond == 0 && resource.amount == 0;
-    _stopButton.isDisabled = scene.generationRatePerSecond == 0;
   }
 
   int? _activeSceneId;
@@ -126,7 +109,7 @@ class PlaygroundComponent extends RectangleComponent
 
     _workerExperienceComponent = StatusBarComponent();
 
-    _rateComponent = TextComponent(
+    rateComponent = TextComponent(
       anchor: Anchor.bottomRight,
       text: _lastRateText,
       position: Vector2(width - _padding - 24 * 2, height - _padding),
@@ -134,78 +117,7 @@ class PlaygroundComponent extends RectangleComponent
       textRenderer: TextPaint(style: game.textTheme.titleLarge),
     );
 
-    _addButton = RectangleButtonComponent(
-      icon: Icons.add_circle_outline,
-      onPressed: () {
-        moveOnClick();
-        addResource();
-      },
-      onHold: () {
-        addResource();
-      },
-    );
-
-    _subtractButton = RectangleButtonComponent(
-      icon: Icons.remove_circle_outline,
-      onPressed: () {
-        subtractResource();
-      },
-    );
-
-    _upgradeButton = CircleButtonComponent(
-      icon: Icons.trending_up,
-      onPressed: () {
-        game.gameStateNotifier.buyActiveSceneUpgrade(_playground.id);
-      },
-    );
-
-    _downgradeButton = CircleButtonComponent(
-      icon: Icons.trending_down,
-      onPressed: () {
-        game.gameStateNotifier.downgradeScene(_playground.id, 0.1);
-      },
-    );
-
-    _resetButton = CircleButtonComponent(
-      icon: Icons.restart_alt,
-      onPressed: () {
-        resetEncounters();
-        resetResource();
-      },
-    );
-
-    _stopButton = CircleButtonComponent(
-      icon: Icons.stop_circle_outlined,
-      onPressed: () {
-        game.gameStateNotifier.resetScene(_playground.id);
-      },
-    );
-
-    _buttonsComponent = RowComponent(
-      anchor: Anchor.topRight,
-      position: Vector2(width - _padding - 24 * 2, _padding),
-      gap: 10.0,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        RowComponent(
-          gap: 10.0,
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ColumnComponent(gap: 10, children: [_addButton, _subtractButton]),
-            ColumnComponent(
-              gap: 10,
-              children: [_upgradeButton, _downgradeButton],
-            ),
-            ColumnComponent(gap: 10, children: [_resetButton, _stopButton]),
-          ],
-        ),
-      ],
-      priority: 100,
-    );
-
-    _headerComponent = ColumnComponent(
+    headerComponent = ColumnComponent(
       position: Vector2.all(_padding),
       children: [
         _nameComponent,
@@ -215,18 +127,17 @@ class PlaygroundComponent extends RectangleComponent
       priority: 10,
     );
 
-    //add(_buttonsComponent);
-    add(_headerComponent);
-    add(_rateComponent);
+    add(headerComponent);
+    add(rateComponent);
 
-    _workerComponent = WorkerComponent(
+    workerComponent = WorkerComponent(
       playgroundModel: _playground,
       workerModel: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
       onDefeated: _handleWorkerDefeated,
     );
-    add(_workerComponent);
+    add(workerComponent);
 
     _borderComponent = RectangleComponent(
       size: size.clone(),
@@ -238,15 +149,22 @@ class PlaygroundComponent extends RectangleComponent
     );
     add(_borderComponent);
 
-    _switchSceneComponent = RectangleComponent(
-      paint: Paint()
+    upgradeButton = RectangleButtonComponent(
+      icon: Icons.settings,
+      onPressed: () {
+        game.displayUpgradeOverlay(playground.id);
+      },
+    );
+
+    switchSceneComponent
+      ..paint = (Paint()
         ..color = Colors.black
-        ..strokeWidth = 2,
-      size: Vector2((24 * 2) + 4, height),
-      anchor: Anchor.topRight,
-      position: Vector2(width, 0),
-      priority: 100,
-      children: [
+        ..strokeWidth = 2)
+      ..size = Vector2((24 * 2) + 4, height)
+      ..anchor = Anchor.topRight
+      ..position = Vector2(width, 0)
+      ..priority = 100
+      ..addAll([
         ColumnComponent(
           size: Vector2((24 * 2) + 4, height),
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -264,20 +182,14 @@ class PlaygroundComponent extends RectangleComponent
                     ..isDisabled =
                         (scene.id == _activeSceneId &&
                         _switchScenesLockedUntilRecovered);
-              _switchSceneButtons[scene.id] = button;
+              switchSceneButtons[scene.id] = button;
               return button;
             }),
-            RectangleButtonComponent(
-              icon: Icons.settings,
-              onPressed: () {
-                game.displayUpgradeOverlay(playground.id);
-              },
-            ),
+            upgradeButton,
           ],
         ),
-      ],
-    );
-    add(_switchSceneComponent);
+      ]);
+    add(switchSceneComponent);
 
     _sceneFadeComponent = RectangleComponent(
       size: size.clone(),
@@ -336,7 +248,7 @@ class PlaygroundComponent extends RectangleComponent
       _activeSceneId = sceneId;
 
       _updateSwitchSceneButtons();
-      for (final buttonEntry in _switchSceneButtons.entries) {
+      for (final buttonEntry in switchSceneButtons.entries) {
         buttonEntry.value.isDisabled = buttonEntry.key == sceneId;
       }
     }
@@ -356,7 +268,7 @@ class PlaygroundComponent extends RectangleComponent
     final rateText = _formatRate(scene.generationRatePerSecond);
     if (_lastRateText != rateText) {
       _lastRateText = rateText;
-      _rateComponent.text = rateText;
+      rateComponent.text = rateText;
     }
 
     final level = _playground.worker.level;
@@ -509,7 +421,7 @@ class PlaygroundComponent extends RectangleComponent
   }
 
   void _updateSwitchSceneButtons() {
-    for (final buttonEntry in _switchSceneButtons.entries) {
+    for (final buttonEntry in switchSceneButtons.entries) {
       buttonEntry.value.isDisabled =
           _switchScenesLockedUntilRecovered ||
           buttonEntry.key == _activeSceneId;
@@ -523,14 +435,13 @@ class PlaygroundComponent extends RectangleComponent
 
     _lastSize = size.clone();
 
-    _rateComponent.position.setValues(
+    rateComponent.position.setValues(
       width - _padding - 24 * 2,
       height - _padding,
     );
-    _buttonsComponent.position.setValues(width - _padding - 24 * 2, _padding);
-    _workerComponent.position.setValues(_padding, height - _padding);
+    workerComponent.position.setValues(_padding, height - _padding);
     _borderComponent.size.setFrom(size.clone());
-    _switchSceneComponent.position.setValues(width, 0);
+    switchSceneComponent.position.setValues(width, 0);
     _sceneFadeComponent.size.setFrom(size.clone());
     _defeatFadeComponent.size.setFrom(size.clone());
   }
@@ -628,20 +539,5 @@ class PlaygroundComponent extends RectangleComponent
         encounter.moveOnClick();
       }
     }
-  }
-
-  void addResource() {
-    final scene = _playground.activeScene;
-    game.gameStateNotifier.add(scene.generationRateUpgradeCostType, 1.0);
-  }
-
-  void subtractResource() {
-    final scene = _playground.activeScene;
-    game.gameStateNotifier.subtract(scene.generationRateUpgradeCostType, 1.0);
-  }
-
-  void resetResource() {
-    final scene = _playground.activeScene;
-    game.gameStateNotifier.resetResource(scene.generationRateUpgradeCostType);
   }
 }

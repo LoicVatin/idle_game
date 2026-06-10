@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
+import 'package:idle_game/presentation/home/tutorial_overlay_widget.dart';
 import 'package:idle_game/presentation/home/upgrade_overlay_widget.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/utils/logger_helper.dart';
@@ -49,6 +50,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           return GameWidget(
             game: _game!,
             overlayBuilderMap: {
+              IdleGame.tutorialOverlay: (context, game) {
+                return TutorialOverlay(
+                  game: game as IdleGame,
+                  onClose: () {
+                    game.dismissTutorialOverlay();
+                  },
+                );
+              },
               IdleGame.upgradeOverlay: (context, game) {
                 return UpgradeOverlay(
                   game: game as IdleGame,
@@ -58,6 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
               },
             },
+            initialActiveOverlays: [IdleGame.tutorialOverlay],
           );
         },
       ),
