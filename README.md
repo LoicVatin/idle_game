@@ -11,15 +11,23 @@ An idle incremental game made with Flutter and Flame.
 
 Manage a team of workers to gather resources.
 
+<img width="270" height="606" alt="Screenshot_20260610-100818" src="https://github.com/user-attachments/assets/2c6c616c-fd5c-41b7-ae09-d0f59819157a" />
+<img width="270" height="606" alt="Screenshot_20260610-100828" src="https://github.com/user-attachments/assets/750e8c38-2e25-4491-bc38-57c9875701e8" />
+
 ## Features & Roadmap [WIP]
 
 - [x] Basic game logic
 - [x] Basic game UI
 - [x] Localization setup
+- [ ] Basic tutorial
 - [ ] Basic identity (sprites, sound, etc...)
 - [ ] Progression persistence
 - [ ] Offline progression
+- [ ] Replace basic resources with loot pool
+- [ ] Game Balance
 - [ ] Definitive identity
+- [ ] Complete tutorial
+- [ ] AND MORE!!!
 
 ## Technical stack [WIP]
 
