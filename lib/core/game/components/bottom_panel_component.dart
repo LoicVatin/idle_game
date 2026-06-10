@@ -7,6 +7,7 @@ import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/resource_cost_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/utils/build_context_helper.dart';
 
 class BottomPanelComponent extends PositionComponent
     with HasGameReference<IdleGame> {
@@ -23,6 +24,8 @@ class BottomPanelComponent extends PositionComponent
   late final RectangleComponent _resourceAmountsBackground;
   late final RowComponent _resourceAmountsRow;
   late final RectangleButtonComponent _button;
+  late final RowComponent _tutorialRow;
+  late final RectangleButtonComponent _tutorialButton;
 
   final Map<ResourceType, ResourceCostComponent> _resourceTexts = {};
 
@@ -83,6 +86,26 @@ class BottomPanelComponent extends PositionComponent
     add(_resourceAmountsBackground);
 
     _button = RectangleButtonComponent(icon: Icons.add, onPressed: onPressed);
+    _tutorialButton = RectangleButtonComponent(
+      icon: Icons.refresh_outlined,
+      onPressed: game.displayTutorialOverlay,
+    );
+
+    _tutorialRow = RowComponent(
+      position: Vector2(padding.left, padding.top),
+      size: Vector2(size.x - padding.horizontal, size.y - padding.vertical),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      gap: 16,
+      children: [
+        _tutorialButton,
+        TextComponent(
+          text: game.text.tutorial_replay_button,
+          textRenderer: TextPaint(style: game.textTheme.bodyLarge),
+        ),
+      ],
+    );
+    add(_tutorialRow);
 
     _resourceAmountsRow = RowComponent(
       position: Vector2(padding.left, padding.top),
@@ -104,6 +127,12 @@ class BottomPanelComponent extends PositionComponent
     if (isLoaded) {
       _resourceAmountsBackground.size.setFrom(this.size);
       _resourceAmountsRow
+        ..position.setValues(padding.left, padding.top)
+        ..size.setValues(
+          this.size.x - padding.horizontal,
+          this.size.y - padding.vertical,
+        );
+      _tutorialRow
         ..position.setValues(padding.left, padding.top)
         ..size.setValues(
           this.size.x - padding.horizontal,

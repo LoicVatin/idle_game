@@ -3,15 +3,79 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
+import 'package:idle_game/utils/build_context_helper.dart';
 
-class TutorialOverlay extends ConsumerWidget {
+class TutorialOverlay extends ConsumerStatefulWidget {
   const TutorialOverlay({super.key, required this.game, required this.onClose});
 
   final IdleGame game;
   final VoidCallback onClose;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _TutorialOverlayState();
+}
+
+class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
+  int _step = 0;
+  static const int stepWelcome = 0;
+  static const int stepPlayground = 1;
+  static const int stepScene = 2;
+  static const int stepHeader = 4;
+  static const int stepWorker = 3;
+  static const int stepRate = 5;
+  static const int stepSwitchButtons = 6;
+  static const int stepEncounterScenesButtons = 7;
+  static const int stepRestSceneButton = 8;
+  static const int stepUpgradeButton = 9;
+  static const int stepResourcePanel = 10;
+  static const int stepBottomPanel = 11;
+  static const int step12 = 12;
+  static const int step13 = 13;
+
+  void _incrementCounter() {
+    setState(() {
+      _step++;
+    });
+  }
+
+  String get _tutorialText {
+    switch (_step) {
+      case stepWelcome:
+        return context.text.tutorial_step_welcome;
+      case stepPlayground:
+        return context.text.tutorial_step_playground;
+      case stepScene:
+        return context.text.tutorial_step_scene;
+      case stepHeader:
+        return context.text.tutorial_step_header;
+      case stepWorker:
+        return context.text.tutorial_step_worker;
+      case stepRate:
+        return context.text.tutorial_step_rate;
+      case stepSwitchButtons:
+        return context.text.tutorial_step_switch_buttons;
+      case stepEncounterScenesButtons:
+        return context.text.tutorial_step_encounter_scenes_buttons;
+      case stepRestSceneButton:
+        return context.text.tutorial_step_rest_scene_button;
+      case stepUpgradeButton:
+        return context.text.tutorial_step_upgrade_button;
+      case stepResourcePanel:
+        return context.text.tutorial_step_resource_panel;
+      case stepBottomPanel:
+        return context.text.tutorial_step_bottom_panel;
+      case step12:
+        return context.text.tutorial_step_almost;
+      case step13:
+        return context.text.tutorial_step_complete;
+      default:
+        return context.text.tutorial_step_close;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
 
     return gameState.when(
@@ -28,7 +92,7 @@ class TutorialOverlay extends ConsumerWidget {
       },
       data: (data) {
         // playground and children
-        final firstPlaygroundComponent = game.firstPlaygroundComponent;
+        final firstPlaygroundComponent = widget.game.firstPlaygroundComponent;
 
         Rect? highlightPlayground;
         if (firstPlaygroundComponent != null &&
@@ -67,6 +131,22 @@ class TutorialOverlay extends ConsumerWidget {
           highlightRate = Rect.fromLTWH(topLeft.x, topLeft.y, size.x, size.y);
         }
 
+        final openUpgradePanelButtonComponent =
+            firstPlaygroundComponent?.upgradeButton;
+        Rect? highlightOpenUpgradePanelButton;
+        if (openUpgradePanelButtonComponent != null &&
+            openUpgradePanelButtonComponent.isMounted) {
+          final topLeft =
+              openUpgradePanelButtonComponent.absoluteTopLeftPosition;
+          final size = openUpgradePanelButtonComponent.size;
+          highlightOpenUpgradePanelButton = Rect.fromLTWH(
+            topLeft.x,
+            topLeft.y,
+            size.x,
+            size.y,
+          );
+        }
+
         final switchSceneComponent =
             firstPlaygroundComponent?.switchSceneComponent;
         Rect? highlightSwitchScene;
@@ -77,6 +157,22 @@ class TutorialOverlay extends ConsumerWidget {
             topLeft.x,
             topLeft.y,
             size.x,
+            size.y,
+          );
+        }
+
+        Rect? highlightSceneArea;
+        if (firstPlaygroundComponent != null &&
+            firstPlaygroundComponent.isMounted &&
+            switchSceneComponent != null &&
+            switchSceneComponent.isMounted) {
+          final topLeft = firstPlaygroundComponent.absoluteTopLeftPosition;
+          final size = firstPlaygroundComponent.size;
+          final switchSize = switchSceneComponent.size;
+          highlightSceneArea = Rect.fromLTWH(
+            topLeft.x,
+            topLeft.y,
+            size.x - switchSize.x,
             size.y,
           );
         }
@@ -130,28 +226,11 @@ class TutorialOverlay extends ConsumerWidget {
             size.y,
           );
         }
-
-        final openUpgradePanelButtonComponent =
-            firstPlaygroundComponent?.upgradeButton;
-        Rect? highlightOpenUpgradePanelButton;
-        if (openUpgradePanelButtonComponent != null &&
-            openUpgradePanelButtonComponent.isMounted) {
-          final topLeft =
-              openUpgradePanelButtonComponent.absoluteTopLeftPosition;
-          final size = openUpgradePanelButtonComponent.size;
-          highlightOpenUpgradePanelButton = Rect.fromLTWH(
-            topLeft.x,
-            topLeft.y,
-            size.x,
-            size.y,
-          );
-        }
         // Resource panel
-        final resourcePanelComponent = game.resourcePanelComponent;
+        final resourcePanelComponent = widget.game.resourcePanelComponent;
 
         Rect? highlightResourcePanel;
-        if (resourcePanelComponent != null &&
-            resourcePanelComponent.isMounted) {
+        if (resourcePanelComponent.isMounted) {
           final topLeft = resourcePanelComponent.absoluteTopLeftPosition;
           final size = resourcePanelComponent.size;
           highlightResourcePanel = Rect.fromLTWH(
@@ -163,11 +242,10 @@ class TutorialOverlay extends ConsumerWidget {
         }
 
         // Bottom panel
-        final bottomPanelComponent = game.bottomPanelComponent;
+        final bottomPanelComponent = widget.game.bottomPanelComponent;
 
         Rect? highlightBottomPanel;
-        if (bottomPanelComponent != null &&
-            bottomPanelComponent.isMounted) {
+        if (bottomPanelComponent.isMounted) {
           final topLeft = bottomPanelComponent.absoluteTopLeftPosition;
           final size = bottomPanelComponent.size;
           highlightBottomPanel = Rect.fromLTWH(
@@ -182,27 +260,38 @@ class TutorialOverlay extends ConsumerWidget {
         return Stack(
           children: [
             GestureDetector(
-              onTap: onClose,
+              onTap: _step >= step13 ? widget.onClose : _incrementCounter,
               child: Material(
                 color: Colors.black54,
                 child: Center(
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: IconButton(
-                        onPressed: onClose,
-                        icon: const Icon(Icons.close),
-                      ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      spacing: 16,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(_tutorialText, textAlign: TextAlign.center),
+                        GestureDetector(
+                          onTap: () {},
+                          child: TextButton(
+                            onPressed: widget.onClose,
+                            child: Text(
+                              "Skip tutorial",
+                              textAlign: TextAlign.center,
+                            ),
+                            //icon: const Icon(Icons.close
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
             // Playground
-            if (highlightPlayground != null)
+            if (highlightPlayground != null && _step == stepPlayground)
               Positioned.fromRect(
-                rect: highlightPlayground.inflate(2),
+                rect: highlightPlayground.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
@@ -211,97 +300,112 @@ class TutorialOverlay extends ConsumerWidget {
                   ),
                 ),
               ),
-            if (highlightWorker != null)
+            if (highlightWorker != null && _step == stepWorker)
               Positioned.fromRect(
-                rect: highlightWorker.inflate(2),
+                rect: highlightWorker.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.yellow, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightHeader != null)
+            if (highlightHeader != null && _step == stepHeader)
               Positioned.fromRect(
-                rect: highlightHeader.inflate(2),
+                rect: highlightHeader.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.yellow, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightRate != null)
+            if (highlightRate != null && _step == stepRate)
               Positioned.fromRect(
-                rect: highlightRate.inflate(2),
+                rect: highlightRate.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.yellow, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightSwitchScene != null)
+            if (highlightSwitchScene != null && _step == stepSwitchButtons)
               Positioned.fromRect(
-                rect: highlightSwitchScene.inflate(2),
+                rect: highlightSwitchScene.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.yellow, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightSwitchSceneButtonOne != null)
+            if (highlightSceneArea != null && _step == stepScene)
               Positioned.fromRect(
-                rect: highlightSwitchSceneButtonOne.inflate(2),
+                rect: highlightSceneArea.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.purple, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightSwitchSceneButtonTwo != null)
+            if (highlightSwitchSceneButtonOne != null &&
+                _step == stepEncounterScenesButtons)
               Positioned.fromRect(
-                rect: highlightSwitchSceneButtonTwo.inflate(2),
+                rect: highlightSwitchSceneButtonOne.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.purpleAccent, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightSwitchSceneButtonThree != null)
+            if (highlightSwitchSceneButtonTwo != null &&
+                _step == stepEncounterScenesButtons)
               Positioned.fromRect(
-                rect: highlightSwitchSceneButtonThree.inflate(2),
+                rect: highlightSwitchSceneButtonTwo.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.orange, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
-            if (highlightOpenUpgradePanelButton != null)
+            if (highlightSwitchSceneButtonThree != null &&
+                _step == stepRestSceneButton)
               Positioned.fromRect(
-                rect: highlightOpenUpgradePanelButton.inflate(2),
+                rect: highlightSwitchSceneButtonThree.inflate(5),
                 child: IgnorePointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 3),
+                      border: Border.all(color: Colors.red, width: 3),
+                    ),
+                  ),
+                ),
+              ),
+            if (highlightOpenUpgradePanelButton != null &&
+                _step == stepUpgradeButton)
+              Positioned.fromRect(
+                rect: highlightOpenUpgradePanelButton.inflate(5),
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 3),
                     ),
                   ),
                 ),
               ),
 
             // Resource panel
-            if (highlightResourcePanel != null)
+            if (highlightResourcePanel != null && _step == stepResourcePanel)
               Positioned.fromRect(
                 rect: highlightResourcePanel.inflate(2),
                 child: IgnorePointer(
@@ -314,7 +418,7 @@ class TutorialOverlay extends ConsumerWidget {
               ),
 
             // Bottom panel
-            if (highlightBottomPanel != null)
+            if (highlightBottomPanel != null && _step == stepBottomPanel)
               Positioned.fromRect(
                 rect: highlightBottomPanel.inflate(2),
                 child: IgnorePointer(

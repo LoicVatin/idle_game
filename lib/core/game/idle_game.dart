@@ -94,6 +94,10 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     overlays.remove(IdleGame.upgradeOverlay);
   }
 
+  void displayTutorialOverlay() {
+    overlays.add(IdleGame.tutorialOverlay);
+  }
+
   void dismissTutorialOverlay() {
     overlays.remove(IdleGame.tutorialOverlay);
   }
