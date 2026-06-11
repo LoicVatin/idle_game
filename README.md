@@ -19,7 +19,7 @@ Manage a team of workers to gather resources.
 - [x] Basic game logic
 - [x] Basic game UI
 - [x] Localization setup
-- [ ] Basic tutorial
+- [X] Basic tutorial
 - [ ] Basic identity (sprites, sound, etc...)
 - [ ] Progression persistence
 - [ ] Offline progression
@@ -71,10 +71,13 @@ lib/
 │   │
 │   └── home/                               #
 │       ├── home_screen.dart                # Home screen
+│       ├── tutorial_overlay_widget.dart    # Tutorial overlay
 │       └── upgrade_overlay_widget.dart     # Upgrade overlay 
 │
 ├── utils/                                  # Utilities
-│   └── build_context_helper.dart           # Helper to access context-related methods (localization, styles, etc.)
+│   ├── build_context_helper.dart           # Helper to access context-related methods (localization, styles, etc.)
+│   ├── logger_helper.dart                  # Helper to access the logger
+│   └── shared_preferences_helper.dart      # Helper to access the shared preferences
 │
 └── main.dart                               # Entry point
 ```

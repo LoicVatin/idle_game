@@ -34,6 +34,54 @@ class MessageLookup extends MessageLookupByLibrary {
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "app_name": MessageLookupByLibrary.simpleMessage("Idle Game"),
     "per_second_indicator": m0,
+    "tutorial_replay_button": MessageLookupByLibrary.simpleMessage(
+      "Replay tutorial",
+    ),
+    "tutorial_step_almost": MessageLookupByLibrary.simpleMessage(
+      "You are almost done.",
+    ),
+    "tutorial_step_bottom_panel": MessageLookupByLibrary.simpleMessage(
+      "Use the bottom panel to add more playgrounds,\nallowing you to collect more resources.",
+    ),
+    "tutorial_step_close": MessageLookupByLibrary.simpleMessage(
+      "Tap to close.",
+    ),
+    "tutorial_step_complete": MessageLookupByLibrary.simpleMessage(
+      "Tutorial complete!\nYou can replay it any time.",
+    ),
+    "tutorial_step_encounter_scenes_buttons": MessageLookupByLibrary.simpleMessage(
+      "Those scenes spawn encounters for the worker to confront.\nEach confrontation with an encounter consumes stamina and can damage the worker.\nResources are earned when an encounter is defeated.",
+    ),
+    "tutorial_step_header": MessageLookupByLibrary.simpleMessage(
+      "His level and experience are displayed here.",
+    ),
+    "tutorial_step_playground": MessageLookupByLibrary.simpleMessage(
+      "This is your playground, where your adventure is played.",
+    ),
+    "tutorial_step_rate": MessageLookupByLibrary.simpleMessage(
+      "When upgraded and automated, his speed in the current scene is displayed here.\nThis speed can represent his walking speed or his regeneration speed depending on the scene.",
+    ),
+    "tutorial_step_resource_panel": MessageLookupByLibrary.simpleMessage(
+      "Your resources are shown at the top of the screen.",
+    ),
+    "tutorial_step_rest_scene_button": MessageLookupByLibrary.simpleMessage(
+      "Those scenes allow the worker to rest and regain HP and SP.",
+    ),
+    "tutorial_step_scene": MessageLookupByLibrary.simpleMessage(
+      "This area shows the current scene.\nEach Taps here will make the worker move by a step",
+    ),
+    "tutorial_step_switch_buttons": MessageLookupByLibrary.simpleMessage(
+      "Use these buttons to switch scenes.\nThere is two types of scenes.",
+    ),
+    "tutorial_step_upgrade_button": MessageLookupByLibrary.simpleMessage(
+      "Tapping here opens the upgrades panel.\nIt is where you upgrade and automate your worker",
+    ),
+    "tutorial_step_welcome": MessageLookupByLibrary.simpleMessage(
+      "Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.\n\nHere is a brief tutorial to show you how to play.\nTap anywhere to continue.",
+    ),
+    "tutorial_step_worker": MessageLookupByLibrary.simpleMessage(
+      "Speaking of the worker, here he is.\nHis health and stamina will be displayed above him when relevant.",
+    ),
     "upgrade_button": MessageLookupByLibrary.simpleMessage("Upgrade"),
     "upgrade_maxed_button": MessageLookupByLibrary.simpleMessage("Maxed out"),
     "worker_damage_indicator": m1,
