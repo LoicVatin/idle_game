@@ -8,6 +8,7 @@ import 'package:idle_game/presentation/home/tutorial_overlay_widget.dart';
 import 'package:idle_game/presentation/home/upgrade_overlay_widget.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/utils/logger_helper.dart';
+import 'package:idle_game/utils/shared_preferences_helper.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,11 +20,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   IdleGame? _game;
   late final Future _googleFontsPending;
+  late final bool _isTutorialAtStartupDismissed;
 
   @override
   void initState() {
     appLogger.d("HomeScreenState.initState()");
     super.initState();
+
+    isTutorialAtStartupDismissed();
 
     GoogleFonts.vt323();
     _googleFontsPending = GoogleFonts.pendingFonts();
@@ -55,6 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   game: game as IdleGame,
                   onClose: () {
                     game.dismissTutorialOverlay();
+                    dismissTutorialAtStartup();
                   },
                 );
               },
@@ -67,10 +72,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
               },
             },
-            initialActiveOverlays: [IdleGame.tutorialOverlay],
+            initialActiveOverlays: _isTutorialAtStartupDismissed
+                ? []
+                : [IdleGame.tutorialOverlay],
           );
         },
       ),
     );
+  }
+
+  Future<void> isTutorialAtStartupDismissed() async {
+    final isTutorialAtStartupDismissed =
+        await SharedPreferencesHelper.isTutorialAtStartupDismissed();
+    setState(() {
+      _isTutorialAtStartupDismissed = isTutorialAtStartupDismissed;
+    });
+  }
+
+  Future<void> dismissTutorialAtStartup() async {
+    SharedPreferencesHelper.dismissTutorial();
   }
 }
