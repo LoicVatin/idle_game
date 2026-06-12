@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
@@ -34,6 +35,7 @@ class WorkerComponent extends RectangleComponent
 
   late final StatusBarComponent healthBar;
   late final StatusBarComponent staminaBar;
+  late final SpriteAnimationComponent animationComponent;
 
   WorkerComponent({
     required this.playgroundModel,
@@ -75,21 +77,36 @@ class WorkerComponent extends RectangleComponent
              anchor: Anchor.topLeft,
              position: Vector2.all(radius),
            ),
+           SpriteAnimationComponent(
+             size: Vector2.all(radius * 2),
+             position: Vector2.zero(),
+           ),
          ],
        ) {
     final statusBars = children.whereType<StatusBarComponent>().toList();
 
     healthBar = statusBars[0];
     staminaBar = statusBars[1];
+    animationComponent = children.whereType<SpriteAnimationComponent>().first;
   }
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
+    final image = await Flame.images.load("test_card_idle.png");
+    final animation = SpriteAnimation.fromFrameData(
+      image,
+      SpriteAnimationData.sequenced(
+        amount: 6,
+        stepTime: 0.1,
+        textureSize: Vector2.all(32),
+      ),
+    );
 
     add(RectangleHitbox());
     updateHealthBar();
     updateStaminaBar();
+    animationComponent.animation = animation;
   }
 
   @override

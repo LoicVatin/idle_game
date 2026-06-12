@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
@@ -25,6 +26,7 @@ class EncounterComponent extends RectangleComponent
   static const double _attackedDuration = 0.15;
 
   late final StatusBarComponent healthBar;
+  late final SpriteAnimationComponent animationComponent;
 
   EncounterComponent({
     required this.sceneModel,
@@ -56,17 +58,32 @@ class EncounterComponent extends RectangleComponent
              anchor: Anchor.topRight,
              position: Vector2.all(radius),
            ),
+           SpriteAnimationComponent(
+             size: Vector2.all(radius * 2),
+             position: Vector2.zero(),
+           ),
          ],
        ) {
     healthBar = children.whereType<StatusBarComponent>().first;
+    animationComponent = children.whereType<SpriteAnimationComponent>().first;
   }
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
+    final image = await Flame.images.load("test_card_idle.png");
+    final animation = SpriteAnimation.fromFrameData(
+      image,
+      SpriteAnimationData.sequenced(
+        amount: 6,
+        stepTime: 0.1,
+        textureSize: Vector2.all(32),
+      ),
+    );
 
     add(RectangleHitbox(collisionType: CollisionType.passive));
     updateHealthBar();
+    animationComponent.animation = animation;
   }
 
   @override
