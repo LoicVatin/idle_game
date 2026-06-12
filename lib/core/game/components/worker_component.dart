@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/sprite_animation_with_states_component.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/encounter_component.dart';
@@ -32,10 +32,11 @@ class WorkerComponent extends RectangleComponent
   int? _lastStaminaSceneId;
   bool? _lastHealthAlwaysVisible;
   bool? _lastStaminaAlwaysVisible;
+  AnimationState state = AnimationState.idle;
 
   late final StatusBarComponent healthBar;
   late final StatusBarComponent staminaBar;
-  late final SpriteAnimationComponent animationComponent;
+  late final SpriteAnimationWithStatesComponent animationComponent;
 
   WorkerComponent({
     required this.playgroundModel,
@@ -77,7 +78,7 @@ class WorkerComponent extends RectangleComponent
              anchor: Anchor.topLeft,
              position: Vector2.all(radius),
            ),
-           SpriteAnimationComponent(
+           SpriteAnimationWithStatesComponent(
              size: Vector2.all(radius * 2),
              position: Vector2.zero(),
            ),
@@ -87,26 +88,18 @@ class WorkerComponent extends RectangleComponent
 
     healthBar = statusBars[0];
     staminaBar = statusBars[1];
-    animationComponent = children.whereType<SpriteAnimationComponent>().first;
+    animationComponent = children
+        .whereType<SpriteAnimationWithStatesComponent>()
+        .first;
   }
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
-    final image = await Flame.images.load("test_card_idle.png");
-    final animation = SpriteAnimation.fromFrameData(
-      image,
-      SpriteAnimationData.sequenced(
-        amount: 6,
-        stepTime: 0.1,
-        textureSize: Vector2.all(32),
-      ),
-    );
 
     add(RectangleHitbox());
     updateHealthBar();
     updateStaminaBar();
-    animationComponent.animation = animation;
   }
 
   @override
@@ -135,12 +128,14 @@ class WorkerComponent extends RectangleComponent
     super.onCollisionStart(intersectionPoints, other);
 
     if (other is EncounterComponent) {
+      animationComponent.state = AnimationState.attack;
       startConfrontation(other);
     }
   }
 
   void attack() {
     if (!workerModel.spendAttackStamina()) {
+      animationComponent.state = AnimationState.depleted;
       return;
     }
     isAttacking = true;
@@ -190,16 +185,20 @@ class WorkerComponent extends RectangleComponent
   }
 
   void updateConfrontation(double dt) {
+    final scene = playgroundModel.activeScene;
+    if (scene is RestSceneModel) {
+      animationComponent.state = AnimationState.rest;
+      return;
+    }
+
+    if ((scene is EncounterSceneModel && !scene.encounter)) {
+      animationComponent.state = AnimationState.idle;
+      return;
+    }
     final target = confrontationTarget;
 
     if (target == null || target.isRemoved) {
       endConfrontation();
-      return;
-    }
-
-    final scene = playgroundModel.activeScene;
-    if (scene is RestSceneModel ||
-        (scene is EncounterSceneModel && !scene.encounter)) {
       return;
     }
 
@@ -209,7 +208,11 @@ class WorkerComponent extends RectangleComponent
       return;
     }
 
-    if (!workerModel.canAttack || !workerModel.isAlive) {
+    if (!workerModel.canAttack) {
+      animationComponent.state = AnimationState.depleted;
+      return;
+    }
+    if (!workerModel.isAlive) {
       return;
     }
 
@@ -252,6 +255,9 @@ class WorkerComponent extends RectangleComponent
   }
 
   void endConfrontation() {
+    animationComponent.state = !workerModel.isAlive
+        ? AnimationState.defeat
+        : AnimationState.idle;
     confrontationTarget = null;
     confrontationAttackTimer = 0;
     game.gameStateNotifier.toggleEncounter(
@@ -273,5 +279,6 @@ class WorkerComponent extends RectangleComponent
     }
 
     game.gameStateNotifier.switchActiveScene(playground.id, restingScene.id);
+    animationComponent.state = AnimationState.rest;
   }
 }
