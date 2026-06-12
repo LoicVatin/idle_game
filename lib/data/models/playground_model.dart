@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 
 class PlaygroundModel {
   final int id;
@@ -23,8 +23,8 @@ class PlaygroundModel {
            WorkerModel(
              name: "Worker",
              damage: 1,
-             icon: Icons.man_outlined,
-             toolsIcon: Icons.waving_hand_outlined,
+             primaryIcon: Icons.man_outlined,
+             secondaryIcon: Icons.waving_hand_outlined,
            ),
        scenes =
            scenes ??

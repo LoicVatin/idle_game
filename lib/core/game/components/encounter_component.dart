@@ -6,7 +6,7 @@ import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
-import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 
@@ -53,7 +53,7 @@ class EncounterComponent extends RectangleComponent
              position: Vector2.all(radius),
            ),
            IconComponent(
-             icon: encounterModel.icon,
+             icon: encounterModel.primaryIcon,
              size: Vector2.all(radius),
              anchor: Anchor.topRight,
              position: Vector2.all(radius),

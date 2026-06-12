@@ -10,7 +10,7 @@ import 'package:idle_game/core/game/components/encounter_component.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 
 class WorkerComponent extends RectangleComponent
     with HasGameReference<IdleGame>, CollisionCallbacks {
@@ -67,13 +67,13 @@ class WorkerComponent extends RectangleComponent
              fillColor: Colors.orangeAccent,
            ),
            IconComponent(
-             icon: workerModel.icon,
+             icon: workerModel.primaryIcon,
              size: Vector2.all(radius),
              anchor: Anchor.bottomRight,
              position: Vector2.all(radius),
            ),
            IconComponent(
-             icon: workerModel.toolsIcon,
+             icon: workerModel.secondaryIcon,
              size: Vector2.all(radius),
              anchor: Anchor.topLeft,
              position: Vector2.all(radius),

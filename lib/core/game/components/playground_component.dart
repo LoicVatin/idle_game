@@ -13,7 +13,7 @@ import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
 class PlaygroundComponent extends RectangleComponent
@@ -277,7 +277,7 @@ class PlaygroundComponent extends RectangleComponent
       _workerLevelComponent.text = game.text.worker_level_indicator(level);
     }
 
-    final xpRequired = _playground.worker.experienceNeeded;
+    final xpRequired = _playground.worker.experienceNeededToLevelUp;
     if (_experienceRequired != xpRequired) {
       _experienceRequired = xpRequired.toDouble();
     }

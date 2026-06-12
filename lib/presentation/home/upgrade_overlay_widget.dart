@@ -5,7 +5,7 @@ import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
@@ -125,7 +125,7 @@ class UpgradeOverlay extends ConsumerWidget {
             Row(
               spacing: 8,
               children: [
-                Icon(worker.icon),
+                Icon(worker.primaryIcon),
                 Expanded(
                   child: Text(
                     worker.name,
@@ -143,7 +143,7 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.linear_scale),
                 Expanded(
                   child: LinearProgressIndicator(
-                    value: (worker.experience / worker.experienceNeeded),
+                    value: (worker.experience / worker.experienceNeededToLevelUp),
                   ),
                 ),
                 Icon(Icons.plus_one_outlined),
@@ -181,7 +181,7 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.handyman_outlined),
                 Expanded(
                   child: Text(
-                    worker.toolsIcon.codePoint.toString(),
+                    worker.secondaryIcon.codePoint.toString(),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),

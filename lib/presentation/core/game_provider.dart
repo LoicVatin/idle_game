@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/data/models/adventure_model.dart';
-import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
@@ -39,8 +39,8 @@ class GameStateData {
         name: "Playground",
         worker: WorkerModel(
           name: "Explorer",
-          icon: Icons.hiking_outlined,
-          toolsIcon: Icons.gavel_sharp,
+          primaryIcon: Icons.hiking_outlined,
+          secondaryIcon: Icons.gavel_sharp,
         ),
         activeSceneId: 0,
         scenes: {
@@ -54,29 +54,37 @@ class GameStateData {
             generationRateUpgradeCostType: ResourceType.wood,
             encounters: WeightedRandom({
               EncounterModel(
+                name: "Tree",
                 type: ResourceType.wood,
-                health: 3,
+                maxHealth: 3,
                 reward: 5,
-                icon: Icons.park,
+                primaryIcon: Icons.park,
+                secondaryIcon: ResourceType.wood.icon,
               ): 1,
               EncounterModel(
+                name: "Trees",
                 type: ResourceType.wood,
-                health: 12,
+                maxHealth: 12,
                 reward: 15,
-                icon: Icons.forest,
+                primaryIcon: Icons.forest,
+                secondaryIcon: ResourceType.wood.icon,
               ): 0.1,
               EncounterModel(
+                name: "Pebbles",
                 type: ResourceType.stone,
-                health: 5,
+                maxHealth: 5,
                 reward: 3,
-                icon: Icons.scatter_plot,
+                primaryIcon: Icons.scatter_plot,
+                secondaryIcon: ResourceType.stone.icon,
               ): 0.2,
               EncounterModel(
+                name: "Rat",
                 type: ResourceType.food,
-                health: 3,
+                maxHealth: 3,
                 damage: 1,
                 reward: 5,
-                icon: Icons.pest_control_rodent,
+                primaryIcon: Icons.pest_control_rodent,
+                secondaryIcon: ResourceType.food.icon,
               ): 0.2,
             }),
           ),
@@ -91,29 +99,37 @@ class GameStateData {
             generationRateUpgradeCostType: ResourceType.stone,
             encounters: WeightedRandom({
               EncounterModel(
+                name: "Tree",
                 type: ResourceType.wood,
-                health: 3,
+                maxHealth: 3,
                 reward: 5,
-                icon: Icons.park,
+                primaryIcon: Icons.park,
+                secondaryIcon: ResourceType.wood.icon,
               ): 1,
               EncounterModel(
+                name: "Rock",
                 type: ResourceType.stone,
-                health: 4,
+                maxHealth: 4,
                 reward: 5,
-                icon: Icons.landslide,
+                primaryIcon: Icons.landslide,
+                secondaryIcon: ResourceType.stone.icon,
               ): 0.5,
               EncounterModel(
+                name: "Boar",
                 type: ResourceType.food,
-                health: 5,
+                maxHealth: 5,
                 damage: 3,
                 reward: 4,
-                icon: Icons.savings,
+                primaryIcon: Icons.savings,
+                secondaryIcon: ResourceType.food.icon,
               ): 0.5,
               EncounterModel(
+                name: "Stockpile",
                 type: ResourceType.wood,
-                health: 25,
+                maxHealth: 25,
                 reward: 10,
-                icon: Icons.inventory,
+                primaryIcon: Icons.inventory,
+                secondaryIcon: ResourceType.wood.icon,
               ): 0.1,
             }),
           ),
@@ -321,8 +337,8 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
       name: "${adventure.name} $increment",
       worker: WorkerModel(
         name: "${adventure.workerName} $increment",
-        icon: adventure.workerIcon,
-        toolsIcon: adventure.workerTool,
+        primaryIcon: adventure.workerIcon,
+        secondaryIcon: adventure.workerTool,
       ),
       scenes: {
         // Forest
@@ -335,29 +351,37 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
           generationRateUpgradeCostType: ResourceType.wood,
           encounters: WeightedRandom({
             EncounterModel(
+              name: "Tree",
               type: ResourceType.wood,
-              health: 3,
+              maxHealth: 3,
               reward: 5,
-              icon: Icons.park,
+              primaryIcon: Icons.park,
+              secondaryIcon: ResourceType.wood.icon,
             ): 1,
             EncounterModel(
+              name: "Trees",
               type: ResourceType.wood,
-              health: 12,
+              maxHealth: 12,
               reward: 15,
-              icon: Icons.forest,
+              primaryIcon: Icons.forest,
+              secondaryIcon: ResourceType.wood.icon,
             ): 0.1,
             EncounterModel(
+              name: "Pebbles",
               type: ResourceType.stone,
-              health: 5,
+              maxHealth: 5,
               reward: 3,
-              icon: Icons.scatter_plot,
+              primaryIcon: Icons.scatter_plot,
+              secondaryIcon: ResourceType.stone.icon,
             ): 0.2,
             EncounterModel(
+              name: "Rat",
               type: ResourceType.food,
-              health: 3,
+              maxHealth: 3,
               damage: 1,
               reward: 5,
-              icon: Icons.pest_control_rodent,
+              primaryIcon: Icons.pest_control_rodent,
+              secondaryIcon: ResourceType.food.icon,
             ): 0.2,
           }),
         ),
@@ -372,29 +396,37 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
           generationRateUpgradeCostType: ResourceType.stone,
           encounters: WeightedRandom({
             EncounterModel(
+              name: "Tree",
               type: ResourceType.wood,
-              health: 3,
+              maxHealth: 3,
               reward: 5,
-              icon: Icons.park,
+              primaryIcon: Icons.park,
+              secondaryIcon: ResourceType.wood.icon,
             ): 1,
             EncounterModel(
+              name: "Rock",
               type: ResourceType.stone,
-              health: 4,
+              maxHealth: 4,
               reward: 5,
-              icon: Icons.landslide,
+              primaryIcon: Icons.landslide,
+              secondaryIcon: ResourceType.stone.icon,
             ): 0.5,
             EncounterModel(
+              name: "Boar",
               type: ResourceType.food,
-              health: 5,
+              maxHealth: 5,
               damage: 3,
               reward: 4,
-              icon: Icons.savings,
+              primaryIcon: Icons.savings,
+              secondaryIcon: ResourceType.food.icon,
             ): 0.5,
             EncounterModel(
+              name: "Stockpile",
               type: ResourceType.wood,
-              health: 25,
+              maxHealth: 25,
               reward: 10,
-              icon: Icons.inventory,
+              primaryIcon: Icons.inventory,
+              secondaryIcon: ResourceType.wood.icon,
             ): 0.1,
           }),
         ),

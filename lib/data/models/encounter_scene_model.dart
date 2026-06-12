@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 
@@ -26,10 +26,12 @@ class EncounterSceneModel extends SceneModel {
            encounters ??
            WeightedRandom({
              EncounterModel(
+               name: "Encounter",
                type: ResourceType.wood,
-               health: 3,
+               maxHealth: 3,
                reward: 5,
-               icon: Icons.data_object_outlined,
+               primaryIcon: Icons.data_object_outlined,
+               secondaryIcon: Icons.data_object_outlined,
              ): 1,
            }),
        super();
