@@ -4,11 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
-import 'package:idle_game/core/game/components/status_bar_component.dart';
+import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
-import 'package:idle_game/core/game/components/encounter_component.dart';
-import 'package:idle_game/core/game/components/worker_component.dart';
+import 'package:idle_game/core/game/components/creature/encounter_component.dart';
+import 'package:idle_game/core/game/components/creature/worker_component.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
@@ -21,7 +22,6 @@ class PlaygroundComponent extends RectangleComponent
   final PlaygroundModel _playground;
   double encounterTimer = 0;
   static const double _padding = 10.0;
-  static const double _encounterRadius = 24.0;
   static const double _height = 200.0;
   static const double _sceneSwitchRecoveryHealthPercent = 0.25;
   static const double _sceneTransitionDuration = 0.4;
@@ -132,7 +132,7 @@ class PlaygroundComponent extends RectangleComponent
 
     workerComponent = WorkerComponent(
       playgroundModel: _playground,
-      workerModel: _playground.worker,
+      model: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
       onDefeated: _handleWorkerDefeated,
@@ -254,7 +254,7 @@ class PlaygroundComponent extends RectangleComponent
     }
 
     for (final encounter in children.whereType<EncounterComponent>()) {
-      final isActiveEncounter = encounter.sceneModel.id == sceneId;
+      final isActiveEncounter = encounter.scene.id == sceneId;
       encounter.isSceneActive = isActiveEncounter;
       encounter.isVisible = isActiveEncounter;
     }
@@ -464,16 +464,16 @@ class PlaygroundComponent extends RectangleComponent
       return;
     }
 
-    final encounterWidth = _encounterRadius * 2;
-    final defaultSpawnX = width - encounterWidth;
+    final creatureComponentRadius = CreatureComponent.componentRadius;
+    final defaultSpawnX = width - creatureComponentRadius;
     var maxEncounterX = double.negativeInfinity;
 
     for (final child in children) {
-      if (child is! EncounterComponent || child.sceneModel.id != scene.id) {
+      if (child is! EncounterComponent || child.scene.id != scene.id) {
         continue;
       }
 
-      if (child.x - encounterWidth > width) {
+      if (child.x - creatureComponentRadius > width) {
         return;
       }
 
@@ -484,7 +484,7 @@ class PlaygroundComponent extends RectangleComponent
 
     final hasEncounters = maxEncounterX.isFinite;
     final spawnX = hasEncounters
-        ? maxEncounterX + encounterWidth + scene.encounterSpacing
+        ? maxEncounterX + creatureComponentRadius + scene.encounterSpacing
         : defaultSpawnX;
 
     if (spawnX > defaultSpawnX) {
@@ -493,9 +493,8 @@ class PlaygroundComponent extends RectangleComponent
 
     add(
       EncounterComponent(
-        sceneModel: scene,
-        encounterModel: scene.encounters.getNext(),
-        radius: _encounterRadius,
+        scene: scene,
+        model: scene.encounters.getNext().copyWith(),
         position: Vector2(spawnX, height - _padding),
         anchor: Anchor.bottomLeft,
       ),
@@ -510,7 +509,7 @@ class PlaygroundComponent extends RectangleComponent
 
   void resetEncounterHealth(int sceneId) {
     for (final encounter in children.whereType<EncounterComponent>().where(
-      (encounter) => encounter.sceneModel.id != sceneId,
+      (encounter) => encounter.scene.id != sceneId,
     )) {
       encounter.resetHealth();
     }
@@ -534,7 +533,7 @@ class PlaygroundComponent extends RectangleComponent
       encounterTimer += scene.encounterInterval / 10;
 
       for (final encounter in children.whereType<EncounterComponent>().where(
-        (encounter) => encounter.sceneModel.id == scene.id,
+        (encounter) => encounter.scene.id == scene.id,
       )) {
         encounter.moveOnClick();
       }

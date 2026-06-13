@@ -5,7 +5,7 @@ enum AnimationState { idle, walk, attack, depleted, rest, defeat }
 
 class SpriteAnimationWithStatesComponent
     extends SpriteAnimationGroupComponent<AnimationState> {
-  SpriteAnimationWithStatesComponent({super.size, super.position});
+  SpriteAnimationWithStatesComponent({super.key, super.size, super.position});
 
   @override
   Future<void> onLoad() async {

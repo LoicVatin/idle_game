@@ -4,22 +4,24 @@ import 'package:flutter/material.dart';
 class StatusBarComponent extends RectangleComponent with HasVisibility {
   static const double statusBarWidth = 42;
   static const double statusBarHeight = 5;
-  static const double statusBarGap = 3;
 
   late final RectangleComponent statusBarFill;
   final Color fillColor;
 
-  StatusBarComponent({super.position, this.fillColor = Colors.yellowAccent})
-    : super(
-        size: Vector2(statusBarWidth, statusBarHeight),
-        paint: Paint()..color = Colors.black54,
-        children: [
-          RectangleComponent(
-            size: Vector2(statusBarWidth, statusBarHeight),
-            paint: Paint()..color = fillColor,
-          ),
-        ],
-      ) {
+  StatusBarComponent({
+    super.key,
+    super.position,
+    this.fillColor = Colors.yellowAccent,
+  }) : super(
+         size: Vector2(statusBarWidth, statusBarHeight),
+         paint: Paint()..color = Colors.black54,
+         children: [
+           RectangleComponent(
+             size: Vector2(statusBarWidth, statusBarHeight),
+             paint: Paint()..color = fillColor,
+           ),
+         ],
+       ) {
     final statusBars = children.whereType<RectangleComponent>().toList();
 
     statusBarFill = statusBars[0];
