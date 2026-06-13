@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idle_game/data/models/playground_model.dart';
@@ -28,9 +29,24 @@ class GameStateData {
   factory GameStateData.initial() {
     appLogger.d("GameStateData.initial()");
     final resources = {
-      ResourceType.wood: Resource(type: ResourceType.wood),
-      ResourceType.stone: Resource(type: ResourceType.stone),
-      ResourceType.food: Resource(type: ResourceType.food),
+      ResourceType.wood: Resource(
+        type: ResourceType.wood,
+        amount: kDebugMode
+            ? 1000000000000000000000000000000000000000000000000000000000000000.0
+            : 0.0,
+      ),
+      ResourceType.stone: Resource(
+        type: ResourceType.stone,
+        amount: kDebugMode
+            ? 1000000000000000000000000000000000000000000000000000000000000000.0
+            : 0.0,
+      ),
+      ResourceType.food: Resource(
+        type: ResourceType.food,
+        amount: kDebugMode
+            ? 1000000000000000000000000000000000000000000000000000000000000000.0
+            : 0.0,
+      ),
     };
 
     final playgrounds = {
