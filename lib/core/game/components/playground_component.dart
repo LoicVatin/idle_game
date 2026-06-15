@@ -34,7 +34,9 @@ class PlaygroundComponent extends RectangleComponent
   RectangleComponent switchSceneComponent = RectangleComponent();
   late RectangleComponent _sceneFadeComponent;
   late RectangleComponent _defeatFadeComponent;
-  final Map<int, RectangleButtonComponent> switchSceneButtons = {};
+  late RectangleButtonComponent firstSwitchButton;
+  late RectangleButtonComponent secondSwitchButton;
+  late RectangleButtonComponent thirdSwitchButton;
   bool _switchScenesLockedUntilRecovered = false;
   bool _isSceneTransitioning = false;
   double _sceneTransitionElapsed = 0;
@@ -156,6 +158,39 @@ class PlaygroundComponent extends RectangleComponent
       },
     );
 
+    firstSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.firstScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.firstScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.firstScene.id == _activeSceneId &&
+              _switchScenesLockedUntilRecovered);
+
+    secondSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.secondScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.secondScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.secondScene.id == _activeSceneId &&
+              _switchScenesLockedUntilRecovered);
+
+    thirdSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.thirdScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.thirdScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.thirdScene.id == _activeSceneId &&
+              _switchScenesLockedUntilRecovered);
+
     switchSceneComponent
       ..paint = (Paint()
         ..color = Colors.black
@@ -171,20 +206,9 @@ class PlaygroundComponent extends RectangleComponent
           crossAxisAlignment: CrossAxisAlignment.center,
           priority: 100,
           children: [
-            ...playground.scenes.map((scene) {
-              final button =
-                  RectangleButtonComponent(
-                      icon: scene.icon,
-                      onPressed: () {
-                        _startSceneTransition(playground.id, scene.id);
-                      },
-                    )
-                    ..isDisabled =
-                        (scene.id == _activeSceneId &&
-                        _switchScenesLockedUntilRecovered);
-              switchSceneButtons[scene.id] = button;
-              return button;
-            }),
+            firstSwitchButton,
+            secondSwitchButton,
+            thirdSwitchButton,
             upgradeButton,
           ],
         ),
@@ -248,9 +272,6 @@ class PlaygroundComponent extends RectangleComponent
       _activeSceneId = sceneId;
 
       _updateSwitchSceneButtons();
-      for (final buttonEntry in switchSceneButtons.entries) {
-        buttonEntry.value.isDisabled = buttonEntry.key == sceneId;
-      }
     }
 
     for (final encounter in children.whereType<EncounterComponent>()) {
@@ -367,11 +388,7 @@ class PlaygroundComponent extends RectangleComponent
     resetEncounters();
 
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final restScene = playground.scenes.whereType<RestSceneModel>().firstOrNull;
-
-    if (restScene == null) {
-      return;
-    }
+    final restScene = playground.thirdScene;
 
     _isDefeatTransitioning = true;
     _defeatTransitionElapsed = 0;
@@ -421,11 +438,15 @@ class PlaygroundComponent extends RectangleComponent
   }
 
   void _updateSwitchSceneButtons() {
-    for (final buttonEntry in switchSceneButtons.entries) {
-      buttonEntry.value.isDisabled =
-          _switchScenesLockedUntilRecovered ||
-          buttonEntry.key == _activeSceneId;
-    }
+    firstSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered ||
+        _playground.firstScene.id == _activeSceneId;
+    secondSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered ||
+        _playground.secondScene.id == _activeSceneId;
+    thirdSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered ||
+        _playground.thirdScene.id == _activeSceneId;
   }
 
   void _updateResponsivePositions({bool force = false}) {

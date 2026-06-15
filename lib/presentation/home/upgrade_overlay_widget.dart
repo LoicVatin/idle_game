@@ -6,6 +6,7 @@ import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/creature/worker_model.dart';
+import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
@@ -73,30 +74,42 @@ class UpgradeOverlay extends ConsumerWidget {
                               shrinkWrap: true,
                               children: [
                                 _workerCard(context, playground.worker),
-                                ...playground.scenes.map((scene) {
-                                  final resource =
-                                      data.resources[scene
+                                _sceneUpgradeCard(
+                                  context,
+                                  playground.firstScene,
+                                  data.resources[playground
+                                          .secondScene
                                           .generationRateUpgradeCostType] ??
                                       Resource(
-                                        type:
-                                            scene.generationRateUpgradeCostType,
-                                      );
-
-                                  if (scene is EncounterSceneModel) {
-                                    return _encounterSceneUpgradeCard(
-                                      context,
-                                      scene,
-                                      resource,
-                                    );
-                                  } else if (scene is RestSceneModel) {
-                                    return _restSceneUpgradeCard(
-                                      context,
-                                      scene,
-                                      resource,
-                                    );
-                                  }
-                                  return Container();
-                                }),
+                                        type: playground
+                                            .firstScene
+                                            .generationRateUpgradeCostType,
+                                      ),
+                                ),
+                                _sceneUpgradeCard(
+                                  context,
+                                  playground.secondScene,
+                                  data.resources[playground
+                                          .secondScene
+                                          .generationRateUpgradeCostType] ??
+                                      Resource(
+                                        type: playground
+                                            .secondScene
+                                            .generationRateUpgradeCostType,
+                                      ),
+                                ),
+                                _sceneUpgradeCard(
+                                  context,
+                                  playground.thirdScene,
+                                  data.resources[playground
+                                          .thirdScene
+                                          .generationRateUpgradeCostType] ??
+                                      Resource(
+                                        type: playground
+                                            .thirdScene
+                                            .generationRateUpgradeCostType,
+                                      ),
+                                ),
                               ],
                             ),
                           ),
@@ -143,7 +156,8 @@ class UpgradeOverlay extends ConsumerWidget {
                 Icon(Icons.linear_scale),
                 Expanded(
                   child: LinearProgressIndicator(
-                    value: (worker.experience / worker.experienceNeededToLevelUp),
+                    value:
+                        (worker.experience / worker.experienceNeededToLevelUp),
                   ),
                 ),
                 Icon(Icons.plus_one_outlined),
@@ -200,6 +214,21 @@ class UpgradeOverlay extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _sceneUpgradeCard(
+    BuildContext context,
+    SceneModel scene,
+    Resource resource,
+  ) {
+    if (scene is EncounterSceneModel) {
+      return _encounterSceneUpgradeCard(context, scene, resource);
+    }
+    if (scene is RestSceneModel) {
+      return _restSceneUpgradeCard(context, scene, resource);
+    }
+
+    return Container();
   }
 
   Widget _encounterSceneUpgradeCard(

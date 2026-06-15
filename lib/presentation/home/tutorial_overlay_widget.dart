@@ -178,7 +178,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
         }
 
         final switchSceneButtonOneComponent =
-            firstPlaygroundComponent?.switchSceneButtons.values.firstOrNull;
+            firstPlaygroundComponent?.firstSwitchButton;
         Rect? highlightSwitchSceneButtonOne;
         if (switchSceneButtonOneComponent != null &&
             switchSceneButtonOneComponent.isMounted) {
@@ -193,9 +193,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
         }
 
         final switchSceneButtonTwoComponent = firstPlaygroundComponent
-            ?.switchSceneButtons
-            .values
-            .elementAtOrNull(1);
+            ?.secondSwitchButton;
         Rect? highlightSwitchSceneButtonTwo;
         if (switchSceneButtonTwoComponent != null &&
             switchSceneButtonTwoComponent.isMounted) {
@@ -210,9 +208,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
         }
 
         final switchSceneButtonThreeComponent = firstPlaygroundComponent
-            ?.switchSceneButtons
-            .values
-            .elementAtOrNull(2);
+            ?.thirdSwitchButton;
         Rect? highlightSwitchSceneButtonThree;
         if (switchSceneButtonThreeComponent != null &&
             switchSceneButtonThreeComponent.isMounted) {

@@ -156,13 +156,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     final playground = game.gameStateNotifier.getPlaygroundById(
       playgroundModel.id,
     );
-    final restingScene = playground.scenes
-        .whereType<RestSceneModel>()
-        .firstOrNull;
-
-    if (restingScene == null) {
-      return;
-    }
+    final restingScene = playground.thirdScene;
 
     game.gameStateNotifier.switchActiveScene(playground.id, restingScene.id);
     spriteAnimationComponent.state = AnimationState.rest;
