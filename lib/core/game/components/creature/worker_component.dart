@@ -28,6 +28,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     super.statusOrder = StatusOrder.statusHealthStamina,
     super.primaryIconAnchor = Anchor.bottomRight,
     super.secondaryIconAnchor = Anchor.topLeft,
+    super.priority = 50,
   }) : super();
 
   @override
@@ -68,6 +69,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
       return;
     }
     isInConfrontation = true;
+    spriteAnimationComponent.state = AnimationState.attack;
     timer = CreatureComponent.confrontationStepDuration;
     paint.color = Colors.yellow;
     updateStaminaBar();
@@ -84,7 +86,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
       if (isRemoved) return;
 
       game.gameStateNotifier.toggleEncounter(
-        playgroundModel.activeSceneId,
+        playgroundModel.activeScene.id,
         true,
       );
     });
@@ -124,6 +126,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
 
     if (!model.canAttack) {
       spriteAnimationComponent.state = AnimationState.depleted;
+      target.pauseConfrontation();
       return;
     }
     if (!model.isAlive) {
@@ -197,7 +200,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     confrontationTarget = null;
     confrontationAttackTimer = 0;
     game.gameStateNotifier.toggleEncounter(
-      playgroundModel.activeSceneId,
+      playgroundModel.activeScene.id,
       false,
     );
   }

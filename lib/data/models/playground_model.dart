@@ -8,21 +8,19 @@ import 'package:idle_game/data/models/creature/worker_model.dart';
 class PlaygroundModel {
   final int id;
   final String name;
-  final SceneModel firstScene;
-  final SceneModel secondScene;
-  final SceneModel thirdScene;
+  final EncounterSceneModel firstScene;
+  final EncounterSceneModel secondScene;
+  final RestSceneModel thirdScene;
   late final Set<SceneModel> _scenes;
   WorkerModel worker;
-  int activeSceneId;
 
   PlaygroundModel({
     required this.id,
     this.name = "Playground",
-    this.activeSceneId = 0,
     WorkerModel? worker,
-    SceneModel? firstScene,
-    SceneModel? secondScene,
-    SceneModel? thirdScene,
+    EncounterSceneModel? firstScene,
+    EncounterSceneModel? secondScene,
+    RestSceneModel? thirdScene,
   }) : worker =
            worker ??
            WorkerModel(
@@ -31,20 +29,21 @@ class PlaygroundModel {
              primaryIcon: Icons.man_outlined,
              secondaryIcon: Icons.waving_hand_outlined,
            ),
-       firstScene = firstScene ?? EncounterSceneModel(id: 0, playgroundId: id),
+       firstScene =
+           firstScene ??
+           EncounterSceneModel(id: 0, playgroundId: id, active: true),
        secondScene =
            secondScene ?? EncounterSceneModel(id: 1, playgroundId: id),
        thirdScene = thirdScene ?? RestSceneModel(id: 2, playgroundId: id) {
-    activeSceneId = this.firstScene.id;
     _scenes = {this.firstScene, this.secondScene, this.thirdScene};
   }
 
   PlaygroundModel copyWith({
     int? id,
     String? name,
-    SceneModel? firstScene,
-    SceneModel? secondScene,
-    SceneModel? thirdScene,
+    EncounterSceneModel? firstScene,
+    EncounterSceneModel? secondScene,
+    RestSceneModel? thirdScene,
     WorkerModel? worker,
     int? activeSceneId,
   }) {
@@ -55,21 +54,22 @@ class PlaygroundModel {
       secondScene: secondScene ?? this.secondScene,
       thirdScene: thirdScene ?? this.thirdScene,
       worker: worker ?? this.worker,
-      activeSceneId: activeSceneId ?? this.activeSceneId,
+      //activeSceneId: activeSceneId ?? this.activeSceneId,
     );
   }
 
-  SceneModel get activeScene => _scenes.firstWhere(
-    (scene) => scene.id == activeSceneId,
-    orElse: () => _scenes.first,
-  );
+  SceneModel get activeScene =>
+      _scenes.firstWhere((scene) => scene.active, orElse: () => _scenes.first);
 
   SceneModel? getSceneById(int id) {
     return _scenes.firstWhereOrNull((scene) => scene.id == id);
   }
 
   void setActiveScene(int id) {
-    if (getSceneById(id) != null) activeSceneId = id;
+    for (final scene in _scenes) {
+      scene.active = scene.id == id;
+    }
+    //if (getSceneById(id) != null) activeSceneId = id;
   }
 
   void addExperience(double baseReward) {

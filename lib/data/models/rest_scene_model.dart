@@ -13,6 +13,7 @@ class RestSceneModel extends SceneModel {
     super.icon = Icons.fireplace_outlined,
     super.backgroundColor = Colors.lightBlue,
     super.generationRateUpgradeCostType = ResourceType.food,
+    super.active,
     this.healthRegenPerSecond = 5,
     this.staminaRegenPerSecond = 10,
   }) : super(

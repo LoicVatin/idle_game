@@ -57,7 +57,7 @@ abstract class CreatureComponent<T extends CreatureModel>
     this.collisionType = CollisionType.active,
     super.position,
     super.anchor,
-    super.priority = 50,
+    super.priority,
     this.color = Colors.yellowAccent,
     this.statusOrder = StatusOrder.statusHealthStamina,
     this.primaryIconAnchor = Anchor.bottomCenter,

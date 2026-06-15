@@ -58,7 +58,6 @@ class GameStateData {
           primaryIcon: Icons.hiking_outlined,
           secondaryIcon: Icons.gavel_sharp,
         ),
-        activeSceneId: 0,
         // Forest
         firstScene: EncounterSceneModel(
           id: 0,
@@ -67,6 +66,7 @@ class GameStateData {
           icon: Icons.forest_outlined,
           backgroundColor: Colors.green,
           generationRateUpgradeCostType: ResourceType.wood,
+          active: true,
           encounters: WeightedRandom({
             EncounterModel(
               name: "Tree",
@@ -274,13 +274,13 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   void downgradeScene(int id, double amount) {
     if (amount <= 0) return;
 
-    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
+    _mutateScene(getPlaygroundById(id).activeScene.id, (scene) {
       scene.downgrade(amount);
     });
   }
 
   void resetScene(int id) {
-    _mutateScene(getPlaygroundById(id).activeSceneId, (scene) {
+    _mutateScene(getPlaygroundById(id).activeScene.id, (scene) {
       scene.reset();
     });
   }
@@ -318,7 +318,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
   }
 
   void switchActiveScene(int playgroundId, int sceneId) {
-    if (getPlaygroundById(playgroundId).activeSceneId == sceneId) return;
+    if (getPlaygroundById(playgroundId).activeScene.id == sceneId) return;
 
     _mutatePlayground(playgroundId, (playground) {
       playground.setActiveScene(sceneId);
@@ -361,6 +361,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         icon: adventure.encounterOneIcon,
         backgroundColor: adventure.encounterOneColor,
         generationRateUpgradeCostType: ResourceType.wood,
+        active: true,
         encounters: WeightedRandom({
           EncounterModel(
             name: "Tree",

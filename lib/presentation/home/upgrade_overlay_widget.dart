@@ -78,7 +78,7 @@ class UpgradeOverlay extends ConsumerWidget {
                                   context,
                                   playground.firstScene,
                                   data.resources[playground
-                                          .secondScene
+                                          .firstScene
                                           .generationRateUpgradeCostType] ??
                                       Resource(
                                         type: playground

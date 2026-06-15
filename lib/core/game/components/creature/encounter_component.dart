@@ -3,13 +3,13 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/core/game/components/creature/sprite_animation_with_states_component.dart';
+import 'package:idle_game/core/game/components/creature/worker_component.dart';
 import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
-import 'package:idle_game/data/models/scene_model.dart';
 
 class EncounterComponent extends CreatureComponent<EncounterModel> {
   @override
-  SceneModel scene;
+  EncounterSceneModel scene;
   bool isSceneActive = true;
 
   EncounterComponent({
@@ -29,7 +29,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
   @override
   void update(double dt) {
     super.update(dt);
-    if (!isSceneActive) {
+    if (!scene.active) {
       return;
     }
 
@@ -46,8 +46,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
       }
     }
 
-    final scene = this.scene;
-    if (scene is EncounterSceneModel && !scene.encounter) {
+    if (!scene.encounter) {
       if (clickBoostTime > 0) {
         clickBoostTime -= dt;
       }
@@ -65,6 +64,17 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     }
   }
 
+  @override
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints,
+      PositionComponent other,
+      ) {
+    super.onCollisionStart(intersectionPoints, other);
+    if(other is WorkerComponent) {
+      scene.encounter = true;
+    }
+  }
+
   bool takeDamage(double amount) {
     model.takeDamage(amount);
     isInConfrontation = true;
@@ -75,6 +85,10 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     updateHealthBar();
 
     return model.health <= 0;
+  }
+
+  void pauseConfrontation() {
+    spriteAnimationComponent.state = AnimationState.idle;
   }
 
   void resetHealth() {

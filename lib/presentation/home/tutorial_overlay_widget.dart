@@ -123,7 +123,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
           highlightHeader = Rect.fromLTWH(topLeft.x, topLeft.y, size.x, size.y);
         }
 
-        final rateComponent = firstPlaygroundComponent?.rateComponent;
+        final rateComponent = firstPlaygroundComponent?.firstScene.rateComponent;
         Rect? highlightRate;
         if (rateComponent != null && rateComponent.isMounted) {
           final topLeft = rateComponent.absoluteTopLeftPosition;

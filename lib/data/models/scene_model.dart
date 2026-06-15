@@ -16,6 +16,7 @@ abstract class SceneModel {
   double generationRateUpgradeAmount;
   double generationRatePerSecond;
   ResourceType generationRateUpgradeCostType;
+  bool active;
 
   SceneModel({
     required this.id,
@@ -28,6 +29,7 @@ abstract class SceneModel {
     this.generationRateMaxLevel = 5,
     this.generationRateUpgradeAmount = 1.0,
     this.generationRateUpgradeCostType = ResourceType.wood,
+    this.active = false,
   });
 
   num get generationRateUpgradeCost =>
