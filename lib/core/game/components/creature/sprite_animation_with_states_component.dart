@@ -5,7 +5,14 @@ enum AnimationState { idle, walk, attack, depleted, rest, defeat }
 
 class SpriteAnimationWithStatesComponent
     extends SpriteAnimationGroupComponent<AnimationState> {
-  SpriteAnimationWithStatesComponent({super.key, super.size, super.position});
+  final String name;
+
+  SpriteAnimationWithStatesComponent({
+    required this.name,
+    super.key,
+    super.size,
+    super.position,
+  });
 
   @override
   Future<void> onLoad() async {
@@ -21,12 +28,12 @@ class SpriteAnimationWithStatesComponent
   }
 
   Future<SpriteAnimation> _loadAnimation(
-    String name, {
+    String state, {
     int frames = 6,
     double stepTime = 0.1,
   }) async {
     return SpriteAnimation.fromFrameData(
-      await Flame.images.load('test_card_$name.png'),
+      await Flame.images.load('${name}_$state.png'),
       SpriteAnimationData.sequenced(
         amount: frames,
         stepTime: stepTime,

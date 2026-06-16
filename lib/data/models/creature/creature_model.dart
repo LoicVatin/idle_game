@@ -6,6 +6,7 @@ abstract class CreatureModel {
   final String name;
   final IconData primaryIcon;
   final IconData secondaryIcon;
+  final String? spriteSheet;
 
   int level;
   final int maxLevel;
@@ -29,6 +30,7 @@ abstract class CreatureModel {
     required this.name,
     required this.primaryIcon,
     required this.secondaryIcon,
+    this.spriteSheet,
     this.level = 1,
     this.maxLevel = 100,
     double? experience,
@@ -42,8 +44,8 @@ abstract class CreatureModel {
     this.damageIncreasePerLevel = 1,
     this.staminaCostPerAttack = 1,
   }) : health = health ?? maxHealth,
-        stamina = stamina ?? maxStamina,
-        experience = experience ?? 0;
+       stamina = stamina ?? maxStamina,
+       experience = experience ?? 0;
 
   bool get canAttack => stamina >= staminaCostPerAttack;
 
@@ -113,6 +115,7 @@ abstract class CreatureModel {
     String? name,
     IconData? primaryIcon,
     IconData? secondaryIcon,
+    String? spriteSheet,
     int? level,
     int? maxLevel,
     double? experience,

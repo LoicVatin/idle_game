@@ -12,6 +12,11 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
   EncounterSceneModel scene;
   bool isSceneActive = true;
 
+  @override
+  String get defaultSpriteSheetFolder => "encounters/";
+  @override
+  String get defaultSpriteSheet => "encounter";
+
   EncounterComponent({
     required this.scene,
     required super.model,
@@ -23,7 +28,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     super.primaryIconAnchor = Anchor.topRight,
     super.secondaryIconAnchor = Anchor.bottomLeft,
   }) : super() {
-    paint.color = model.type.color;
+    paint.color = model.type.color.withValues(alpha: 0.3);
   }
 
   @override
@@ -42,7 +47,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
 
       if (timer <= 0) {
         isInConfrontation = false;
-        paint.color = model.type.color;
+        paint.color = model.type.color.withValues(alpha: 0.3);
       }
     }
 
@@ -66,11 +71,11 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
 
   @override
   void onCollisionStart(
-      Set<Vector2> intersectionPoints,
-      PositionComponent other,
-      ) {
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
     super.onCollisionStart(intersectionPoints, other);
-    if(other is WorkerComponent) {
+    if (other is WorkerComponent) {
       scene.encounter = true;
     }
   }
@@ -81,7 +86,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     spriteAnimationComponent.state = AnimationState.attack;
 
     timer = CreatureComponent.confrontationStepDuration;
-    paint.color = Colors.orange;
+    paint.color = Colors.orange.withValues(alpha: 0.3);
     updateHealthBar();
 
     return model.health <= 0;
@@ -96,7 +101,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     isInConfrontation = false;
     spriteAnimationComponent.state = AnimationState.idle;
     timer = 0;
-    paint.color = model.type.color;
+    paint.color = model.type.color.withValues(alpha: 0.3);
     updateHealthBar();
   }
 

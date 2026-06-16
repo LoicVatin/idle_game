@@ -18,6 +18,12 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
   EncounterComponent? confrontationTarget;
   double confrontationAttackTimer = 0;
 
+  @override
+  String get defaultSpriteSheetFolder => "workers/";
+
+  @override
+  String get defaultSpriteSheet => "worker";
+
   WorkerComponent({
     required this.playgroundModel,
     required super.model,
@@ -40,7 +46,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
 
       if (timer <= 0) {
         isInConfrontation = false;
-        paint.color = Colors.blueAccent;
+        paint.color = Colors.blueAccent.withValues(alpha: 0.3);
       }
     }
 
@@ -71,7 +77,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     isInConfrontation = true;
     spriteAnimationComponent.state = AnimationState.attack;
     timer = CreatureComponent.confrontationStepDuration;
-    paint.color = Colors.yellow;
+    paint.color = Colors.yellow.withValues(alpha: 0.3);
     updateStaminaBar();
   }
 

@@ -57,6 +57,7 @@ class GameStateData {
           name: "Explorer",
           primaryIcon: Icons.hiking_outlined,
           secondaryIcon: Icons.gavel_sharp,
+          spriteSheet: "adventurer",
         ),
         // Forest
         firstScene: EncounterSceneModel(
@@ -75,6 +76,7 @@ class GameStateData {
               reward: 5,
               primaryIcon: Icons.park,
               secondaryIcon: ResourceType.wood.icon,
+              spriteSheet: "tree",
             ): 1,
             EncounterModel(
               name: "Trees",
@@ -83,6 +85,7 @@ class GameStateData {
               reward: 15,
               primaryIcon: Icons.forest,
               secondaryIcon: ResourceType.wood.icon,
+              spriteSheet: "tree",
             ): 0.1,
             EncounterModel(
               name: "Pebbles",
@@ -91,15 +94,17 @@ class GameStateData {
               reward: 3,
               primaryIcon: Icons.scatter_plot,
               secondaryIcon: ResourceType.stone.icon,
+              spriteSheet: "rock",
             ): 0.2,
             EncounterModel(
-              name: "Rat",
+              name: "Goblin",
               type: ResourceType.food,
               maxHealth: 3,
               damage: 1,
               reward: 5,
               primaryIcon: Icons.pest_control_rodent,
               secondaryIcon: ResourceType.food.icon,
+              spriteSheet: "goblin",
             ): 0.2,
           }),
         ),
@@ -119,6 +124,7 @@ class GameStateData {
               reward: 5,
               primaryIcon: Icons.park,
               secondaryIcon: ResourceType.wood.icon,
+              spriteSheet: "tree",
             ): 1,
             EncounterModel(
               name: "Rock",
@@ -127,15 +133,17 @@ class GameStateData {
               reward: 5,
               primaryIcon: Icons.landslide,
               secondaryIcon: ResourceType.stone.icon,
+              spriteSheet: "rock",
             ): 0.5,
             EncounterModel(
-              name: "Boar",
+              name: "Hobgoblin",
               type: ResourceType.food,
               maxHealth: 5,
               damage: 3,
               reward: 4,
               primaryIcon: Icons.savings,
               secondaryIcon: ResourceType.food.icon,
+              spriteSheet: "goblin",
             ): 0.5,
             EncounterModel(
               name: "Stockpile",
@@ -352,6 +360,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         name: "${adventure.workerName} $increment",
         primaryIcon: adventure.workerIcon,
         secondaryIcon: adventure.workerTool,
+        spriteSheet: "adventurer",
       ),
       // Forest
       firstScene: EncounterSceneModel(
@@ -370,6 +379,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
             reward: 5,
             primaryIcon: Icons.park,
             secondaryIcon: ResourceType.wood.icon,
+            spriteSheet: "tree",
           ): 1,
           EncounterModel(
             name: "Trees",
@@ -378,6 +388,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
             reward: 15,
             primaryIcon: Icons.forest,
             secondaryIcon: ResourceType.wood.icon,
+            spriteSheet: "tree",
           ): 0.1,
           EncounterModel(
             name: "Pebbles",
@@ -386,15 +397,17 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
             reward: 3,
             primaryIcon: Icons.scatter_plot,
             secondaryIcon: ResourceType.stone.icon,
+            spriteSheet: "rock",
           ): 0.2,
           EncounterModel(
-            name: "Rat",
+            name: "Goblin",
             type: ResourceType.food,
             maxHealth: 3,
             damage: 1,
             reward: 5,
             primaryIcon: Icons.pest_control_rodent,
             secondaryIcon: ResourceType.food.icon,
+            spriteSheet: "goblin",
           ): 0.2,
         }),
       ),
@@ -414,6 +427,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
             reward: 5,
             primaryIcon: Icons.park,
             secondaryIcon: ResourceType.wood.icon,
+            spriteSheet: "tree",
           ): 1,
           EncounterModel(
             name: "Rock",
@@ -422,15 +436,17 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
             reward: 5,
             primaryIcon: Icons.landslide,
             secondaryIcon: ResourceType.stone.icon,
+            spriteSheet: "rock",
           ): 0.5,
           EncounterModel(
-            name: "Boar",
+            name: "Hobgoblin",
             type: ResourceType.food,
             maxHealth: 5,
             damage: 3,
             reward: 4,
             primaryIcon: Icons.savings,
             secondaryIcon: ResourceType.food.icon,
+            spriteSheet: "goblin",
           ): 0.5,
           EncounterModel(
             name: "Stockpile",

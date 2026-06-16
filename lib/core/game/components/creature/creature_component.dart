@@ -52,6 +52,9 @@ abstract class CreatureComponent<T extends CreatureModel>
   final Anchor primaryIconAnchor;
   final Anchor secondaryIconAnchor;
 
+  final String defaultSpriteSheetFolder = "";
+  final String defaultSpriteSheet = "test_card";
+
   CreatureComponent({
     required this.model,
     this.collisionType = CollisionType.active,
@@ -64,12 +67,14 @@ abstract class CreatureComponent<T extends CreatureModel>
     this.secondaryIconAnchor = Anchor.topCenter,
   }) : super(
          size: Vector2.all(componentRadius),
-         paint: Paint()..color = color,
+         paint: Paint()..color = color.withValues(alpha: 0.3),
        ) {
     statusText = StatusTextComponent();
     healthBar = StatusBarComponent(fillColor: Colors.greenAccent);
     staminaBar = StatusBarComponent(fillColor: Colors.orangeAccent);
     spriteAnimationComponent = SpriteAnimationWithStatesComponent(
+      name:
+          "$defaultSpriteSheetFolder${model.spriteSheet ?? defaultSpriteSheet}",
       size: Vector2.all(componentRadius),
       position: Vector2.zero(),
     );
@@ -101,12 +106,14 @@ abstract class CreatureComponent<T extends CreatureModel>
         size: Vector2.all(componentHalfRadius),
         anchor: primaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
+        paint: Paint()..color = Colors.white30,
       ),
       IconComponent(
         icon: model.secondaryIcon,
         size: Vector2.all(componentHalfRadius),
         anchor: secondaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
+        paint: Paint()..color = Colors.white30,
       ),
       spriteAnimationComponent,
     ]);
