@@ -9,6 +9,7 @@ abstract class SceneModel {
   String name;
   IconData icon;
   Color backgroundColor;
+  final String? spriteSheet;
   final double x = 0.1;
   final double y = 2.0;
   int generationRateLevel;
@@ -22,6 +23,7 @@ abstract class SceneModel {
     required this.id,
     required this.playgroundId,
     this.name = "Scene",
+    this.spriteSheet,
     this.icon = Icons.map_outlined,
     this.backgroundColor = Colors.grey,
     this.generationRateLevel = 0,

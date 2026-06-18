@@ -16,6 +16,7 @@ class EncounterSceneModel extends SceneModel {
     super.name = "Encounter Scene",
     super.icon = Icons.forest_outlined,
     super.backgroundColor = Colors.green,
+    super.spriteSheet,
     super.generationRateUpgradeCostType = ResourceType.wood,
     super.active,
     this.encounterInterval = 25,

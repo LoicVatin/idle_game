@@ -116,6 +116,9 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
           : AnimationState.idle;
       return;
     }
+    if ((scene is EncounterSceneModel && scene.encounter)) {
+      clickBoostTime = 0.0;
+    }
 
     final target = confrontationTarget;
 

@@ -66,6 +66,7 @@ class GameStateData {
           name: "Forest",
           icon: Icons.forest_outlined,
           backgroundColor: Colors.green,
+          spriteSheet: "forest",
           generationRateUpgradeCostType: ResourceType.wood,
           active: true,
           encounters: WeightedRandom({
@@ -115,6 +116,7 @@ class GameStateData {
           name: "Deep Forest",
           icon: Icons.forest,
           backgroundColor: Colors.green.shade900,
+          spriteSheet: "deep_forest",
           generationRateUpgradeCostType: ResourceType.stone,
           encounters: WeightedRandom({
             EncounterModel(
@@ -162,6 +164,7 @@ class GameStateData {
           name: "Camp fire",
           icon: Icons.fireplace_outlined,
           backgroundColor: Colors.green.shade600,
+          spriteSheet: "rest",
           generationRateUpgradeCostType: ResourceType.food,
           healthRegenPerSecond: 5,
           staminaRegenPerSecond: 10,

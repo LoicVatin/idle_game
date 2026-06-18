@@ -66,6 +66,8 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
       if (x < -width) {
         removeFromParent();
       }
+    } else {
+      clickBoostTime = 0;
     }
   }
 

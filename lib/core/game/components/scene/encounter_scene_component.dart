@@ -17,18 +17,34 @@ class EncounterSceneComponent extends SceneComponent<EncounterSceneModel> {
   });
 
   @override
+  String get defaultSpriteSheet => "background";
+
+  double clickBoostTime = 0;
+  static const double clickBoostDuration = 0.6;
+  static const double clickBoostVelocity = 3;
+
+  @override
   void update(double dt) {
     super.update(dt);
 
     if (scene.active) {
-        //if (scene.generationRatePerSecond > 0 && !scene.encounter) {
-        //  encounterTimer += dt * scene.generationRatePerSecond * 10;
-        //}
+      //if (scene.generationRatePerSecond > 0 && !scene.encounter) {
+      //  encounterTimer += dt * scene.generationRatePerSecond * 10;
+      //}
 
-        //if (encounterTimer >= scene.encounterInterval) {
-        //  encounterTimer = 0;
-          generateEncounter();
-        //}
+      //if (encounterTimer >= scene.encounterInterval) {
+      //  encounterTimer = 0;
+      if (!scene.encounter && clickBoostTime > 0) {
+        clickBoostTime -= dt;
+      }
+      if(scene.encounter) {
+        clickBoostTime = 0;
+      }
+
+      final parallax = parallaxComponent.parallax;
+      parallax?.baseVelocity = Vector2(scene.encounter ? 0.0 : (scene.generationRatePerSecond + (clickBoostTime > 0 ? clickBoostVelocity : 0.0)), 0.0);
+      generateEncounter();
+      //}
     } else {
       resetEncounterHealth(scene.id);
     }
@@ -87,6 +103,7 @@ class EncounterSceneComponent extends SceneComponent<EncounterSceneModel> {
   @override
   void moveOnClick() {
     encounterTimer += scene.encounterInterval / 10;
+    clickBoostTime = clickBoostDuration;
 
     for (final encounter in children.whereType<EncounterComponent>()) {
       encounter.moveOnClick();
