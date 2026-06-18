@@ -20,7 +20,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   IdleGame? _game;
   late final Future _googleFontsPending;
-  late final bool _isTutorialAtStartupDismissed;
+  bool _isTutorialAtStartupDismissed = false;
 
   @override
   void initState() {

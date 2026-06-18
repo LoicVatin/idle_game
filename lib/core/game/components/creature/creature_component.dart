@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/core/game/components/creature/sprite_animation_with_states_component.dart';
 import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
 import 'package:idle_game/core/game/components/creature/status_text_component.dart';
@@ -21,10 +22,8 @@ abstract class CreatureComponent<T extends CreatureModel>
   bool isInConfrontation = false;
   double timer = 0;
 
-  AnimationState state = AnimationState.idle;
-
   int _lastLevel = -1;
-  double _lastHealth = -1;
+  double lastHealth = -1;
   double _lastStamina = -1;
   int? _lastStatusSceneId;
   int? _lastHealthSceneId;
@@ -38,14 +37,8 @@ abstract class CreatureComponent<T extends CreatureModel>
   late final StatusBarComponent staminaBar;
   late final SpriteAnimationWithStatesComponent spriteAnimationComponent;
 
-  double clickBoostTime = 0;
-  static const double clickBoostDuration = 0.6;
-  static const double clickBoostVelocity = 30;
-
   static const double componentRadius = 48.0;
   static const double componentHalfRadius = componentRadius / 2;
-  static const double confrontationStepDuration = 0.15;
-  static const double confrontationAttackInterval = 0.35;
 
   final Color color;
   final StatusOrder statusOrder;
@@ -129,6 +122,12 @@ abstract class CreatureComponent<T extends CreatureModel>
     updateStaminaBar();
   }
 
+  @override
+  void update(double dt) {
+    super.update(dt);
+    model.update(dt);
+  }
+
   void updateStatusText() {
     final alwaysVisible = isStatusAlwaysVisible();
 
@@ -151,12 +150,12 @@ abstract class CreatureComponent<T extends CreatureModel>
   void updateHealthBar() {
     final alwaysVisible = isHealthBarAlwaysVisible();
 
-    if (_lastHealth == model.health &&
+    if (lastHealth == model.health &&
         _lastHealthSceneId == scene.id &&
         _lastHealthAlwaysVisible == alwaysVisible) {
       return;
     }
-    _lastHealth = model.health;
+    lastHealth = model.health;
     _lastHealthSceneId = scene.id;
     _lastHealthAlwaysVisible = alwaysVisible;
 
@@ -186,15 +185,44 @@ abstract class CreatureComponent<T extends CreatureModel>
     );
   }
 
+  void updateCreatureState(double dt) {
+    updateStatusText();
+    updateHealthBar();
+    updateStaminaBar();
+  }
+
+  void onConfrontation() {
+    isInConfrontation = true;
+    state = CreatureState.attack;
+    timer = CreatureModel.confrontationStepDuration;
+    paint.color = Colors.orangeAccent.withValues(alpha: 0.3);
+    updateHealthBar();
+    updateStaminaBar();
+  }
+
+  void moveOnClick() {
+    clickBoostTime = CreatureModel.clickBoostDuration;
+  }
+
   SceneModel get scene;
+
+  CreatureState get state => model.state;
+
+  set state(CreatureState value) {
+    model.state = value;
+    if (spriteAnimationComponent.state == value) return;
+    spriteAnimationComponent.state = value;
+  }
+
+  double get clickBoostTime => model.clickBoostTime;
+
+  set clickBoostTime(double value) => model.clickBoostTime = value;
 
   bool isStatusAlwaysVisible();
 
   bool isHealthBarAlwaysVisible();
 
   bool isStaminaBarAlwaysVisible();
-
-  void moveOnClick();
 
   void defeat();
 }

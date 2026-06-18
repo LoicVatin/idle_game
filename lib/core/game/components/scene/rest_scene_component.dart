@@ -5,7 +5,6 @@ class RestSceneComponent extends SceneComponent<RestSceneModel> {
   RestSceneComponent({
     required super.playground,
     required super.scene,
-    required super.onDefeated,
     super.size,
     super.position,
     super.visible,
@@ -13,22 +12,23 @@ class RestSceneComponent extends SceneComponent<RestSceneModel> {
   });
 
   @override
-  void update(double dt) {
-    super.update(dt);
+  String get defaultSpriteSheet => "background";
 
-    if (scene.active) {
-      playground.worker.restoreHealth(
-        scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
-      );
-      playground.worker.restoreStamina(
-        scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
-      );
-      encounterTimer = 0;
-    }
+  @override
+  void onSceneActive(double dt) {
+    playground.worker.restoreHealth(
+      scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
+    );
+    playground.worker.restoreStamina(
+      scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
+    );
   }
 
   @override
-  void moveOnClick() {
+  void onSceneInactive(double dt) {}
+
+  @override
+  void onSceneTap() {
     RestSceneModel restingSpotModel = scene;
     playground.worker.restoreHealth(
       restingSpotModel.generationRatePerSecond *
@@ -38,11 +38,5 @@ class RestSceneComponent extends SceneComponent<RestSceneModel> {
       restingSpotModel.generationRatePerSecond *
           restingSpotModel.staminaRegenPerSecond,
     );
-  }
-
-  @override
-  void handleWorkerDefeated() {
-    //resetEncounters();
-    onDefeated;
   }
 }

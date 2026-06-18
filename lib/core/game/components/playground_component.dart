@@ -8,7 +8,6 @@ import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
 import 'package:idle_game/core/game/components/scene/encounter_scene_component.dart';
 import 'package:idle_game/core/game/components/scene/rest_scene_component.dart';
-import 'package:idle_game/core/game/components/scene/scene_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/creature/worker_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
@@ -48,11 +47,12 @@ class PlaygroundComponent extends RectangleComponent
   late WorkerComponent workerComponent;
   late TextComponent _workerLevelComponent;
   late StatusBarComponent _workerExperienceComponent;
-  late SceneComponent firstScene;
-  late SceneComponent secondScene;
-  late SceneComponent thirdScene;
+  late EncounterSceneComponent firstScene;
+  late EncounterSceneComponent secondScene;
+  late RestSceneComponent thirdScene;
 
   StreamSubscription? _subscription;
+  StreamSubscription? _defeatSubscription;
 
   @override
   void onMount() {
@@ -60,12 +60,18 @@ class PlaygroundComponent extends RectangleComponent
     _subscription = game.gameStateNotifier.onUpdate.listen(
       (_) => _updateState(),
     );
+    _defeatSubscription = game.gameStateNotifier.onWorkerDefeated.listen(
+      (playgroundId) {
+        if (playgroundId == _playground.id) handleWorkerDefeated();
+      },
+    );
     _updateState();
   }
 
   @override
   void onRemove() {
     _subscription?.cancel();
+    _defeatSubscription?.cancel();
     super.onRemove();
   }
 
@@ -116,7 +122,6 @@ class PlaygroundComponent extends RectangleComponent
       model: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
-      onDefeated: null,
     );
     add(workerComponent);
 
@@ -212,7 +217,6 @@ class PlaygroundComponent extends RectangleComponent
       size: Vector2(width - ((24 * 2) + 4), height),
       playground: playground,
       scene: playground.firstScene,
-      onDefeated: handleWorkerDefeated,
       visible: true,
     );
     add(firstScene);
@@ -221,7 +225,6 @@ class PlaygroundComponent extends RectangleComponent
       size: Vector2(width - ((24 * 2) + 4), height),
       playground: playground,
       scene: playground.secondScene,
-      onDefeated: handleWorkerDefeated,
     );
     add(secondScene);
 
@@ -229,7 +232,6 @@ class PlaygroundComponent extends RectangleComponent
       size: Vector2(width - ((24 * 2) + 4), height),
       playground: playground,
       scene: playground.thirdScene,
-      onDefeated: handleWorkerDefeated,
     );
     add(thirdScene);
 
@@ -242,8 +244,6 @@ class PlaygroundComponent extends RectangleComponent
     _updateDefeatTransition(dt);
     _updateSceneSwitchLock(_playground.worker);
     _updateResponsivePositions();
-
-    _updateSceneSwitchLock(_playground.worker);
 
     super.update(dt);
   }
@@ -345,6 +345,8 @@ class PlaygroundComponent extends RectangleComponent
     }
 
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
+    firstScene.resetEncounters();
+    secondScene.resetEncounters();
     final restScene = playground.thirdScene;
 
     _isDefeatTransitioning = true;

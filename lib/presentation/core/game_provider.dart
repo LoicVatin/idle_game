@@ -8,16 +8,17 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/data/models/adventure_model.dart';
+import 'package:idle_game/data/models/creature/creature_model.dart';
 import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/utils/logger_helper.dart';
+import 'package:idle_game/utils/weighted_list.dart';
 
-final gameStateProvider =
-    AsyncNotifierProvider<GameStateNotifier, GameStateData>(
-      GameStateNotifier.new,
-    );
+final gameStateProvider = NotifierProvider<GameStateNotifier, GameStateData>(
+  GameStateNotifier.new,
+);
 
 @immutable
 class GameStateData {
@@ -26,26 +27,99 @@ class GameStateData {
 
   const GameStateData({required this.resources, required this.playgrounds});
 
+  static WeightedList<EncounterModel> _firstSceneEncounters() => WeightedList({
+    EncounterModel(
+      name: "Tree",
+      type: ResourceType.wood,
+      maxHealth: 3,
+      reward: 5,
+      primaryIcon: Icons.park,
+      secondaryIcon: ResourceType.wood.icon,
+      spriteSheet: "tree",
+    ): 1,
+    EncounterModel(
+      name: "Trees",
+      type: ResourceType.wood,
+      maxHealth: 12,
+      reward: 15,
+      primaryIcon: Icons.forest,
+      secondaryIcon: ResourceType.wood.icon,
+      spriteSheet: "tree",
+    ): 0.1,
+    EncounterModel(
+      name: "Pebbles",
+      type: ResourceType.stone,
+      maxHealth: 5,
+      reward: 3,
+      primaryIcon: Icons.scatter_plot,
+      secondaryIcon: ResourceType.stone.icon,
+      spriteSheet: "rock",
+    ): 0.2,
+    EncounterModel(
+      name: "Goblin",
+      type: ResourceType.food,
+      maxHealth: 3,
+      damage: 1,
+      reward: 5,
+      primaryIcon: Icons.pest_control_rodent,
+      secondaryIcon: ResourceType.food.icon,
+      spriteSheet: "goblin",
+    ): 2,
+  });
+
+  static WeightedList<EncounterModel> _secondSceneEncounters() => WeightedList({
+    EncounterModel(
+      name: "Dead Tree",
+      type: ResourceType.wood,
+      maxHealth: 2,
+      reward: 2,
+      primaryIcon: Icons.park,
+      secondaryIcon: ResourceType.wood.icon,
+      spriteSheet: "tree",
+    ): 1,
+    EncounterModel(
+      name: "Rock",
+      type: ResourceType.stone,
+      maxHealth: 4,
+      reward: 5,
+      primaryIcon: Icons.landslide,
+      secondaryIcon: ResourceType.stone.icon,
+      spriteSheet: "rock",
+    ): 0.5,
+    EncounterModel(
+      name: "Hobgoblin",
+      type: ResourceType.food,
+      maxHealth: 5,
+      damage: 10,
+      reward: 4,
+      primaryIcon: Icons.savings,
+      secondaryIcon: ResourceType.food.icon,
+      spriteSheet: "goblin",
+    ): 2,
+    EncounterModel(
+      name: "Stockpile",
+      type: ResourceType.wood,
+      maxHealth: 25,
+      reward: 10,
+      primaryIcon: Icons.inventory,
+      secondaryIcon: ResourceType.wood.icon,
+    ): 0.1,
+  });
+
   factory GameStateData.initial() {
     appLogger.d("GameStateData.initial()");
     final resources = {
       ResourceType.wood: Resource(
         type: ResourceType.wood,
-        amount: kDebugMode
-            ? 1000000000000000000000000000000000000000000000000000000000000000.0
-            : 0.0,
+        amount: kDebugMode ? 1e63 : 0.0,
       ),
       ResourceType.stone: Resource(
         type: ResourceType.stone,
-        amount: kDebugMode
-            ? 1000000000000000000000000000000000000000000000000000000000000000.0
-            : 0.0,
+        amount: kDebugMode ? 1e63 : 0.0,
       ),
       ResourceType.food: Resource(
         type: ResourceType.food,
-        amount: kDebugMode
-            ? 1000000000000000000000000000000000000000000000000000000000000000.0
-            : 0.0,
+        amount: kDebugMode ? 1e63 : 0.0,
       ),
     };
 
@@ -59,7 +133,6 @@ class GameStateData {
           secondaryIcon: Icons.gavel_sharp,
           spriteSheet: "adventurer",
         ),
-        // Forest
         firstScene: EncounterSceneModel(
           id: 0,
           playgroundId: 0,
@@ -69,47 +142,8 @@ class GameStateData {
           spriteSheet: "forest",
           generationRateUpgradeCostType: ResourceType.wood,
           active: true,
-          encounters: WeightedRandom({
-            EncounterModel(
-              name: "Tree",
-              type: ResourceType.wood,
-              maxHealth: 3,
-              reward: 5,
-              primaryIcon: Icons.park,
-              secondaryIcon: ResourceType.wood.icon,
-              spriteSheet: "tree",
-            ): 1,
-            EncounterModel(
-              name: "Trees",
-              type: ResourceType.wood,
-              maxHealth: 12,
-              reward: 15,
-              primaryIcon: Icons.forest,
-              secondaryIcon: ResourceType.wood.icon,
-              spriteSheet: "tree",
-            ): 0.1,
-            EncounterModel(
-              name: "Pebbles",
-              type: ResourceType.stone,
-              maxHealth: 5,
-              reward: 3,
-              primaryIcon: Icons.scatter_plot,
-              secondaryIcon: ResourceType.stone.icon,
-              spriteSheet: "rock",
-            ): 0.2,
-            EncounterModel(
-              name: "Goblin",
-              type: ResourceType.food,
-              maxHealth: 3,
-              damage: 1,
-              reward: 5,
-              primaryIcon: Icons.pest_control_rodent,
-              secondaryIcon: ResourceType.food.icon,
-              spriteSheet: "goblin",
-            ): 0.2,
-          }),
+          encounters: _firstSceneEncounters(),
         ),
-        // Cave
         secondScene: EncounterSceneModel(
           id: 1,
           playgroundId: 0,
@@ -118,46 +152,8 @@ class GameStateData {
           backgroundColor: Colors.green.shade900,
           spriteSheet: "deep_forest",
           generationRateUpgradeCostType: ResourceType.stone,
-          encounters: WeightedRandom({
-            EncounterModel(
-              name: "Tree",
-              type: ResourceType.wood,
-              maxHealth: 3,
-              reward: 5,
-              primaryIcon: Icons.park,
-              secondaryIcon: ResourceType.wood.icon,
-              spriteSheet: "tree",
-            ): 1,
-            EncounterModel(
-              name: "Rock",
-              type: ResourceType.stone,
-              maxHealth: 4,
-              reward: 5,
-              primaryIcon: Icons.landslide,
-              secondaryIcon: ResourceType.stone.icon,
-              spriteSheet: "rock",
-            ): 0.5,
-            EncounterModel(
-              name: "Hobgoblin",
-              type: ResourceType.food,
-              maxHealth: 5,
-              damage: 3,
-              reward: 4,
-              primaryIcon: Icons.savings,
-              secondaryIcon: ResourceType.food.icon,
-              spriteSheet: "goblin",
-            ): 0.5,
-            EncounterModel(
-              name: "Stockpile",
-              type: ResourceType.wood,
-              maxHealth: 25,
-              reward: 10,
-              primaryIcon: Icons.inventory,
-              secondaryIcon: ResourceType.wood.icon,
-            ): 0.1,
-          }),
+          encounters: _secondSceneEncounters(),
         ),
-        // Resting Spot
         thirdScene: RestSceneModel(
           id: 2,
           playgroundId: 0,
@@ -186,27 +182,55 @@ class GameStateData {
   }
 }
 
-class GameStateNotifier extends AsyncNotifier<GameStateData> {
+class GameStateNotifier extends Notifier<GameStateData> {
   late GameStateData _currentData;
 
   GameStateData get currentData => _currentData;
 
   final _updateController = StreamController<void>.broadcast();
+  final _workerDefeatedController = StreamController<int>.broadcast();
+
+  static const double _x = 0.1;
+  static const double _y = 2.0;
+
+  num? _cachedPlaygroundCost;
 
   Stream<void> get onUpdate => _updateController.stream;
 
+  Stream<int> get onWorkerDefeated => _workerDefeatedController.stream;
+
+  int _batchDepth = 0;
+  bool _needsPublish = false;
+
   @override
-  FutureOr<GameStateData> build() {
+  GameStateData build() {
     _currentData = GameStateData.initial();
+    ref.onDispose(() {
+      _updateController.close();
+      _workerDefeatedController.close();
+    });
     return _currentData;
   }
 
+  void _startBatch() => _batchDepth++;
+
+  void _endBatch() {
+    if (--_batchDepth == 0 && _needsPublish) {
+      _needsPublish = false;
+      _publish();
+    }
+  }
+
   void _publish() {
+    if (_batchDepth > 0) {
+      _needsPublish = true;
+      return;
+    }
     _currentData = _currentData.copyWith(
       resources: Map.from(_currentData.resources),
       playgrounds: Set.from(_currentData.playgrounds),
     );
-    state = AsyncData(_currentData);
+    state = _currentData;
     _updateController.add(null);
   }
 
@@ -272,7 +296,7 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     final scene = getSceneById(id);
     final resource = getResourceByType(scene.generationRateUpgradeCostType);
 
-    resource.amount -= scene.generationRateUpgradeCost;
+    resource.subtract(scene.generationRateUpgradeCost.toDouble());
     scene.levelUpGenerationRate();
     _publish();
   }
@@ -309,22 +333,103 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
       if (scene.encounter == toggle) return;
 
       scene.toggleEncounter(toggle);
+      if (!toggle) {
+        _mutatePlayground(scene.playgroundId, (playground) {
+          playground.confrontationTarget = null;
+          playground.confrontationAttackTimer = 0;
+        });
+        return;
+      }
       _publish();
     }
+  }
+
+  void startConfrontation(int playgroundId, EncounterModel target) {
+    _startBatch();
+    _mutatePlayground(playgroundId, (playground) {
+      if (playground.confrontationTarget == target) return;
+      playground.confrontationTarget = target;
+      playground.confrontationAttackTimer = 0;
+      toggleEncounter(playground.activeScene.id, true);
+    });
+    _endBatch();
+  }
+
+  void updatePlaygrounds(double dt) {
+    _startBatch();
+    for (final playground in _currentData.playgrounds) {
+      updatePlayground(playground, dt);
+    }
+    _endBatch();
+  }
+
+  void updatePlayground(PlaygroundModel playground, double dt) {
+    final scene = playground.activeScene;
+    if (scene is! EncounterSceneModel || !scene.encounter) {
+      return;
+    }
+
+    final target = playground.confrontationTarget;
+    if (target == null) {
+      toggleEncounter(scene.id, false);
+      return;
+    }
+
+    playground.confrontationAttackTimer -= dt;
+
+    if (playground.confrontationAttackTimer > 0) {
+      return;
+    }
+
+    if (!playground.worker.isAlive || !playground.worker.canAttack) {
+      return;
+    }
+
+    playground.confrontationAttackTimer =
+        CreatureModel.confrontationAttackInterval;
+
+    // Perform attack
+    playground.worker.spendAttackStamina();
+
+    final targetDefeated = target.health <= playground.worker.damage;
+    target.takeDamage(playground.worker.damage);
+    playground.worker.takeDamage(target.damage);
+
+    if (!playground.worker.isAlive) {
+      playground.confrontationTarget = null;
+      playground.confrontationAttackTimer = 0;
+      toggleEncounter(scene.id, false);
+      playground.worker.resetExperience();
+      _workerDefeatedController.add(playground.id);
+      _publish();
+      return;
+    }
+
+    if (targetDefeated) {
+      // Target defeated
+      defeatEncounter(scene.id, target.type, target.reward);
+      playground.confrontationTarget = null;
+      playground.confrontationAttackTimer = 0;
+      toggleEncounter(scene.id, false);
+    }
+
+    _publish();
   }
 
   void defeatEncounter(int id, ResourceType type, double baseReward) {
     final scene = getSceneById(id);
 
     if (scene is EncounterSceneModel) {
-      _mutateResource(type, (resource) {
-        final reward = baseReward * scene.enemyRewardMultiplier;
-        resource.add(reward);
-      });
-
-      _mutatePlayground(scene.playgroundId, (playground) {
-        playground.addExperience(baseReward);
-      });
+      _startBatch();
+      _mutateResource(
+        type,
+        (resource) => resource.add(baseReward * scene.enemyRewardMultiplier),
+      );
+      _mutatePlayground(
+        scene.playgroundId,
+        (playground) => playground.addExperience(baseReward),
+      );
+      _endBatch();
     }
   }
 
@@ -336,28 +441,22 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     });
   }
 
-  final double x = 0.1;
-  final double y = 2.0;
-
-  num get playgroundCost => pow((_currentData.playgrounds.length) / x, y);
+  num get playgroundCost =>
+      _cachedPlaygroundCost ??= pow((_currentData.playgrounds.length) / _x, _y);
 
   bool get canBuyPlayground {
-    for (final resource in _currentData.resources.values) {
-      if (resource.amount < playgroundCost.toDouble()) {
-        return false;
-      }
-    }
-
-    return true;
+    final cost = playgroundCost.toDouble();
+    return _currentData.resources.values.every((r) => r.amount >= cost);
   }
 
   PlaygroundModel addPlayground() {
+    final cost = playgroundCost.toDouble();
     final increment = _currentData.playgrounds.last.id + 10;
 
     final adventure = Adventure.randomAdventure();
 
     final playground = PlaygroundModel(
-      id: increment + 0,
+      id: increment,
       name: "${adventure.name} $increment",
       worker: WorkerModel(
         name: "${adventure.workerName} $increment",
@@ -365,106 +464,28 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
         secondaryIcon: adventure.workerTool,
         spriteSheet: "adventurer",
       ),
-      // Forest
       firstScene: EncounterSceneModel(
-        id: increment + 0,
-        playgroundId: increment + 0,
+        id: increment,
+        playgroundId: increment,
         name: adventure.encounterOneName,
         icon: adventure.encounterOneIcon,
         backgroundColor: adventure.encounterOneColor,
         generationRateUpgradeCostType: ResourceType.wood,
         active: true,
-        encounters: WeightedRandom({
-          EncounterModel(
-            name: "Tree",
-            type: ResourceType.wood,
-            maxHealth: 3,
-            reward: 5,
-            primaryIcon: Icons.park,
-            secondaryIcon: ResourceType.wood.icon,
-            spriteSheet: "tree",
-          ): 1,
-          EncounterModel(
-            name: "Trees",
-            type: ResourceType.wood,
-            maxHealth: 12,
-            reward: 15,
-            primaryIcon: Icons.forest,
-            secondaryIcon: ResourceType.wood.icon,
-            spriteSheet: "tree",
-          ): 0.1,
-          EncounterModel(
-            name: "Pebbles",
-            type: ResourceType.stone,
-            maxHealth: 5,
-            reward: 3,
-            primaryIcon: Icons.scatter_plot,
-            secondaryIcon: ResourceType.stone.icon,
-            spriteSheet: "rock",
-          ): 0.2,
-          EncounterModel(
-            name: "Goblin",
-            type: ResourceType.food,
-            maxHealth: 3,
-            damage: 1,
-            reward: 5,
-            primaryIcon: Icons.pest_control_rodent,
-            secondaryIcon: ResourceType.food.icon,
-            spriteSheet: "goblin",
-          ): 0.2,
-        }),
+        encounters: GameStateData._firstSceneEncounters(),
       ),
-      // Cave
       secondScene: EncounterSceneModel(
         id: increment + 1,
-        playgroundId: increment + 0,
+        playgroundId: increment,
         name: adventure.encounterTwoName,
         icon: adventure.encounterTwoIcon,
         backgroundColor: adventure.encounterTwoColor,
         generationRateUpgradeCostType: ResourceType.stone,
-        encounters: WeightedRandom({
-          EncounterModel(
-            name: "Tree",
-            type: ResourceType.wood,
-            maxHealth: 3,
-            reward: 5,
-            primaryIcon: Icons.park,
-            secondaryIcon: ResourceType.wood.icon,
-            spriteSheet: "tree",
-          ): 1,
-          EncounterModel(
-            name: "Rock",
-            type: ResourceType.stone,
-            maxHealth: 4,
-            reward: 5,
-            primaryIcon: Icons.landslide,
-            secondaryIcon: ResourceType.stone.icon,
-            spriteSheet: "rock",
-          ): 0.5,
-          EncounterModel(
-            name: "Hobgoblin",
-            type: ResourceType.food,
-            maxHealth: 5,
-            damage: 3,
-            reward: 4,
-            primaryIcon: Icons.savings,
-            secondaryIcon: ResourceType.food.icon,
-            spriteSheet: "goblin",
-          ): 0.5,
-          EncounterModel(
-            name: "Stockpile",
-            type: ResourceType.wood,
-            maxHealth: 25,
-            reward: 10,
-            primaryIcon: Icons.inventory,
-            secondaryIcon: ResourceType.wood.icon,
-          ): 0.1,
-        }),
+        encounters: GameStateData._secondSceneEncounters(),
       ),
-      // Resting Spot
       thirdScene: RestSceneModel(
         id: increment + 2,
-        playgroundId: increment + 0,
+        playgroundId: increment,
         name: adventure.restName,
         icon: adventure.restIcon,
         backgroundColor: adventure.restColor,
@@ -475,10 +496,11 @@ class GameStateNotifier extends AsyncNotifier<GameStateData> {
     );
 
     for (final resource in _currentData.resources.values) {
-      resource.subtract(playgroundCost.toDouble());
+      resource.subtract(cost);
     }
 
     _currentData.playgrounds.add(playground);
+    _cachedPlaygroundCost = null;
     _publish();
 
     return playground;

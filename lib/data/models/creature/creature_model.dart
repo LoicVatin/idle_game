@@ -1,8 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:idle_game/data/models/creature/creature_state.dart';
 
 abstract class CreatureModel {
+  static const double confrontationStepDuration = 0.15;
+  static const double confrontationAttackInterval = 0.35;
+
+  static const double clickBoostDuration = 0.6;
+  static const double clickBoostVelocity = 3;
+
   final String name;
   final IconData primaryIcon;
   final IconData secondaryIcon;
@@ -11,6 +18,8 @@ abstract class CreatureModel {
   int level;
   final int maxLevel;
   double experience;
+  CreatureState state = CreatureState.idle;
+  double clickBoostTime = 0;
   final double x = 0.1;
   final double y = 2.0;
 
@@ -43,6 +52,7 @@ abstract class CreatureModel {
     this.damage = 1,
     this.damageIncreasePerLevel = 1,
     this.staminaCostPerAttack = 1,
+    this.state = CreatureState.idle,
   }) : health = health ?? maxHealth,
        stamina = stamina ?? maxStamina,
        experience = experience ?? 0;
@@ -111,6 +121,12 @@ abstract class CreatureModel {
     experience = 0;
   }
 
+  void update(double dt) {
+    if (clickBoostTime > 0) {
+      clickBoostTime -= dt;
+    }
+  }
+
   CreatureModel copyWith({
     String? name,
     IconData? primaryIcon,
@@ -133,5 +149,6 @@ abstract class CreatureModel {
     double? damage,
     double? damageIncreasePerLevel,
     double? staminaCostPerAttack,
+    CreatureState? state,
   });
 }

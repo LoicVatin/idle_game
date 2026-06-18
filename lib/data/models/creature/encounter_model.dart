@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:idle_game/data/models/creature/creature_model.dart';
+import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class EncounterModel extends CreatureModel {
   final ResourceType type;
   final double reward;
+  final bool canWalk;
 
   EncounterModel({
     required super.name,
@@ -23,9 +25,30 @@ class EncounterModel extends CreatureModel {
     super.damage = 0,
     super.damageIncreasePerLevel,
     super.staminaCostPerAttack,
+    super.state,
     required this.type,
     required this.reward,
+    this.canWalk = false,
   });
+
+  void updateState({
+    required bool isWorkerDepleted,
+    required bool isInConfrontationStep,
+    bool isMoving = false,
+  }) {
+    if (isInConfrontationStep) {
+      state = isWorkerDepleted ? CreatureState.depleted : CreatureState.attack;
+      return;
+    }
+    if (isWorkerDepleted) {
+      state = CreatureState.depleted;
+      return;
+    }
+    if (isMoving) {
+      state = canWalk ? CreatureState.walk : CreatureState.idle;
+      return;
+    }
+  }
 
   @override
   EncounterModel copyWith({
@@ -49,6 +72,8 @@ class EncounterModel extends CreatureModel {
     double? staminaCostPerAttack,
     ResourceType? type,
     double? reward,
+    bool? canWalk,
+    CreatureState? state,
   }) {
     return EncounterModel(
       name: name ?? super.name,
@@ -72,6 +97,8 @@ class EncounterModel extends CreatureModel {
       staminaCostPerAttack: staminaCostPerAttack ?? super.staminaCostPerAttack,
       type: type ?? this.type,
       reward: reward ?? this.reward,
+      canWalk: canWalk ?? this.canWalk,
+      state: state ?? this.state,
     );
   }
 }

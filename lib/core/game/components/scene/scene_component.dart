@@ -22,11 +22,12 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
   final T scene;
   final PlaygroundModel playground;
 
-  double encounterTimer = 0;
-  final VoidCallback? onDefeated;
+  double clickBoostTime = 0;
+  bool wasActive = false;
 
-  String? _lastRateText;
+  String _lastRateText = '';
 
+  Vector2? _lastSize;
   late RectangleComponent _borderComponent;
   late ParallaxComponent parallaxComponent;
   late TextComponent _nameComponent;
@@ -58,19 +59,9 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     ),
   ];
 
-  Future<ParallaxComponent> _loadParallaxComponent() {
-    return game.loadParallaxComponent(
-      _parallaxImages,
-      size: size.clone(),
-      baseVelocity: Vector2(0.0, 0.0),
-      velocityMultiplierDelta: Vector2(1.5, 1.0),
-    );
-  }
-
   SceneComponent({
     required this.playground,
     required this.scene,
-    required this.onDefeated,
     super.size,
     super.position,
     bool visible = false,
@@ -118,10 +109,9 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     _updateResponsivePositions(force: true);
   }
 
-  Vector2? _lastSize;
-
   @override
   void update(double dt) {
+    super.update(dt);
     isVisible = scene.active;
 
     final rateText = _formatRate(scene.generationRatePerSecond);
@@ -130,9 +120,13 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       rateComponent.text = rateText;
     }
 
-    _updateResponsivePositions();
+    if (scene.active) {
+      onSceneActive(dt);
+    } else {
+      onSceneInactive(dt);
+    }
 
-    super.update(dt);
+    _updateResponsivePositions();
   }
 
   @override
@@ -146,15 +140,20 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       return;
     }
     super.onTapDown(event);
-    moveOnClick();
+    onSceneTap();
   }
-
-  void moveOnClick();
-
-  void handleWorkerDefeated();
 
   String _formatRate(double rate) =>
       '(${game.text.per_second_indicator(rate.toStringAsPrecision(3))})';
+
+  Future<ParallaxComponent> _loadParallaxComponent() {
+    return game.loadParallaxComponent(
+      _parallaxImages,
+      size: size.clone(),
+      baseVelocity: Vector2(0.0, 0.0),
+      velocityMultiplierDelta: Vector2(1.5, 1.0),
+    );
+  }
 
   Future<void> _reloadParallaxAfterResize() async {
     if (_isReloadingParallax || isRemoved) {
@@ -190,11 +189,16 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
 
     _lastSize = size.clone();
 
-
     _borderComponent.size.setFrom(size.clone());
     parallaxComponent.size.setFrom(size.clone());
     unawaited(_reloadParallaxAfterResize());
 
     rateComponent.position.setValues(width - padding, height - padding);
   }
+
+  void onSceneActive(double dt);
+
+  void onSceneInactive(double dt);
+
+  void onSceneTap();
 }

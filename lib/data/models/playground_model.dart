@@ -4,6 +4,7 @@ import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/creature/worker_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 
 class PlaygroundModel {
   final int id;
@@ -13,6 +14,8 @@ class PlaygroundModel {
   final RestSceneModel thirdScene;
   late final Set<SceneModel> _scenes;
   WorkerModel worker;
+  EncounterModel? confrontationTarget;
+  double confrontationAttackTimer = 0;
 
   PlaygroundModel({
     required this.id,
@@ -21,6 +24,8 @@ class PlaygroundModel {
     EncounterSceneModel? firstScene,
     EncounterSceneModel? secondScene,
     RestSceneModel? thirdScene,
+    this.confrontationTarget,
+    this.confrontationAttackTimer = 0,
   }) : worker =
            worker ??
            WorkerModel(
@@ -46,6 +51,8 @@ class PlaygroundModel {
     RestSceneModel? thirdScene,
     WorkerModel? worker,
     int? activeSceneId,
+    EncounterModel? confrontationTarget,
+    double? confrontationAttackTimer,
   }) {
     return PlaygroundModel(
       id: id ?? this.id,
@@ -54,6 +61,9 @@ class PlaygroundModel {
       secondScene: secondScene ?? this.secondScene,
       thirdScene: thirdScene ?? this.thirdScene,
       worker: worker ?? this.worker,
+      confrontationTarget: confrontationTarget ?? this.confrontationTarget,
+      confrontationAttackTimer:
+          confrontationAttackTimer ?? this.confrontationAttackTimer,
       //activeSceneId: activeSceneId ?? this.activeSceneId,
     );
   }

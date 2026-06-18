@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:idle_game/data/models/creature/creature_model.dart';
+import 'package:idle_game/data/models/encounter_scene_model.dart';
+import 'package:idle_game/data/models/rest_scene_model.dart';
+import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/data/models/creature/creature_state.dart';
 
 class WorkerModel extends CreatureModel {
   WorkerModel({
@@ -19,7 +23,39 @@ class WorkerModel extends CreatureModel {
     super.damage,
     super.damageIncreasePerLevel,
     super.staminaCostPerAttack,
+    super.state,
   });
+
+  void updateState({
+    required SceneModel scene,
+    required bool encounterAttackHappened,
+  }) {
+    if (scene is RestSceneModel) {
+      state = CreatureState.rest;
+      return;
+    }
+
+    if (scene is EncounterSceneModel && !scene.encounter) {
+      state = (scene.generationRatePerSecond > 0 || clickBoostTime > 0)
+          ? CreatureState.walk
+          : CreatureState.idle;
+      return;
+    }
+
+    if (scene is EncounterSceneModel && scene.encounter) {
+      if (encounterAttackHappened) {
+        clickBoostTime = 0.0;
+      }
+
+      if (!isAlive) {
+        state = CreatureState.defeat;
+      } else if (!canAttack) {
+        state = CreatureState.depleted;
+      } else {
+        state = CreatureState.attack;
+      }
+    }
+  }
 
   @override
   CreatureModel copyWith({
@@ -41,6 +77,7 @@ class WorkerModel extends CreatureModel {
     double? damage,
     double? damageIncreasePerLevel,
     double? staminaCostPerAttack,
+    CreatureState? state,
   }) {
     return WorkerModel(
       name: name ?? super.name,
@@ -62,6 +99,7 @@ class WorkerModel extends CreatureModel {
       damageIncreasePerLevel:
           damageIncreasePerLevel ?? super.damageIncreasePerLevel,
       staminaCostPerAttack: staminaCostPerAttack ?? super.staminaCostPerAttack,
+      state: state ?? this.state,
     );
   }
 }

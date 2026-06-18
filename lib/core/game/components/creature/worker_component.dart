@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
-import 'package:idle_game/core/game/components/creature/sprite_animation_with_states_component.dart';
+import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/core/game/components/creature/encounter_component.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/playground_model.dart';
@@ -13,10 +11,6 @@ import 'package:idle_game/data/models/creature/worker_model.dart';
 
 class WorkerComponent extends CreatureComponent<WorkerModel> {
   final PlaygroundModel playgroundModel;
-  final VoidCallback? onDefeated;
-
-  EncounterComponent? confrontationTarget;
-  double confrontationAttackTimer = 0;
 
   @override
   String get defaultSpriteSheetFolder => "workers/";
@@ -24,10 +18,11 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
   @override
   String get defaultSpriteSheet => "worker";
 
+  double _lastConfrontationAttackTimer = 0;
+
   WorkerComponent({
     required this.playgroundModel,
     required super.model,
-    required this.onDefeated,
     super.position,
     super.anchor,
     super.color = Colors.blueAccent,
@@ -40,6 +35,27 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
   @override
   void update(double dt) {
     super.update(dt);
+    updateCreatureState(dt);
+  }
+
+  @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    super.onCollisionStart(intersectionPoints, other);
+    if (other is EncounterComponent) {
+      game.gameStateNotifier.startConfrontation(
+        playgroundModel.id,
+        other.model,
+      );
+    }
+  }
+
+  // Creature overrides
+  @override
+  void updateCreatureState(double dt) {
+    super.updateCreatureState(dt);
 
     if (isInConfrontation) {
       timer -= dt;
@@ -50,139 +66,31 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
       }
     }
 
-    updateStatusText();
-    updateHealthBar();
-    updateStaminaBar();
-    updateConfrontation(dt);
-  }
-
-  @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    super.onCollisionStart(intersectionPoints, other);
-
-    if (other is EncounterComponent) {
-      spriteAnimationComponent.state = AnimationState.attack;
-      startConfrontation(other);
-    }
-  }
-
-  void attack() {
-    if (!model.spendAttackStamina()) {
-      spriteAnimationComponent.state = AnimationState.depleted;
-      return;
-    }
-    isInConfrontation = true;
-    spriteAnimationComponent.state = AnimationState.attack;
-    timer = CreatureComponent.confrontationStepDuration;
-    paint.color = Colors.yellow.withValues(alpha: 0.3);
-    updateStaminaBar();
-  }
-
-  void startConfrontation(EncounterComponent enemy) {
-    if (confrontationTarget == enemy) {
-      return;
-    }
-
-    confrontationTarget = enemy;
-    confrontationAttackTimer = 0;
-    Future<void>(() {
-      if (isRemoved) return;
-
-      game.gameStateNotifier.toggleEncounter(
-        playgroundModel.activeScene.id,
-        true,
-      );
-    });
-  }
-
-  void updateConfrontation(double dt) {
     final scene = playgroundModel.activeScene;
-    if (scene is RestSceneModel) {
-      spriteAnimationComponent.state = AnimationState.rest;
-      return;
+    final encounterAttackHappened =
+        scene is EncounterSceneModel &&
+        scene.encounter &&
+        playgroundModel.confrontationAttackTimer >
+            _lastConfrontationAttackTimer;
+
+    if (encounterAttackHappened) {
+      onConfrontation();
     }
 
-    if ((scene is EncounterSceneModel && !scene.encounter)) {
-      if (clickBoostTime > 0) {
-        clickBoostTime -= dt;
-      }
-
-      spriteAnimationComponent.state =
-          (scene.generationRatePerSecond > 0 || clickBoostTime > 0)
-          ? AnimationState.walk
-          : AnimationState.idle;
-      return;
-    }
-    if ((scene is EncounterSceneModel && scene.encounter)) {
-      clickBoostTime = 0.0;
-    }
-
-    final target = confrontationTarget;
-
-    if (target == null || target.isRemoved) {
-      defeat();
-      return;
-    }
-
-    confrontationAttackTimer -= dt;
-
-    if (confrontationAttackTimer > 0) {
-      return;
-    }
-
-    if (!model.canAttack) {
-      spriteAnimationComponent.state = AnimationState.depleted;
-      target.pauseConfrontation();
-      return;
-    }
-    if (!model.isAlive) {
-      return;
-    }
-
-    confrontationAttackTimer = CreatureComponent.confrontationAttackInterval;
-    attack();
-
-    final defeated = target.takeDamage(model.damage);
-    model.takeDamage(target.model.damage);
-    updateHealthBar();
-
-    if (!model.isAlive) {
-      spriteAnimationComponent.state = AnimationState.defeat;
-      defeat();
-      model.resetExperience();
-      onDefeated?.call();
-      switchToRestingScene();
-      return;
-    }
-
-    if (defeated) {
-      target.defeat();
-      defeat();
-    }
-  }
-
-  void switchToRestingScene() {
-    final playground = game.gameStateNotifier.getPlaygroundById(
-      playgroundModel.id,
+    model.updateState(
+      scene: scene,
+      encounterAttackHappened: encounterAttackHappened,
     );
-    final restingScene = playground.thirdScene;
 
-    game.gameStateNotifier.switchActiveScene(playground.id, restingScene.id);
-    spriteAnimationComponent.state = AnimationState.rest;
+    state = model.state;
+    _lastConfrontationAttackTimer = playgroundModel.confrontationAttackTimer;
   }
-
-  // Creature overrides
 
   @override
   SceneModel get scene => playgroundModel.activeScene;
 
   @override
   bool isStatusAlwaysVisible() {
-    //final scene = playgroundModel.activeScene;
-    //return scene is RestSceneModel;
     return false;
   }
 
@@ -199,15 +107,8 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
   }
 
   @override
-  void moveOnClick() {
-    clickBoostTime = CreatureComponent.clickBoostDuration;
-  }
-
-  @override
   void defeat() {
-    spriteAnimationComponent.state = AnimationState.idle;
-    confrontationTarget = null;
-    confrontationAttackTimer = 0;
+    state = CreatureState.idle;
     game.gameStateNotifier.toggleEncounter(
       playgroundModel.activeScene.id,
       false,

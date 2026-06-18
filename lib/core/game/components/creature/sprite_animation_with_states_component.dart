@@ -1,10 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
-
-enum AnimationState { idle, walk, attack, depleted, rest, defeat }
+import 'package:idle_game/data/models/creature/creature_state.dart';
 
 class SpriteAnimationWithStatesComponent
-    extends SpriteAnimationGroupComponent<AnimationState> {
+    extends SpriteAnimationGroupComponent<CreatureState> {
   final String name;
 
   SpriteAnimationWithStatesComponent({
@@ -17,14 +16,14 @@ class SpriteAnimationWithStatesComponent
   @override
   Future<void> onLoad() async {
     animations = {
-      AnimationState.idle: await _loadAnimation('idle'),
-      AnimationState.walk: await _loadAnimation('walk'),
-      AnimationState.attack: await _loadAnimation('attack'),
-      AnimationState.depleted: await _loadAnimation('depleted'),
-      AnimationState.rest: await _loadAnimation('rest'),
-      AnimationState.defeat: await _loadAnimation('defeat'),
+      CreatureState.idle: await _loadAnimation('idle'),
+      CreatureState.walk: await _loadAnimation('walk'),
+      CreatureState.attack: await _loadAnimation('attack'),
+      CreatureState.depleted: await _loadAnimation('depleted'),
+      CreatureState.rest: await _loadAnimation('rest'),
+      CreatureState.defeat: await _loadAnimation('defeat'),
     };
-    current = AnimationState.idle;
+    current = CreatureState.idle;
   }
 
   Future<SpriteAnimation> _loadAnimation(
@@ -42,7 +41,9 @@ class SpriteAnimationWithStatesComponent
     );
   }
 
-  set state(AnimationState? state) {
+  CreatureState? get state => current;
+
+  set state(CreatureState? state) {
     if (animations != null && state != null && state != current) {
       current = state;
     }
