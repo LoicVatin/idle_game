@@ -3,6 +3,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class ResourceCostComponent extends PositionComponent
@@ -55,24 +56,27 @@ class ResourceCostComponent extends PositionComponent
     required double upgradeCost,
   }) : _resource = resource,
        _upgradeCost = upgradeCost,
-       super(size: Vector2(80, 12));
+       super(size: Vector2(Dimensions.huge, Dimensions.small));
 
   @override
   Future<void> onLoad() async {
     _amountTextComponent
       ..text = _formatAmount(_upgradeCost)
-      ..size = Vector2(80, 12)
+      ..size = Vector2(Dimensions.extraLarge, Dimensions.small)
       ..textRenderer = TextPaint(style: game.textTheme.bodyLarge);
 
     add(
       RowComponent(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
-        gap: 8,
-        size: Vector2(size.x, 12),
+        gap: Dimensions.extraSmall,
+        size: Vector2(size.x, Dimensions.small),
         children: [
           AlignComponent(alignment: Anchor.center, child: _amountTextComponent),
-          IconComponent(icon: _resource.type.icon, size: Vector2.all(12)),
+          IconComponent(
+            icon: _resource.type.icon,
+            size: Vector2.all(Dimensions.small),
+          ),
         ],
       ),
     );

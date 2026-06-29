@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/playground_component.dart';
 
 import 'package:idle_game/core/game/idle_game.dart';
@@ -17,8 +18,8 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
         TapCallbacks,
         HasVisibility,
         ParentIsA<PlaygroundComponent> {
-  static const double padding = 10.0;
-  static const double _height = 200.0;
+  static final double padding = Dimensions.extraSmall;
+  static const double _height = Dimensions.gigantic;
   final T scene;
   final PlaygroundModel playground;
 
@@ -150,7 +151,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     return game.loadParallaxComponent(
       _parallaxImages,
       size: size.clone(),
-      baseVelocity: Vector2(0.0, 0.0),
+      baseVelocity: Vector2.zero(),
       velocityMultiplierDelta: Vector2(1.5, 1.0),
     );
   }

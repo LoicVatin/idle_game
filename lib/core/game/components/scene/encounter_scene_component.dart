@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:idle_game/core/game/components/scene/scene_component.dart';
 import 'package:idle_game/data/models/creature/creature_model.dart';
-
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/core/game/components/creature/encounter_component.dart';

@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/hold_button_component.dart';
 
 class RectangleButtonComponent extends HoldableButtonComponent {
@@ -9,7 +10,7 @@ class RectangleButtonComponent extends HoldableButtonComponent {
     super.onHold,
     super.anchor,
     super.position,
-    double radius = 24,
+    double radius = Dimensions.medium,
   }) : super(
          size: Vector2.all(radius * 2),
          defaultSkin: RectangleButtonFace(

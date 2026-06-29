@@ -4,11 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 
 class StatusTextComponent extends RectangleComponent
     with HasGameReference<IdleGame>, HasVisibility {
-  static const double statusBarWidth = 42;
-  static const double statusBarHeight = 5;
+  static final double statusBarWidth = Dimensions.large;
+  static final double statusBarHeight = Dimensions.tiny;
 
   late final TextComponent nameText;
   late final TextComponent levelText;
@@ -22,7 +23,7 @@ class StatusTextComponent extends RectangleComponent
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             size: Vector2(statusBarWidth, statusBarHeight),
-            gap: 8,
+            gap: Dimensions.extraSmall,
             anchor: Anchor.center,
             position: Vector2(statusBarWidth / 2, statusBarHeight / 2),
             children: [

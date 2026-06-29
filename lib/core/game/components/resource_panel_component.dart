@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/resource_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
@@ -14,7 +15,7 @@ class ResourcePanelComponent extends PositionComponent
     super.size,
     super.anchor,
     super.priority = 10,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(Dimensions.small),
   });
 
   final EdgeInsets padding;

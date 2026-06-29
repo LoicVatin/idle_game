@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
 
 class SpriteAnimationWithStatesComponent
@@ -36,7 +37,7 @@ class SpriteAnimationWithStatesComponent
       SpriteAnimationData.sequenced(
         amount: frames,
         stepTime: stepTime,
-        textureSize: Vector2(32, 32),
+        textureSize: Vector2.all(Dimensions.regular),
       ),
     );
   }

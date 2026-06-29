@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
 class ResourceComponent extends RectangleComponent
@@ -25,10 +26,10 @@ class ResourceComponent extends RectangleComponent
 
   ResourceComponent({
     required Resource resource,
-    this.padding = const EdgeInsets.all(8),
+    this.padding = const EdgeInsets.all(Dimensions.extraSmall),
   }) : _resource = resource,
        super(
-         size: Vector2(120, 24 + padding.vertical),
+         size: Vector2(Dimensions.huge, Dimensions.medium + padding.vertical),
          paint: Paint()..color = resource.type.color,
        );
 
@@ -36,18 +37,21 @@ class ResourceComponent extends RectangleComponent
   Future<void> onLoad() async {
     _amountTextComponent
       ..text = _formatAmount(_resource.amount)
-      ..size = Vector2(50, 24)
+      ..size = Vector2(Dimensions.large, Dimensions.medium)
       ..textRenderer = TextPaint(style: game.textTheme.bodyLarge);
 
     add(
       RowComponent(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
-        gap: 10,
+        gap: Dimensions.extraSmall,
         position: Vector2(padding.left, padding.top),
-        size: Vector2(size.x - padding.horizontal, 24),
+        size: Vector2(size.x - padding.horizontal, Dimensions.medium),
         children: [
-          IconComponent(icon: _resource.type.icon, size: Vector2.all(24)),
+          IconComponent(
+            icon: _resource.type.icon,
+            size: Vector2.all(Dimensions.medium),
+          ),
           _amountTextComponent,
         ],
       ),

@@ -1,9 +1,10 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 
 class StatusBarComponent extends RectangleComponent with HasVisibility {
-  static const double statusBarWidth = 42;
-  static const double statusBarHeight = 5;
+  static final double statusBarWidth = Dimensions.large;
+  static final double statusBarHeight = Dimensions.tiny;
 
   late final RectangleComponent statusBarFill;
   final Color fillColor;

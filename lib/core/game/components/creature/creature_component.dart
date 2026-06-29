@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/core/game/components/creature/sprite_animation_with_states_component.dart';
 import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
@@ -37,8 +38,8 @@ abstract class CreatureComponent<T extends CreatureModel>
   late final StatusBarComponent staminaBar;
   late final SpriteAnimationWithStatesComponent spriteAnimationComponent;
 
-  static const double componentRadius = 48.0;
-  static const double componentHalfRadius = componentRadius / 2;
+  static final double componentRadius = Dimensions.large;
+  static final double componentHalfRadius = componentRadius / 2;
 
   final Color color;
   final StatusOrder statusOrder;

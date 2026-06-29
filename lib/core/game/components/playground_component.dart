@@ -8,6 +8,7 @@ import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
 import 'package:idle_game/core/game/components/scene/encounter_scene_component.dart';
 import 'package:idle_game/core/game/components/scene/rest_scene_component.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/creature/worker_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
@@ -18,8 +19,8 @@ import 'package:idle_game/utils/build_context_helper.dart';
 class PlaygroundComponent extends RectangleComponent
     with HasGameReference<IdleGame>, TapCallbacks, HasVisibility {
   final PlaygroundModel _playground;
-  static const double _padding = 10.0;
-  static const double _height = 200.0;
+  static final double _padding = Dimensions.extraSmall;
+  static const double _height = Dimensions.gigantic;
   static const double _sceneSwitchRecoveryHealthPercent = 0.25;
   static const double _sceneTransitionDuration = 0.4;
 
@@ -60,11 +61,11 @@ class PlaygroundComponent extends RectangleComponent
     _subscription = game.gameStateNotifier.onUpdate.listen(
       (_) => _updateState(),
     );
-    _defeatSubscription = game.gameStateNotifier.onWorkerDefeated.listen(
-      (playgroundId) {
-        if (playgroundId == _playground.id) handleWorkerDefeated();
-      },
-    );
+    _defeatSubscription = game.gameStateNotifier.onWorkerDefeated.listen((
+      playgroundId,
+    ) {
+      if (playgroundId == _playground.id) handleWorkerDefeated();
+    });
     _updateState();
   }
 
@@ -179,13 +180,13 @@ class PlaygroundComponent extends RectangleComponent
       ..paint = (Paint()
         ..color = Colors.black
         ..strokeWidth = 2)
-      ..size = Vector2((24 * 2) + 4, height)
+      ..size = Vector2((Dimensions.medium * 2) + 4, height)
       ..anchor = Anchor.topRight
       ..position = Vector2(width, 0)
       ..priority = 100
       ..addAll([
         ColumnComponent(
-          size: Vector2((24 * 2) + 4, height),
+          size: Vector2((Dimensions.medium * 2) + 4, height),
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           priority: 100,
@@ -214,7 +215,7 @@ class PlaygroundComponent extends RectangleComponent
     add(_defeatFadeComponent);
 
     firstScene = EncounterSceneComponent(
-      size: Vector2(width - ((24 * 2) + 4), height),
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
       playground: playground,
       scene: playground.firstScene,
       visible: true,
@@ -222,14 +223,14 @@ class PlaygroundComponent extends RectangleComponent
     add(firstScene);
 
     secondScene = EncounterSceneComponent(
-      size: Vector2(width - ((24 * 2) + 4), height),
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
       playground: playground,
       scene: playground.secondScene,
     );
     add(secondScene);
 
     thirdScene = RestSceneComponent(
-      size: Vector2(width - ((24 * 2) + 4), height),
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
       playground: playground,
       scene: playground.thirdScene,
     );
@@ -417,8 +418,14 @@ class PlaygroundComponent extends RectangleComponent
     _sceneFadeComponent.size.setFrom(size.clone());
     _defeatFadeComponent.size.setFrom(size.clone());
 
-    firstScene.size.setFrom(Vector2(width - ((24 * 2) + 4), height));
-    secondScene.size.setFrom(Vector2(width - ((24 * 2) + 4), height));
-    thirdScene.size.setFrom(Vector2(width - ((24 * 2) + 4), height));
+    firstScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
+    );
+    secondScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
+    );
+    thirdScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
+    );
   }
 }

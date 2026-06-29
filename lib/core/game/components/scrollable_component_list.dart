@@ -4,13 +4,14 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/playground_component.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 
 class ScrollableComponentList extends PositionComponent with DragCallbacks {
   ScrollableComponentList({
     super.position,
     super.size,
-    this.spacing = 16,
-    this.padding = const EdgeInsets.all(16),
+    this.spacing = Dimensions.small,
+    this.padding = const EdgeInsets.all(Dimensions.small),
   });
 
   final double spacing;
@@ -122,14 +123,17 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     final trackHeight = size.y - padding.vertical;
 
     final visibleRatio = size.y / _contentHeight;
-    final thumbHeight = math.max(32.0, trackHeight * visibleRatio);
+    final thumbHeight = math.max(
+      Dimensions.regular,
+      trackHeight * visibleRatio,
+    );
 
     final scrollRatio = _scrollOffset / maxScrollOffset;
     final thumbY = padding.top + (trackHeight - thumbHeight) * scrollRatio;
 
     _scrollbarThumb
       ..position.setValues(size.x - (padding.right / 2), thumbY)
-      ..size.setValues(6, thumbHeight);
+      ..size.setValues(Dimensions.tiny, thumbHeight);
   }
 
   double get maxScrollOffset {
