@@ -80,7 +80,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     _nameComponent = TextComponent(
       text: scene.name,
       position: Vector2.all(padding),
-      priority: 10,
+      priority: Priorities.low,
       textRenderer: TextPaint(style: game.textTheme.titleLarge),
     );
     add(_nameComponent);
@@ -89,7 +89,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       anchor: Anchor.bottomRight,
       text: _lastRateText,
       position: Vector2(width - padding, height - padding),
-      priority: 10,
+      priority: Priorities.low,
       textRenderer: TextPaint(style: game.textTheme.titleLarge),
     );
     add(rateComponent);
@@ -100,7 +100,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
         ..color = Colors.black
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
-      priority: 100,
+      priority: Priorities.overlay,
     );
     add(_borderComponent);
 

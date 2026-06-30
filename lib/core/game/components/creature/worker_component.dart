@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/core/game/components/creature/encounter_component.dart';
@@ -29,7 +30,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     super.statusOrder = StatusOrder.statusHealthStamina,
     super.primaryIconAnchor = Anchor.bottomRight,
     super.secondaryIconAnchor = Anchor.topLeft,
-    super.priority = 50,
+    super.priority = Priorities.high,
   }) : super();
 
   @override

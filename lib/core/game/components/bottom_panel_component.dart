@@ -16,7 +16,7 @@ class BottomPanelComponent extends PositionComponent
     super.position,
     super.size,
     super.anchor,
-    super.priority = 10,
+    super.priority = Priorities.low,
     required this.onPressed,
   });
 

@@ -34,7 +34,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
       ..addAll(items);
 
     for (final item in _items) {
-      item.priority = 0;
+      item.priority = Priorities.background;
       await add(item);
     }
 
@@ -46,7 +46,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   Future<void> addItem(PlaygroundComponent item) async {
     _items.add(item);
 
-    item.priority = 0;
+    item.priority = Priorities.background;
     await add(item);
 
     await _ensureBordersMounted();
@@ -169,7 +169,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
 
 class ScrollbarThumbIndicatorComponent extends PositionComponent {
   ScrollbarThumbIndicatorComponent()
-    : super(priority: 1000, anchor: Anchor.topCenter);
+    : super(priority: Priorities.alwaysOnTop, anchor: Anchor.topCenter);
 
   final Paint _paint = Paint()..color = Colors.grey;
 

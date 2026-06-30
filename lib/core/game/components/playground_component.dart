@@ -113,7 +113,7 @@ class PlaygroundComponent extends RectangleComponent
         _workerLevelComponent,
         _workerExperienceComponent,
       ],
-      priority: 10,
+      priority: Priorities.low,
     );
 
     add(headerComponent);
@@ -132,7 +132,7 @@ class PlaygroundComponent extends RectangleComponent
         ..color = Colors.black
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
-      priority: 100,
+      priority: Priorities.overlay,
     );
     add(_borderComponent);
 
@@ -183,13 +183,13 @@ class PlaygroundComponent extends RectangleComponent
       ..size = Vector2((Dimensions.medium * 2) + 4, height)
       ..anchor = Anchor.topRight
       ..position = Vector2(width, 0)
-      ..priority = 100
+      ..priority = Priorities.overlay
       ..addAll([
         ColumnComponent(
           size: Vector2((Dimensions.medium * 2) + 4, height),
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
-          priority: 100,
+          priority: Priorities.overlay,
           children: [
             firstSwitchButton,
             secondSwitchButton,
@@ -203,14 +203,14 @@ class PlaygroundComponent extends RectangleComponent
     _sceneFadeComponent = RectangleComponent(
       size: size.clone(),
       paint: Paint()..color = Colors.black.withValues(alpha: 0.0),
-      priority: 25,
+      priority: Priorities.normal,
     );
     add(_sceneFadeComponent);
 
     _defeatFadeComponent = RectangleComponent(
       size: size.clone(),
       paint: Paint()..color = Colors.red.withValues(alpha: 0.0),
-      priority: 75,
+      priority: Priorities.top,
     );
     add(_defeatFadeComponent);
 

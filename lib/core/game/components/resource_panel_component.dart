@@ -14,7 +14,7 @@ class ResourcePanelComponent extends PositionComponent
     super.position,
     super.size,
     super.anchor,
-    super.priority = 10,
+    super.priority = Priorities.low,
     this.padding = const EdgeInsets.all(Dimensions.small),
   });
 
