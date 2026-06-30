@@ -65,6 +65,8 @@ class ResourceCostComponent extends PositionComponent
       ..size = Vector2(Dimensions.extraLarge, Dimensions.small)
       ..textRenderer = TextPaint(style: game.textTheme.bodyLarge);
 
+    _updateStyle();
+
     add(
       RowComponent(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
