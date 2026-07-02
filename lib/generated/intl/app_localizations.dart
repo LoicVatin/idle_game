@@ -237,6 +237,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Replay tutorial'**
   String get tutorial_replay_button;
+
+  /// No description provided for @device_orientation_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Landscape orientation not supported.\nPlease rotate your device to portrait mode.'**
+  String get device_orientation_warning;
 }
 
 class _AppLocalizationsDelegate

@@ -33,6 +33,9 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "app_name": MessageLookupByLibrary.simpleMessage("Idle Game"),
+    "device_orientation_warning": MessageLookupByLibrary.simpleMessage(
+      "Landscape orientation not supported.\nPlease rotate your device to portrait mode.",
+    ),
     "per_second_indicator": m0,
     "tutorial_replay_button": MessageLookupByLibrary.simpleMessage(
       "Replay tutorial",

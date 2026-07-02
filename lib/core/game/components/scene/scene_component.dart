@@ -80,7 +80,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     _nameComponent = TextComponent(
       text: scene.name,
       position: Vector2.all(padding),
-      priority: Priorities.low,
+      priority: Priorities.overlay,
       textRenderer: TextPaint(style: game.textTheme.titleLarge),
     );
     add(_nameComponent);
@@ -89,7 +89,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       anchor: Anchor.bottomRight,
       text: _lastRateText,
       position: Vector2(width - padding, height - padding),
-      priority: Priorities.low,
+      priority: Priorities.overlay,
       textRenderer: TextPaint(style: game.textTheme.titleLarge),
     );
     add(rateComponent);
@@ -153,6 +153,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       size: size.clone(),
       baseVelocity: Vector2.zero(),
       velocityMultiplierDelta: Vector2(1.5, 1.0),
+      priority: Priorities.background
     );
   }
 
@@ -164,7 +165,6 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     _isReloadingParallax = true;
 
     final oldParallaxComponent = parallaxComponent;
-    final oldPriority = oldParallaxComponent.priority;
 
     final newParallaxComponent = await _loadParallaxComponent();
 
@@ -174,7 +174,6 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
       return;
     }
 
-    newParallaxComponent.priority = oldPriority;
     parallaxComponent = newParallaxComponent;
 
     oldParallaxComponent.removeFromParent();

@@ -102,4 +102,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorial_replay_button => 'Replay tutorial';
+
+  @override
+  String get device_orientation_warning =>
+      'Landscape orientation not supported.\nPlease rotate your device to portrait mode.';
 }

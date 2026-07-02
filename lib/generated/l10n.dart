@@ -283,6 +283,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Landscape orientation not supported.\nPlease rotate your device to portrait mode.`
+  String get device_orientation_warning {
+    return Intl.message(
+      'Landscape orientation not supported.\nPlease rotate your device to portrait mode.',
+      name: 'device_orientation_warning',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

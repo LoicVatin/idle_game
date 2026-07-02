@@ -51,7 +51,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
-          return GameWidget(
+
+          final gameWidget = GameWidget(
             game: _game!,
             overlayBuilderMap: {
               IdleGame.tutorialOverlay: (context, game) {
@@ -76,6 +77,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ? []
                 : [IdleGame.tutorialOverlay],
           );
+
+          if (context.isWebMobile) {
+            if (context.isLandscape) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    context.text.device_orientation_warning,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ),
+              );
+            }
+
+            return gameWidget;
+          }
+
+          if (context.isWebDesktop) {
+            return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: Image.asset('images/web_background.png').image,
+                  repeat: ImageRepeat.repeat,
+                  fit: BoxFit.none,
+                ),
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: gameWidget,
+                ),
+              ),
+            );
+          }
+          return gameWidget;
         },
       ),
     );

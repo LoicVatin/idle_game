@@ -71,5 +71,6 @@
   "tutorial_step_almost": "You are almost done.",
   "tutorial_step_complete": "Tutorial complete!\nYou can replay it any time.",
   "tutorial_step_close": "Tap to close.",
-  "tutorial_replay_button": "Replay tutorial"
+  "tutorial_replay_button": "Replay tutorial",
+  "device_orientation_warning": "Landscape orientation not supported.\nPlease rotate your device to portrait mode."
 }

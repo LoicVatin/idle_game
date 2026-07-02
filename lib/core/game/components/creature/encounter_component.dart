@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
 import 'package:idle_game/core/game/components/creature/worker_component.dart';
@@ -28,6 +29,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     super.statusOrder = StatusOrder.staminaStatusHealth,
     super.primaryIconAnchor = Anchor.topRight,
     super.secondaryIconAnchor = Anchor.bottomLeft,
+    super.priority = Priorities.high,
   }) : super() {
     paint.color = model.type.color.withValues(alpha: 0.3);
   }
