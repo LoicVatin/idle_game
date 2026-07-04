@@ -1,6 +1,5 @@
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
-import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
 
 class SpriteAnimationWithStatesComponent
@@ -16,30 +15,34 @@ class SpriteAnimationWithStatesComponent
 
   @override
   Future<void> onLoad() async {
-    animations = {
-      CreatureState.idle: await _loadAnimation('idle'),
-      CreatureState.walk: await _loadAnimation('walk'),
-      CreatureState.attack: await _loadAnimation('attack'),
-      CreatureState.depleted: await _loadAnimation('depleted'),
-      CreatureState.rest: await _loadAnimation('rest'),
-      CreatureState.defeat: await _loadAnimation('defeat'),
-    };
+    final image = await Flame.images.load('$name.png');
+    final jsonData = await Flame.assets.readJson('images/$name.json');
+
+    final sheetAnimation = SpriteAnimation.fromAsepriteData(image, jsonData);
+    final frames = sheetAnimation.frames;
+
+    final frameTags = (jsonData['meta']['frameTags'] as List)
+        .cast<Map<String, dynamic>>();
+
+    final loaded = <CreatureState, SpriteAnimation>{};
+    for (final tag in frameTags) {
+      final state = _getStateFromTag(tag['name'] as String);
+      if (state == null) continue;
+      loaded[state] = SpriteAnimation(
+        frames.sublist(tag['from'] as int, (tag['to'] as int) + 1),
+      );
+    }
+
+    animations = loaded;
     current = CreatureState.idle;
   }
 
-  Future<SpriteAnimation> _loadAnimation(
-    String state, {
-    int frames = 6,
-    double stepTime = 0.1,
-  }) async {
-    return SpriteAnimation.fromFrameData(
-      await Flame.images.load('${name}_$state.png'),
-      SpriteAnimationData.sequenced(
-        amount: frames,
-        stepTime: stepTime,
-        textureSize: Vector2.all(Dimensions.regular),
-      ),
-    );
+  CreatureState? _getStateFromTag(String tagName) {
+    final normalized = tagName.toLowerCase();
+    for (final state in CreatureState.values) {
+      if (state.name == normalized) return state;
+    }
+    return null;
   }
 
   CreatureState? get state => current;
