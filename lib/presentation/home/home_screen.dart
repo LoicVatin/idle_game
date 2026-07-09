@@ -9,6 +9,7 @@ import 'package:idle_game/presentation/home/upgrade_overlay_widget.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/utils/logger_helper.dart';
 import 'package:idle_game/utils/shared_preferences_helper.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});

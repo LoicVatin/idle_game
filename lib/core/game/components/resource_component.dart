@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class ResourceComponent extends RectangleComponent
     with HasGameReference<IdleGame> {
@@ -51,7 +52,7 @@ class ResourceComponent extends RectangleComponent
           IconComponent(
             icon: _resource.type.icon,
             size: Vector2.all(Dimensions.medium),
-          ),
+          )..tint(AppColors.light),
           _amountTextComponent,
         ],
       ),

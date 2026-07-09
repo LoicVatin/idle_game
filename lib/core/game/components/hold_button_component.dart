@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 abstract class HoldableButtonComponent extends AdvancedButtonComponent {
   HoldableButtonComponent({
@@ -84,7 +85,7 @@ mixin IconButtonFaceMixin on PositionComponent {
   void initializeIconPainter({
     required IconData icon,
     required double radius,
-    Color iconColor = Colors.white,
+    Color iconColor = AppColors.light,
   }) {
     _iconPainter = TextPainter(
       text: TextSpan(

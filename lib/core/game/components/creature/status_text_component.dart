@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 
+import 'package:idle_game/core/styles/app_colors.dart';
+
 class StatusTextComponent extends RectangleComponent
     with HasGameReference<IdleGame>, HasVisibility {
   static final double statusBarWidth = Dimensions.large;
@@ -17,7 +19,7 @@ class StatusTextComponent extends RectangleComponent
   StatusTextComponent({super.key, super.position})
     : super(
         size: Vector2(statusBarWidth, statusBarHeight),
-        paint: Paint()..color = Colors.black54,
+        paint: Paint()..color = AppColors.dark.withValues(alpha: 0.5),
         children: [
           RowComponent(
             mainAxisAlignment: MainAxisAlignment.center,

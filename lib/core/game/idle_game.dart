@@ -9,6 +9,7 @@ import 'package:idle_game/core/game/components/resource_panel_component.dart';
 import 'package:idle_game/core/game/components/scrollable_component_list.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/logger_helper.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
@@ -32,7 +33,7 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       .firstOrNull;
 
   @override
-  Color backgroundColor() => Colors.indigo;
+  Color backgroundColor() => AppColors.lightDark;
 
   @override
   Future<void> onLoad() async {

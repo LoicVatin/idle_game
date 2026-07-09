@@ -5,6 +5,8 @@ import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
+import '../../core/styles/app_colors.dart';
+
 class TutorialOverlay extends ConsumerStatefulWidget {
   const TutorialOverlay({super.key, required this.game, required this.onClose});
 
@@ -237,7 +239,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
         GestureDetector(
           onTap: _step >= step13 ? widget.onClose : _incrementCounter,
           child: Material(
-            color: Colors.black54,
+            color: AppColors.dark.withValues(alpha: 0.5),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
@@ -270,7 +272,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -281,7 +283,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -292,7 +294,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -303,7 +305,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -314,7 +316,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -325,7 +327,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -337,7 +339,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -349,7 +351,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -361,7 +363,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -373,7 +375,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -386,7 +388,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),
@@ -399,7 +401,7 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 3),
+                  border: Border.all(color: AppColors.accent, width: 3),
                 ),
               ),
             ),

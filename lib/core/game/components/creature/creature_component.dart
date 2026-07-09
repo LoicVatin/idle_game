@@ -12,6 +12,7 @@ import 'package:idle_game/core/game/components/creature/status_text_component.da
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/creature/creature_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 enum StatusOrder { statusHealthStamina, staminaStatusHealth }
 
@@ -55,7 +56,7 @@ abstract class CreatureComponent<T extends CreatureModel>
     super.position,
     super.anchor,
     super.priority,
-    this.color = Colors.yellowAccent,
+    this.color = AppColors.yellow,
     this.statusOrder = StatusOrder.statusHealthStamina,
     this.primaryIconAnchor = Anchor.bottomCenter,
     this.secondaryIconAnchor = Anchor.topCenter,
@@ -64,8 +65,8 @@ abstract class CreatureComponent<T extends CreatureModel>
          paint: Paint()..color = color.withValues(alpha: 0.3),
        ) {
     statusText = StatusTextComponent();
-    healthBar = StatusBarComponent(fillColor: Colors.greenAccent);
-    staminaBar = StatusBarComponent(fillColor: Colors.orangeAccent);
+    healthBar = StatusBarComponent(fillColor: AppColors.green);
+    staminaBar = StatusBarComponent(fillColor: AppColors.yellow);
     spriteAnimationComponent = SpriteAnimationWithStatesComponent(
       name:
           "$defaultSpriteSheetFolder${model.spriteSheet ?? defaultSpriteSheet}",
@@ -100,14 +101,14 @@ abstract class CreatureComponent<T extends CreatureModel>
         size: Vector2.all(componentHalfRadius),
         anchor: primaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
-        paint: Paint()..color = Colors.white30,
+        paint: Paint()..color = AppColors.light.withValues(alpha: 0.3),
       ),
       IconComponent(
         icon: model.secondaryIcon,
         size: Vector2.all(componentHalfRadius),
         anchor: secondaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
-        paint: Paint()..color = Colors.white30,
+        paint: Paint()..color = AppColors.light.withValues(alpha: 0.3),
       ),
       spriteAnimationComponent,
     ]);
@@ -196,7 +197,7 @@ abstract class CreatureComponent<T extends CreatureModel>
     isInConfrontation = true;
     state = CreatureState.attack;
     timer = CreatureModel.confrontationStepDuration;
-    paint.color = Colors.orangeAccent.withValues(alpha: 0.3);
+    paint.color = AppColors.darkYellow.withValues(alpha: 0.3);
     updateHealthBar();
     updateStaminaBar();
   }

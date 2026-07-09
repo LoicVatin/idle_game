@@ -2,6 +2,8 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 
+import 'package:idle_game/core/styles/app_colors.dart';
+
 class StatusBarComponent extends RectangleComponent with HasVisibility {
   static final double statusBarWidth = Dimensions.large;
   static final double statusBarHeight = Dimensions.tiny;
@@ -12,10 +14,10 @@ class StatusBarComponent extends RectangleComponent with HasVisibility {
   StatusBarComponent({
     super.key,
     super.position,
-    this.fillColor = Colors.yellowAccent,
+    this.fillColor = AppColors.yellow,
   }) : super(
          size: Vector2(statusBarWidth, statusBarHeight),
-         paint: Paint()..color = Colors.black54,
+         paint: Paint()..color = AppColors.dark.withValues(alpha: 0.5),
          children: [
            RectangleComponent(
              size: Vector2(statusBarWidth, statusBarHeight),

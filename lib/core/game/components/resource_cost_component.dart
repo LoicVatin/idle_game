@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/resource_model.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class ResourceCostComponent extends PositionComponent
     with HasGameReference<IdleGame> {
@@ -14,7 +15,7 @@ class ResourceCostComponent extends PositionComponent
 
   double _lastAmount = -1;
   double _lastUpgradeCost = -1;
-  Color? _originalColor;
+  Color? _originalColor = AppColors.light;
 
   Resource get resource => _resource;
 
@@ -41,7 +42,7 @@ class ResourceCostComponent extends PositionComponent
       _originalColor ??= textPaint.style.color;
 
       final canAfford = _resource.amount >= _upgradeCost;
-      final targetColor = canAfford ? _originalColor : Colors.red;
+      final targetColor = canAfford ? _originalColor : AppColors.red;
 
       if (textPaint.style.color != targetColor) {
         _amountTextComponent.textRenderer = TextPaint(
@@ -78,7 +79,7 @@ class ResourceCostComponent extends PositionComponent
           IconComponent(
             icon: _resource.type.icon,
             size: Vector2.all(Dimensions.small),
-          ),
+          )..tint(AppColors.light),
         ],
       ),
     );

@@ -9,6 +9,7 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/creature/worker_model.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class WorkerComponent extends CreatureComponent<WorkerModel> {
   final PlaygroundModel playgroundModel;
@@ -26,7 +27,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
     required super.model,
     super.position,
     super.anchor,
-    super.color = Colors.blueAccent,
+    super.color = AppColors.lightBlue,
     super.statusOrder = StatusOrder.statusHealthStamina,
     super.primaryIconAnchor = Anchor.bottomRight,
     super.secondaryIconAnchor = Anchor.topLeft,
@@ -63,7 +64,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
 
       if (timer <= 0) {
         isInConfrontation = false;
-        paint.color = Colors.blueAccent.withValues(alpha: 0.3);
+        paint.color = AppColors.lightBlue.withValues(alpha: 0.3);
       }
     }
 

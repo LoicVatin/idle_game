@@ -13,6 +13,8 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
+import 'package:idle_game/core/styles/app_colors.dart';
+
 abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     with
         HasGameReference<IdleGame>,
@@ -83,7 +85,7 @@ abstract class SceneComponent<T extends SceneModel> extends RectangleComponent
     _borderComponent = RectangleComponent(
       size: size.clone(),
       paint: Paint()
-        ..color = Colors.black
+        ..color = AppColors.dark
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
       priority: Priorities.overlay,

@@ -10,6 +10,8 @@ import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 
+import 'package:idle_game/core/styles/app_colors.dart';
+
 class UpgradeOverlay extends ConsumerWidget {
   const UpgradeOverlay({super.key, required this.game, required this.onClose});
 
@@ -28,7 +30,7 @@ class UpgradeOverlay extends ConsumerWidget {
     return GestureDetector(
       onTap: onClose,
       child: Material(
-        color: Colors.black54,
+        color: AppColors.dark.withValues(alpha: 0.5),
         child: Center(
           child: GestureDetector(
             onTap: () {},

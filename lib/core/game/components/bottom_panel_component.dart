@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/resource_cost_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
@@ -80,7 +81,7 @@ class BottomPanelComponent extends PositionComponent
 
     _resourceAmountsBackground = RectangleComponent(
       size: Vector2.copy(size),
-      paint: Paint()..color = Colors.black,
+      paint: Paint()..color = AppColors.dark,
     );
 
     add(_resourceAmountsBackground);

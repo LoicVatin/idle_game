@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/playground_component.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class ScrollableComponentList extends PositionComponent with DragCallbacks {
   ScrollableComponentList({
@@ -171,7 +172,7 @@ class ScrollbarThumbIndicatorComponent extends PositionComponent {
   ScrollbarThumbIndicatorComponent()
     : super(priority: Priorities.alwaysOnTop, anchor: Anchor.topCenter);
 
-  final Paint _paint = Paint()..color = Colors.grey;
+  final Paint _paint = Paint()..color = AppColors.grey;
 
   bool visible = false;
 

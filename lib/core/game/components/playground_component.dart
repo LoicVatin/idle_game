@@ -15,6 +15,7 @@ import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class PlaygroundComponent extends RectangleComponent
     with HasGameReference<IdleGame>, TapCallbacks, HasVisibility {
@@ -93,7 +94,7 @@ class PlaygroundComponent extends RectangleComponent
     size = Vector2.all(_height);
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
 
-    paint = Paint()..color = Colors.black;
+    paint = Paint()..color = AppColors.dark;
 
     _currentLevel = playground.worker.level;
 
@@ -129,7 +130,7 @@ class PlaygroundComponent extends RectangleComponent
     _borderComponent = RectangleComponent(
       size: size.clone(),
       paint: Paint()
-        ..color = Colors.black
+        ..color = AppColors.dark
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
       priority: Priorities.overlay,
@@ -178,7 +179,7 @@ class PlaygroundComponent extends RectangleComponent
 
     switchSceneComponent
       ..paint = (Paint()
-        ..color = Colors.black
+        ..color = AppColors.dark
         ..strokeWidth = 2)
       ..size = Vector2((Dimensions.medium * 2) + 4, height)
       ..anchor = Anchor.topRight
@@ -202,14 +203,14 @@ class PlaygroundComponent extends RectangleComponent
 
     _sceneFadeComponent = RectangleComponent(
       size: size.clone(),
-      paint: Paint()..color = Colors.black.withValues(alpha: 0.0),
+      paint: Paint()..color = AppColors.dark.withValues(alpha: 0.0),
       priority: Priorities.normal,
     );
     add(_sceneFadeComponent);
 
     _defeatFadeComponent = RectangleComponent(
       size: size.clone(),
-      paint: Paint()..color = Colors.red.withValues(alpha: 0.0),
+      paint: Paint()..color = AppColors.red.withValues(alpha: 0.0),
       priority: Priorities.top,
     );
     add(_defeatFadeComponent);
@@ -337,7 +338,7 @@ class PlaygroundComponent extends RectangleComponent
 
   void _setSceneFadeOpacity(double opacity) {
     _sceneFadeComponent.paint = Paint()
-      ..color = Colors.black.withValues(alpha: opacity.clamp(0.0, 1.0));
+      ..color = AppColors.dark.withValues(alpha: opacity.clamp(0.0, 1.0));
   }
 
   void handleWorkerDefeated() {
@@ -394,7 +395,7 @@ class PlaygroundComponent extends RectangleComponent
 
   void _setDefeatFadeOpacity(double opacity) {
     _defeatFadeComponent.paint = Paint()
-      ..color = Colors.red.withValues(alpha: opacity.clamp(0.0, 1.0));
+      ..color = AppColors.red.withValues(alpha: opacity.clamp(0.0, 1.0));
   }
 
   void _updateSwitchSceneButtons() {
