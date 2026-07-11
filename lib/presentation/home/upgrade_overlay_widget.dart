@@ -27,82 +27,90 @@ class UpgradeOverlay extends ConsumerWidget {
       orElse: () => data.playgrounds.first,
     );
 
-    return GestureDetector(
-      onTap: onClose,
-      child: Material(
-        color: AppColors.dark.withValues(alpha: 0.5),
-        child: Center(
-          child: GestureDetector(
-            onTap: () {},
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              playground.name,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: onClose,
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Flexible(
-                        child: ListView(
-                          shrinkWrap: true,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          onClose();
+        }
+      },
+      child: GestureDetector(
+        onTap: onClose,
+        child: Material(
+          color: AppColors.dark.withValues(alpha: 0.5),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
                           children: [
-                            _workerCard(context, playground.worker),
-                            _sceneUpgradeCard(
-                              context,
-                              playground.firstScene,
-                              data.resources[playground
-                                      .firstScene
-                                      .generationRateUpgradeCostType] ??
-                                  Resource(
-                                    type: playground
-                                        .firstScene
-                                        .generationRateUpgradeCostType,
-                                  ),
+                            Expanded(
+                              child: Text(
+                                playground.name,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
                             ),
-                            _sceneUpgradeCard(
-                              context,
-                              playground.secondScene,
-                              data.resources[playground
-                                      .secondScene
-                                      .generationRateUpgradeCostType] ??
-                                  Resource(
-                                    type: playground
-                                        .secondScene
-                                        .generationRateUpgradeCostType,
-                                  ),
-                            ),
-                            _sceneUpgradeCard(
-                              context,
-                              playground.thirdScene,
-                              data.resources[playground
-                                      .thirdScene
-                                      .generationRateUpgradeCostType] ??
-                                  Resource(
-                                    type: playground
-                                        .thirdScene
-                                        .generationRateUpgradeCostType,
-                                  ),
+                            IconButton(
+                              onPressed: onClose,
+                              icon: const Icon(Icons.close),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Flexible(
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              _workerCard(context, playground.worker),
+                              _sceneUpgradeCard(
+                                context,
+                                playground.firstScene,
+                                data.resources[playground
+                                        .firstScene
+                                        .generationRateUpgradeCostType] ??
+                                    Resource(
+                                      type: playground
+                                          .firstScene
+                                          .generationRateUpgradeCostType,
+                                    ),
+                              ),
+                              _sceneUpgradeCard(
+                                context,
+                                playground.secondScene,
+                                data.resources[playground
+                                        .secondScene
+                                        .generationRateUpgradeCostType] ??
+                                    Resource(
+                                      type: playground
+                                          .secondScene
+                                          .generationRateUpgradeCostType,
+                                    ),
+                              ),
+                              _sceneUpgradeCard(
+                                context,
+                                playground.thirdScene,
+                                data.resources[playground
+                                        .thirdScene
+                                        .generationRateUpgradeCostType] ??
+                                    Resource(
+                                      type: playground
+                                          .thirdScene
+                                          .generationRateUpgradeCostType,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

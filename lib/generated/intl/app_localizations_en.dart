@@ -106,4 +106,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get device_orientation_warning =>
       'Landscape orientation not supported.\nPlease rotate your device to portrait mode.';
+
+  @override
+  String get quit_game_dialog_title => 'Quit game?';
+
+  @override
+  String get quit_game_dialog_body => 'Are you sure you want to leave?';
+
+  @override
+  String get confirm_button => 'Confirm';
+
+  @override
+  String get cancel_button => 'Cancel';
 }

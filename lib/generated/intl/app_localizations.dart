@@ -243,6 +243,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Landscape orientation not supported.\nPlease rotate your device to portrait mode.'**
   String get device_orientation_warning;
+
+  /// No description provided for @quit_game_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit game?'**
+  String get quit_game_dialog_title;
+
+  /// No description provided for @quit_game_dialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to leave?'**
+  String get quit_game_dialog_body;
+
+  /// No description provided for @confirm_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm_button;
+
+  /// No description provided for @cancel_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel_button;
 }
 
 class _AppLocalizationsDelegate

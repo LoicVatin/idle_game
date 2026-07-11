@@ -293,6 +293,36 @@ class S {
       args: [],
     );
   }
+
+  /// `Quit game?`
+  String get quit_game_dialog_title {
+    return Intl.message(
+      'Quit game?',
+      name: 'quit_game_dialog_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to leave?`
+  String get quit_game_dialog_body {
+    return Intl.message(
+      'Are you sure you want to leave?',
+      name: 'quit_game_dialog_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm`
+  String get confirm_button {
+    return Intl.message('Confirm', name: 'confirm_button', desc: '', args: []);
+  }
+
+  /// `Cancel`
+  String get cancel_button {
+    return Intl.message('Cancel', name: 'cancel_button', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

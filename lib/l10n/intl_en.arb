@@ -72,5 +72,9 @@
   "tutorial_step_complete": "Tutorial complete!\nYou can replay it any time.",
   "tutorial_step_close": "Tap to close.",
   "tutorial_replay_button": "Replay tutorial",
-  "device_orientation_warning": "Landscape orientation not supported.\nPlease rotate your device to portrait mode."
+  "device_orientation_warning": "Landscape orientation not supported.\nPlease rotate your device to portrait mode.",
+  "quit_game_dialog_title": "Quit game?",
+  "quit_game_dialog_body": "Are you sure you want to leave?",
+  "confirm_button": "Confirm",
+  "cancel_button": "Cancel"
 }
