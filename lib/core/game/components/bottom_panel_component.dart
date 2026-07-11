@@ -86,10 +86,15 @@ class BottomPanelComponent extends PositionComponent
 
     add(_resourceAmountsBackground);
 
-    _button = RectangleButtonComponent(icon: Icons.add, onPressed: onPressed);
+    _button = RectangleButtonComponent(
+      icon: Icons.add,
+      onPressed: onPressed,
+      outlined: true,
+    );
     _tutorialButton = RectangleButtonComponent(
       icon: Icons.refresh_outlined,
       onPressed: game.displayTutorialOverlay,
+      outlined: true,
     );
 
     _tutorialRow = RowComponent(

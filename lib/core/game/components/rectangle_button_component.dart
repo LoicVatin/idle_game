@@ -12,22 +12,26 @@ class RectangleButtonComponent extends HoldableButtonComponent {
     super.anchor,
     super.position,
     double radius = Dimensions.medium,
+    bool outlined = false,
   }) : super(
          size: Vector2.all(radius * 2),
          defaultSkin: RectangleButtonFace(
            icon: icon,
            color: AppColors.accent,
            radius: radius,
+           outlined: outlined,
          ),
          downSkin: RectangleButtonFace(
            icon: icon,
            color: AppColors.antiqueGold,
            radius: radius,
+           outlined: outlined,
          ),
          disabledSkin: RectangleButtonFace(
            icon: icon,
            color: AppColors.grey,
            radius: radius,
+           outlined: outlined,
          ),
        );
 }
@@ -37,8 +41,21 @@ class RectangleButtonFace extends RectangleComponent with IconButtonFaceMixin {
     required IconData icon,
     required Color color,
     required double radius,
+    required bool outlined,
   }) : super(size: Vector2.all(radius * 2), paint: Paint()..color = color) {
     initializeIconPainter(icon: icon, radius: radius);
+    if (outlined) {
+      add(
+        RectangleComponent(
+          size: super.size,
+          paint: Paint()
+            ..color = AppColors.black
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2,
+          priority: Priorities.overlay,
+        ),
+      );
+    }
   }
 
   @override

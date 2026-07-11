@@ -58,6 +58,17 @@ class ResourceComponent extends RectangleComponent
       ),
     );
 
+    add(
+      RectangleComponent(
+        size: super.size,
+        paint: Paint()
+          ..color = AppColors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+        priority: Priorities.overlay,
+      ),
+    );
+
     return super.onLoad();
   }
 

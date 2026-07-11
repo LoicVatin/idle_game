@@ -20,8 +20,17 @@ class StatusBarComponent extends RectangleComponent with HasVisibility {
          paint: Paint()..color = AppColors.dark.withValues(alpha: 0.5),
          children: [
            RectangleComponent(
-             size: Vector2(statusBarWidth, statusBarHeight),
+             size: Vector2(statusBarWidth - 4, statusBarHeight - 4),
+             position: Vector2.all(2),
              paint: Paint()..color = fillColor,
+           ),
+           RectangleComponent(
+             size: Vector2(statusBarWidth, statusBarHeight),
+             paint: Paint()
+               ..color = AppColors.dark
+               ..style = PaintingStyle.stroke
+               ..strokeWidth = 2,
+             priority: Priorities.overlay,
            ),
          ],
        ) {
@@ -38,7 +47,7 @@ class StatusBarComponent extends RectangleComponent with HasVisibility {
     final fillPercent = maxValue <= 0
         ? 0.0
         : (currentValue / maxValue).clamp(0.0, 1.0);
-    statusBarFill.size.x = statusBarWidth * fillPercent;
+    statusBarFill.size.x = (statusBarWidth - 4) * fillPercent;
     isVisible = currentValue < maxValue || alwaysVisible;
   }
 }

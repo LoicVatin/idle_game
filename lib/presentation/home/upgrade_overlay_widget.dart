@@ -9,7 +9,6 @@ import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
-
 import 'package:idle_game/core/styles/app_colors.dart';
 
 class UpgradeOverlay extends ConsumerWidget {
@@ -42,8 +41,13 @@ class UpgradeOverlay extends ConsumerWidget {
             child: GestureDetector(
               onTap: () {},
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Card(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.dark,
+                    border: Border.all(color: AppColors.black, width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -70,6 +74,7 @@ class UpgradeOverlay extends ConsumerWidget {
                             shrinkWrap: true,
                             children: [
                               _workerCard(context, playground.worker),
+                              const SizedBox(height: 8),
                               _sceneUpgradeCard(
                                 context,
                                 playground.firstScene,
@@ -82,6 +87,7 @@ class UpgradeOverlay extends ConsumerWidget {
                                           .generationRateUpgradeCostType,
                                     ),
                               ),
+                              const SizedBox(height: 8),
                               _sceneUpgradeCard(
                                 context,
                                 playground.secondScene,
@@ -94,6 +100,7 @@ class UpgradeOverlay extends ConsumerWidget {
                                           .generationRateUpgradeCostType,
                                     ),
                               ),
+                              const SizedBox(height: 8),
                               _sceneUpgradeCard(
                                 context,
                                 playground.thirdScene,
@@ -122,91 +129,96 @@ class UpgradeOverlay extends ConsumerWidget {
   }
 
   Widget _workerCard(BuildContext context, WorkerModel worker) {
-    return Card(
-      color: Colors.blueAccent,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          spacing: 12,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              spacing: 8,
-              children: [
-                Icon(worker.primaryIcon),
-                Expanded(
-                  child: Text(
-                    worker.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Icon(Icons.analytics_outlined),
-                Text(worker.level.toStringAsPrecision(3)),
-              ],
-            ),
-            //
-            Row(
-              spacing: 8,
-              children: [
-                Icon(Icons.linear_scale),
-                Expanded(
-                  child: LinearProgressIndicator(
-                    value:
-                        (worker.experience / worker.experienceNeededToLevelUp),
-                  ),
-                ),
-                Icon(Icons.plus_one_outlined),
-              ],
-            ),
-            Row(
-              spacing: 8,
-              children: [
-                Icon(Icons.health_and_safety_outlined),
-                Expanded(
-                  child: Text(
-                    context.text.worker_health_indicator(
-                      worker.health.toStringAsPrecision(3),
-                      worker.maxHealth.toStringAsPrecision(3),
-                    ),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Icon(Icons.energy_savings_leaf_outlined),
-                Expanded(
-                  child: Text(
-                    context.text.worker_stamina_indicator(
-                      worker.stamina.toStringAsPrecision(3),
-                      worker.maxStamina.toStringAsPrecision(3),
-                    ),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-              ],
-            ),
-            //
-            Row(
-              spacing: 8,
-              children: [
-                Icon(Icons.handyman_outlined),
-                Expanded(
-                  child: Text(
-                    worker.secondaryIcon.codePoint.toString(),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Icon(Icons.gavel_outlined),
-                Expanded(
-                  child: Text(
-                    context.text.worker_damage_indicator(
-                      worker.damage.toStringAsPrecision(3),
-                    ),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.accent.withValues(alpha: 0.2), AppColors.lightDark],
+          begin: Alignment.topLeft,
+          end: AlignmentGeometry.bottomCenter,
         ),
+        border: Border.all(color: AppColors.black, width: 2),
+        borderRadius: BorderRadius.zero,
+      ),
+      child: Column(
+        spacing: 12,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            spacing: 8,
+            children: [
+              Icon(worker.primaryIcon),
+              Expanded(
+                child: Text(
+                  worker.name,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Icon(Icons.analytics_outlined),
+              Text(worker.level.toStringAsPrecision(3)),
+            ],
+          ),
+          //
+          Row(
+            spacing: 8,
+            children: [
+              Icon(Icons.linear_scale),
+              Expanded(
+                child: LinearProgressIndicator(
+                  value: (worker.experience / worker.experienceNeededToLevelUp),
+                ),
+              ),
+              Icon(Icons.plus_one_outlined),
+            ],
+          ),
+          Row(
+            spacing: 8,
+            children: [
+              Icon(Icons.health_and_safety_outlined),
+              Expanded(
+                child: Text(
+                  context.text.worker_health_indicator(
+                    worker.health.toStringAsPrecision(3),
+                    worker.maxHealth.toStringAsPrecision(3),
+                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Icon(Icons.energy_savings_leaf_outlined),
+              Expanded(
+                child: Text(
+                  context.text.worker_stamina_indicator(
+                    worker.stamina.toStringAsPrecision(3),
+                    worker.maxStamina.toStringAsPrecision(3),
+                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          //
+          Row(
+            spacing: 8,
+            children: [
+              Icon(Icons.handyman_outlined),
+              Expanded(
+                child: Text(
+                  worker.secondaryIcon.codePoint.toString(),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Icon(Icons.gavel_outlined),
+              Expanded(
+                child: Text(
+                  context.text.worker_damage_indicator(
+                    worker.damage.toStringAsPrecision(3),
+                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -216,14 +228,30 @@ class UpgradeOverlay extends ConsumerWidget {
     SceneModel scene,
     Resource resource,
   ) {
-    if (scene is EncounterSceneModel) {
-      return _encounterSceneUpgradeCard(context, scene, resource);
-    }
-    if (scene is RestSceneModel) {
-      return _restSceneUpgradeCard(context, scene, resource);
-    }
-
-    return Container();
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            scene.backgroundColor.withValues(alpha: 0.2),
+            AppColors.lightDark,
+          ],
+          begin: Alignment.topLeft,
+          end: AlignmentGeometry.bottomCenter,
+        ),
+        border: Border.all(color: AppColors.black, width: 2),
+        borderRadius: BorderRadius.zero,
+      ),
+      child: switch (scene) {
+        EncounterSceneModel() => _encounterSceneUpgradeCard(
+          context,
+          scene,
+          resource,
+        ),
+        RestSceneModel() => _restSceneUpgradeCard(context, scene, resource),
+        SceneModel() => Container(),
+      },
+    );
   }
 
   Widget _encounterSceneUpgradeCard(
@@ -233,71 +261,65 @@ class UpgradeOverlay extends ConsumerWidget {
   ) {
     final upgradeCost = scene.generationRateUpgradeCost;
     final canUpgrade = scene.canLevelUpGenerationRate(resource.amount);
-    return Card(
-      color: scene.backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          spacing: 12,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      spacing: 12,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          spacing: 8,
           children: [
-            Row(
-              spacing: 8,
-              children: [
-                Icon(scene.icon),
-                Expanded(
-                  child: Text(
-                    scene.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Icon(Icons.run_circle_outlined),
-                Text(
-                  context.text.per_second_indicator(
-                    scene.generationRatePerSecond.toStringAsPrecision(3),
-                  ),
-                ),
-              ],
+            Icon(scene.icon),
+            Expanded(
+              child: Text(
+                scene.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
-            Row(
-              spacing: 8,
-              children: [
-                Icon(Icons.directions_run),
-                Expanded(
-                  child: Text(
-                    '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
-                  ),
-                ),
-                _upgradeProgressionBar(
-                  scene.generationRateLevel,
-                  scene.generationRateMaxLevel,
-                ),
-              ],
-            ),
-
-            Row(
-              spacing: 8,
-              children: [
-                Icon(scene.generationRateUpgradeCostType.icon),
-                Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
-                FilledButton.icon(
-                  onPressed: canUpgrade
-                      ? () {
-                          game.gameStateNotifier.buySceneUpgrade(scene.id);
-                        }
-                      : null,
-                  icon: const Icon(Icons.trending_up),
-                  label: Text(
-                    scene.isMaxLevelGenerationRate
-                        ? context.text.upgrade_maxed_button
-                        : context.text.upgrade_button,
-                  ),
-                ),
-              ],
+            Icon(Icons.run_circle_outlined),
+            Text(
+              context.text.per_second_indicator(
+                scene.generationRatePerSecond.toStringAsPrecision(3),
+              ),
             ),
           ],
         ),
-      ),
+        Row(
+          spacing: 8,
+          children: [
+            Icon(Icons.directions_run),
+            Expanded(
+              child: Text(
+                '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
+              ),
+            ),
+            _upgradeProgressionBar(
+              scene.generationRateLevel,
+              scene.generationRateMaxLevel,
+            ),
+          ],
+        ),
+
+        Row(
+          spacing: 8,
+          children: [
+            Icon(scene.generationRateUpgradeCostType.icon),
+            Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
+            FilledButton.icon(
+              onPressed: canUpgrade
+                  ? () {
+                      game.gameStateNotifier.buySceneUpgrade(scene.id);
+                    }
+                  : null,
+              icon: const Icon(Icons.trending_up),
+              label: Text(
+                scene.isMaxLevelGenerationRate
+                    ? context.text.upgrade_maxed_button
+                    : context.text.upgrade_button,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -308,69 +330,65 @@ class UpgradeOverlay extends ConsumerWidget {
   ) {
     final upgradeCost = scene.generationRateUpgradeCost;
     final canUpgrade = scene.canLevelUpGenerationRate(resource.amount);
-    return Card(
-      color: scene.backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          spacing: 12,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      spacing: 12,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          spacing: 8,
           children: [
-            Row(
-              spacing: 8,
-              children: [
-                Icon(scene.icon),
-                Expanded(
-                  child: Text(
-                    scene.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Icon(Icons.healing),
-                Text(
-                  context.text.per_second_indicator(
-                    scene.generationRatePerSecond.toStringAsPrecision(3),
-                  ),
-                ),
-              ],
+            Icon(scene.icon),
+            Expanded(
+              child: Text(
+                scene.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
-            Row(
-              spacing: 8,
-              children: [
-                Icon(Icons.monitor_heart),
-                Expanded(
-                  child: Text(
-                    '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
-                  ),
-                ),
-                _upgradeHalfProgressionBar(
-                  scene.generationRateLevel,
-                  scene.generationRateMaxLevel,
-                ),
-              ],
-            ),
-
-            Row(
-              spacing: 8,
-              children: [
-                Icon(scene.generationRateUpgradeCostType.icon),
-                Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
-                FilledButton.icon(
-                  onPressed: canUpgrade
-                      ? () {
-                          game.gameStateNotifier.buySceneUpgrade(scene.id);
-                        }
-                      : null,
-                  icon: const Icon(Icons.trending_up),
-                  label: Text(
-                    scene.isMaxLevelGenerationRate ? 'Maxed out' : 'Upgrade',
-                  ),
-                ),
-              ],
+            Icon(Icons.healing),
+            Text(
+              context.text.per_second_indicator(
+                scene.generationRatePerSecond.toStringAsPrecision(3),
+              ),
             ),
           ],
         ),
-      ),
+        Row(
+          spacing: 8,
+          children: [
+            Icon(Icons.monitor_heart),
+            Expanded(
+              child: Text(
+                '+${context.text.per_second_indicator(scene.generationRateUpgradeAmount.toStringAsPrecision(3))}',
+              ),
+            ),
+            _upgradeHalfProgressionBar(
+              scene.generationRateLevel,
+              scene.generationRateMaxLevel,
+            ),
+          ],
+        ),
+
+        Row(
+          spacing: 8,
+          children: [
+            Icon(scene.generationRateUpgradeCostType.icon),
+            Expanded(child: Text(upgradeCost.toStringAsPrecision(3))),
+            FilledButton.icon(
+              onPressed: canUpgrade
+                  ? () {
+                      game.gameStateNotifier.buySceneUpgrade(scene.id);
+                    }
+                  : null,
+              icon: const Icon(Icons.trending_up),
+              label: Text(
+                scene.isMaxLevelGenerationRate
+                    ? context.text.upgrade_maxed_button
+                    : context.text.upgrade_button,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

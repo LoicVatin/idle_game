@@ -29,9 +29,16 @@ abstract final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          side: const BorderSide(color: AppColors.light, width: 2),
+          side: const BorderSide(color: AppColors.black, width: 2),
         ),
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          side: const BorderSide(color: AppColors.black, width: 2),
+        ),
+      ),
+      iconTheme: IconThemeData(color: AppColors.light),
     );
   }
 }

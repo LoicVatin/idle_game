@@ -157,14 +157,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return Dialog(
               backgroundColor: AppColors.dark,
               shape: const RoundedRectangleBorder(
-                side: BorderSide(color: AppColors.light, width: 4),
+                side: BorderSide(color: AppColors.black, width: 4),
                 borderRadius: BorderRadius.zero,
               ),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppColors.dark,
-                  border: Border.all(color: AppColors.light, width: 2),
+                  border: Border.all(color: AppColors.black, width: 2),
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Column(
