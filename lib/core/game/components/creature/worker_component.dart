@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/creature/creature_component.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
@@ -13,9 +12,6 @@ import 'package:idle_game/core/styles/app_colors.dart';
 
 class WorkerComponent extends CreatureComponent<WorkerModel> {
   final PlaygroundModel playgroundModel;
-
-  @override
-  String get defaultSpriteSheetFolder => "workers/";
 
   @override
   String get defaultSpriteSheet => "worker";
@@ -64,7 +60,7 @@ class WorkerComponent extends CreatureComponent<WorkerModel> {
 
       if (timer <= 0) {
         isInConfrontation = false;
-        paint.color = AppColors.lightBlue.withValues(alpha: 0.3);
+        paint.color = AppColors.lightBlue.withValues(alpha: CreatureComponent.alphaOverlayValue);
       }
     }
 

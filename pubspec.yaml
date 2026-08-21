@@ -72,8 +72,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/backgrounds/
-    - assets/images/encounters/
-    - assets/images/workers/
+    - assets/images/creatures/
     - assets/audio/
     - assets/fonts/
 

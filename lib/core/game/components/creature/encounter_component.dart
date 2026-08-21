@@ -14,9 +14,6 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
   EncounterSceneModel scene;
 
   @override
-  String get defaultSpriteSheetFolder => "encounters/";
-
-  @override
   String get defaultSpriteSheet => "encounter";
 
   EncounterComponent({
@@ -31,7 +28,8 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     super.secondaryIconAnchor = Anchor.bottomLeft,
     super.priority = Priorities.high,
   }) : super() {
-    paint.color = model.type.color.withValues(alpha: 0.3);
+    paint.color = model.type.color.withValues(alpha: CreatureComponent.alphaOverlayValue);
+    spriteAnimationComponent.flipHorizontallyAroundCenter();
   }
 
   @override
@@ -66,7 +64,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
     isInConfrontation = false;
     state = CreatureState.idle;
     timer = 0;
-    paint.color = model.type.color.withValues(alpha: 0.3);
+    paint.color = model.type.color.withValues(alpha: CreatureComponent.alphaOverlayValue);
     updateHealthBar();
   }
 
@@ -85,7 +83,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
 
       if (timer <= 0) {
         isInConfrontation = false;
-        paint.color = model.type.color.withValues(alpha: 0.3);
+        paint.color = model.type.color.withValues(alpha: CreatureComponent.alphaOverlayValue);
       }
     }
 
@@ -121,7 +119,7 @@ class EncounterComponent extends CreatureComponent<EncounterModel> {
       if (!playground.worker.canAttack) {
         isInConfrontation = false;
         timer = 0;
-        paint.color = model.type.color.withValues(alpha: 0.3);
+        paint.color = model.type.color.withValues(alpha: CreatureComponent.alphaOverlayValue);
       }
     }
 

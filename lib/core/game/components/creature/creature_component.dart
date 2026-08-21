@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/data/models/creature/creature_state.dart';
@@ -39,15 +40,16 @@ abstract class CreatureComponent<T extends CreatureModel>
   late final StatusBarComponent staminaBar;
   late final SpriteAnimationWithStatesComponent spriteAnimationComponent;
 
-  static final double componentRadius = Dimensions.large;
+  static final double componentRadius = Dimensions.extraLarge;
   static final double componentHalfRadius = componentRadius / 2;
+  static final double alphaOverlayValue = kDebugMode? 0.3 : 0.0;
 
   final Color color;
   final StatusOrder statusOrder;
   final Anchor primaryIconAnchor;
   final Anchor secondaryIconAnchor;
 
-  final String defaultSpriteSheetFolder = "";
+  final String defaultSpriteSheetFolder = "creatures/";
   final String defaultSpriteSheet = "test_card";
 
   CreatureComponent({
@@ -62,7 +64,7 @@ abstract class CreatureComponent<T extends CreatureModel>
     this.secondaryIconAnchor = Anchor.topCenter,
   }) : super(
          size: Vector2.all(componentRadius),
-         paint: Paint()..color = color.withValues(alpha: 0.3),
+         paint: Paint()..color = color.withValues(alpha: alphaOverlayValue),
        ) {
     statusText = StatusTextComponent();
     healthBar = StatusBarComponent(fillColor: AppColors.green);
@@ -101,14 +103,14 @@ abstract class CreatureComponent<T extends CreatureModel>
         size: Vector2.all(componentHalfRadius),
         anchor: primaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
-        paint: Paint()..color = AppColors.light.withValues(alpha: 0.3),
+        paint: Paint()..color = AppColors.light.withValues(alpha: alphaOverlayValue),
       ),
       IconComponent(
         icon: model.secondaryIcon,
         size: Vector2.all(componentHalfRadius),
         anchor: secondaryIconAnchor,
         position: Vector2.all(componentHalfRadius),
-        paint: Paint()..color = AppColors.light.withValues(alpha: 0.3),
+        paint: Paint()..color = AppColors.light.withValues(alpha: alphaOverlayValue),
       ),
       spriteAnimationComponent,
     ]);
@@ -197,7 +199,7 @@ abstract class CreatureComponent<T extends CreatureModel>
     isInConfrontation = true;
     state = CreatureState.attack;
     timer = CreatureModel.confrontationStepDuration;
-    paint.color = AppColors.darkYellow.withValues(alpha: 0.3);
+    paint.color = AppColors.darkYellow.withValues(alpha: alphaOverlayValue);
     updateHealthBar();
     updateStaminaBar();
   }
