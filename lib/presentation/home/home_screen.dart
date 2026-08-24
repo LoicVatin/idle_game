@@ -23,6 +23,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   IdleGame? _game;
   late final Future _googleFontsPending;
   bool _isTutorialAtStartupDismissed = false;
+  bool _isBgmOn = true;
+  bool _isInitialPreferencesLoaded = false;
   bool _ignoreNextMainPop = false;
 
   @override
@@ -30,7 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     appLogger.d("HomeScreenState.initState()");
     super.initState();
 
-    isTutorialAtStartupDismissed();
+    loadInitialSharedPreferences();
 
     GoogleFonts.vt323();
     _googleFontsPending = GoogleFonts.pendingFonts();
@@ -64,11 +66,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(context.text.app_name),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _isBgmOn
+                    ? Icons.volume_up_outlined
+                    : Icons.volume_off_outlined,
+              ),
+              tooltip: _isBgmOn ? 'Pause music' : 'Resume music',
+              onPressed: () async {
+                final nextValue = !_isBgmOn;
+
+                await _game?.setBgmMusicOn(nextValue);
+
+                if (!mounted) {
+                  return;
+                }
+
+                setState(() {
+                  _isBgmOn = nextValue;
+                });
+              },
+            ),
+          ],
         ),
         body: FutureBuilder(
           future: _googleFontsPending,
           builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
+            if (snapshot.connectionState != ConnectionState.done ||
+                !_isInitialPreferencesLoaded) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -78,9 +104,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 IdleGame.tutorialOverlay: (context, game) {
                   return TutorialOverlay(
                     game: game as IdleGame,
-                    onClose: () {
+                    onClose: () async {
                       game.dismissTutorialOverlay();
-                      dismissTutorialAtStartup();
+                      await dismissTutorialAtStartup();
                     },
                   );
                 },
@@ -141,11 +167,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Future<void> isTutorialAtStartupDismissed() async {
+  Future<void> loadInitialSharedPreferences() async {
     final isTutorialAtStartupDismissed =
         await SharedPreferencesHelper.isTutorialAtStartupDismissed();
+    final isBackgroundMusicOn = await SharedPreferencesHelper.isBackgroundMusicOn();
+
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _isTutorialAtStartupDismissed = isTutorialAtStartupDismissed;
+      _isBgmOn = isBackgroundMusicOn;
+      _isInitialPreferencesLoaded = true;
     });
   }
 
@@ -201,6 +235,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> dismissTutorialAtStartup() async {
-    SharedPreferencesHelper.dismissTutorial();
+    await SharedPreferencesHelper.dismissTutorial();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isTutorialAtStartupDismissed = true;
+    });
   }
 }

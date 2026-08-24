@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
   static const String _tutorial = "tutorial";
+  static const String _bgm = "bgm";
 
   // Set Value (Generic)
   static Future<void> _setValue<T>(String key, T value) async {
@@ -44,7 +45,23 @@ class SharedPreferencesHelper {
     return await _getValue<bool>(_tutorial) ?? false;
   }
 
-  static void dismissTutorial() {
-    _setValue<bool>(_tutorial, true);
+  static Future<void> dismissTutorial() async {
+     await _setValue<bool>(_tutorial, true);
+  }
+
+  // Background music
+  static Future<bool> isBackgroundMusicOn() async {
+    return await _getValue<bool>(_bgm) ?? true;
+  }
+
+  static Future<void> setBackgroundMusicOn(bool isOn) async {
+    await _setValue<bool>(_bgm, isOn);
+  }
+
+  static Future<bool> toggleBackgroundMusic() async {
+    final currentValue = await isBackgroundMusicOn();
+    final newValue = !currentValue;
+    await setBackgroundMusicOn(newValue);
+    return newValue;
   }
 }

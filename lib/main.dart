@@ -6,10 +6,13 @@ import 'package:idle_game/presentation/home/home_screen.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/utils/logger_helper.dart';
 import 'generated/intl/app_localizations.dart';
+import 'package:flame_audio/flame_audio.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Flame.device.setPortrait();
+  await FlameAudio.bgm.initialize();
+  await FlameAudio.audioCache.loadAll(['bgm.ogg']);
   runApp(const ProviderScope(child: IdleApp()));
 }
 

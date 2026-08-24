@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/bottom_panel_component.dart';
 import 'package:idle_game/core/game/components/component_utils.dart';
@@ -10,6 +11,7 @@ import 'package:idle_game/core/game/components/scrollable_component_list.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/logger_helper.dart';
 import 'package:idle_game/core/styles/app_colors.dart';
+import 'package:idle_game/utils/shared_preferences_helper.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
@@ -20,6 +22,8 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   late final ResourcePanelComponent resourcePanelComponent;
   late final ScrollableComponentList _playgroundList;
   late final BottomPanelComponent bottomPanelComponent;
+
+  bool isBgmOn = true;
 
   static const String upgradeOverlay = 'upgrade_overlay';
   static const String tutorialOverlay = 'tutorial_overlay';
@@ -38,6 +42,9 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     appLogger.d("IdleGame.onLoad()");
+
+    startBgmMusic();
+
     resourcePanelComponent = ResourcePanelComponent(
       position: Vector2.zero(),
       size: Vector2(
@@ -157,5 +164,25 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     final playground = gameStateNotifier.addPlayground();
 
     await _playgroundList.addItem(PlaygroundComponent(playground: playground));
+  }
+
+  Future<void> startBgmMusic() async {
+    await FlameAudio.bgm.play('bgm.ogg', volume: 0.5);
+
+    isBgmOn = await SharedPreferencesHelper.isBackgroundMusicOn();
+    if (!isBgmOn) {
+      await FlameAudio.bgm.pause();
+    }
+  }
+
+  Future<void> setBgmMusicOn(bool isOn) async {
+    isBgmOn = isOn;
+    await SharedPreferencesHelper.setBackgroundMusicOn(isOn);
+
+    if (isOn) {
+      await FlameAudio.bgm.resume();
+    } else {
+      await FlameAudio.bgm.pause();
+    }
   }
 }
