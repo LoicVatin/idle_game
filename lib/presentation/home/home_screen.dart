@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:idle_game/core/audio/soloud_audio_player.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/presentation/home/tutorial_overlay_widget.dart';
@@ -23,7 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   IdleGame? _game;
   late final Future _googleFontsPending;
   bool _isTutorialAtStartupDismissed = false;
-  bool _isBgmOn = true;
+  bool _isBgmOn = SoLoudAudioPlayer.isOn;
   bool _isInitialPreferencesLoaded = false;
   bool _ignoreNextMainPop = false;
 
@@ -69,15 +70,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           actions: [
             IconButton(
               icon: Icon(
-                _isBgmOn
-                    ? Icons.volume_up_outlined
-                    : Icons.volume_off_outlined,
+                _isBgmOn ? Icons.volume_up_outlined : Icons.volume_off_outlined,
               ),
               tooltip: _isBgmOn ? 'Pause music' : 'Resume music',
               onPressed: () async {
                 final nextValue = !_isBgmOn;
 
-                await _game?.setBgmMusicOn(nextValue);
+                await SoLoudAudioPlayer.setBackgroundMusicOn(nextValue);
 
                 if (!mounted) {
                   return;
@@ -170,7 +169,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> loadInitialSharedPreferences() async {
     final isTutorialAtStartupDismissed =
         await SharedPreferencesHelper.isTutorialAtStartupDismissed();
-    final isBackgroundMusicOn = await SharedPreferencesHelper.isBackgroundMusicOn();
 
     if (!mounted) {
       return;
@@ -178,7 +176,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     setState(() {
       _isTutorialAtStartupDismissed = isTutorialAtStartupDismissed;
-      _isBgmOn = isBackgroundMusicOn;
       _isInitialPreferencesLoaded = true;
     });
   }
