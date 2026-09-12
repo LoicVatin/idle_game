@@ -82,6 +82,7 @@ jobs:
       - name: Publish APKs to rolling prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           # Recreate the release so the tag follows the newest master commit and no
           # stale assets linger. The download URLs stay stable across runs.
