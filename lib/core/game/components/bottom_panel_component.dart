@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
 import 'package:idle_game/core/game/components/resource_cost_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 
 class BottomPanelComponent extends PositionComponent
     with HasGameReference<IdleGame> {
@@ -15,12 +17,11 @@ class BottomPanelComponent extends PositionComponent
     super.position,
     super.size,
     super.anchor,
-    super.priority = 10,
-    this.padding = const EdgeInsets.all(16),
+    super.priority = Priorities.low,
     required this.onPressed,
   });
 
-  final EdgeInsets padding;
+  final EdgeInsets padding = EdgeInsets.all(Dimensions.small);
   late final RectangleComponent _resourceAmountsBackground;
   late final RowComponent _resourceAmountsRow;
   late final RectangleButtonComponent _button;
@@ -80,15 +81,20 @@ class BottomPanelComponent extends PositionComponent
 
     _resourceAmountsBackground = RectangleComponent(
       size: Vector2.copy(size),
-      paint: Paint()..color = Colors.black,
+      paint: Paint()..color = AppColors.dark,
     );
 
     add(_resourceAmountsBackground);
 
-    _button = RectangleButtonComponent(icon: Icons.add, onPressed: onPressed);
+    _button = RectangleButtonComponent(
+      icon: Icons.add,
+      onPressed: onPressed,
+      outlined: true,
+    );
     _tutorialButton = RectangleButtonComponent(
       icon: Icons.refresh_outlined,
       onPressed: game.displayTutorialOverlay,
+      outlined: true,
     );
 
     _tutorialRow = RowComponent(
@@ -96,7 +102,7 @@ class BottomPanelComponent extends PositionComponent
       size: Vector2(size.x - padding.horizontal, size.y - padding.vertical),
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
-      gap: 16,
+      gap: Dimensions.small,
       children: [
         _tutorialButton,
         TextComponent(
@@ -112,7 +118,7 @@ class BottomPanelComponent extends PositionComponent
       size: Vector2(size.x - padding.horizontal, size.y - padding.vertical),
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
-      gap: 16,
+      gap: Dimensions.small,
       children: [
         ColumnComponent(gap: 2, children: _resourceTexts.values.toList()),
         _button,

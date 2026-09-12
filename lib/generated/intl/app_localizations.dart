@@ -237,6 +237,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Replay tutorial'**
   String get tutorial_replay_button;
+
+  /// No description provided for @device_orientation_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Landscape orientation not supported.\nPlease rotate your device to portrait mode.'**
+  String get device_orientation_warning;
+
+  /// No description provided for @quit_game_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit game?'**
+  String get quit_game_dialog_title;
+
+  /// No description provided for @quit_game_dialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to leave?'**
+  String get quit_game_dialog_body;
+
+  /// No description provided for @confirm_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm_button;
+
+  /// No description provided for @cancel_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel_button;
+
+  /// No description provided for @warning_web_welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.'**
+  String get warning_web_welcome;
+
+  /// No description provided for @warning_web_not_supported.
+  ///
+  /// In en, this message translates to:
+  /// **'This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.'**
+  String get warning_web_not_supported;
+
+  /// No description provided for @warning_web_please_consider_mobile.
+  ///
+  /// In en, this message translates to:
+  /// **'This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.'**
+  String get warning_web_please_consider_mobile;
 }
 
 class _AppLocalizationsDelegate

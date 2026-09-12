@@ -1,0 +1,312 @@
+{ "frames": {
+   "backgrounds_template (sky_5) 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (sky_5) 1.aseprite": {
+    "frame": { "x": 384, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (sky_5) 2.aseprite": {
+    "frame": { "x": 768, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (sky_5) 3.aseprite": {
+    "frame": { "x": 1152, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (sky_5) 4.aseprite": {
+    "frame": { "x": 1536, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (sky_5) 5.aseprite": {
+    "frame": { "x": 1920, "y": 0, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 0.aseprite": {
+    "frame": { "x": 0, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 1.aseprite": {
+    "frame": { "x": 384, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 2.aseprite": {
+    "frame": { "x": 768, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 3.aseprite": {
+    "frame": { "x": 1152, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 4.aseprite": {
+    "frame": { "x": 1536, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_4) 5.aseprite": {
+    "frame": { "x": 1920, "y": 216, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 0.aseprite": {
+    "frame": { "x": 0, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 1.aseprite": {
+    "frame": { "x": 384, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 2.aseprite": {
+    "frame": { "x": 768, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 3.aseprite": {
+    "frame": { "x": 1152, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 4.aseprite": {
+    "frame": { "x": 1536, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (background_3) 5.aseprite": {
+    "frame": { "x": 1920, "y": 432, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 0.aseprite": {
+    "frame": { "x": 0, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 1.aseprite": {
+    "frame": { "x": 384, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 2.aseprite": {
+    "frame": { "x": 768, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 3.aseprite": {
+    "frame": { "x": 1152, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 4.aseprite": {
+    "frame": { "x": 1536, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_2) 5.aseprite": {
+    "frame": { "x": 1920, "y": 648, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 0.aseprite": {
+    "frame": { "x": 0, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 1.aseprite": {
+    "frame": { "x": 384, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 2.aseprite": {
+    "frame": { "x": 768, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 3.aseprite": {
+    "frame": { "x": 1152, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 4.aseprite": {
+    "frame": { "x": 1536, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (foreground_1) 5.aseprite": {
+    "frame": { "x": 1920, "y": 864, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 0.aseprite": {
+    "frame": { "x": 0, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 1.aseprite": {
+    "frame": { "x": 384, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 2.aseprite": {
+    "frame": { "x": 768, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 3.aseprite": {
+    "frame": { "x": 1152, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 4.aseprite": {
+    "frame": { "x": 1536, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   },
+   "backgrounds_template (path_0) 5.aseprite": {
+    "frame": { "x": 1920, "y": 1080, "w": 384, "h": 216 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 384, "h": 216 },
+    "sourceSize": { "w": 384, "h": 216 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.17.2-x64",
+  "image": "backgrounds_forest.png",
+  "format": "I8",
+  "size": { "w": 2304, "h": 1296 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "forest" },
+   { "name": "sky_5", "group": "forest", "opacity": 255, "blendMode": "normal" },
+   { "name": "background_4", "group": "forest", "opacity": 255, "blendMode": "normal" },
+   { "name": "background_3", "group": "forest", "opacity": 255, "blendMode": "normal" },
+   { "name": "foreground_2", "group": "forest", "opacity": 255, "blendMode": "normal" },
+   { "name": "foreground_1", "group": "forest", "opacity": 255, "blendMode": "normal" },
+   { "name": "path_0", "group": "forest", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

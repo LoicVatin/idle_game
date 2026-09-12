@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:idle_game/core/styles/app_colors.dart';
+
 enum ResourceType {
-  food(icon: Icons.grass_outlined, color: Colors.redAccent),
-  wood(icon: Icons.forest_outlined, color: Colors.brown),
-  stone(icon: Icons.landscape_outlined, color: Colors.blueGrey);
+  food(icon: Icons.grass_outlined, color: AppColors.red),
+  wood(icon: Icons.forest_outlined, color: AppColors.darkBrown),
+  stone(icon: Icons.landscape_outlined, color: AppColors.lightGrey);
 
   const ResourceType({required this.icon, required this.color});
 

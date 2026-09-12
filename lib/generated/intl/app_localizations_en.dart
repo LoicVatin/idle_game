@@ -102,4 +102,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorial_replay_button => 'Replay tutorial';
+
+  @override
+  String get device_orientation_warning =>
+      'Landscape orientation not supported.\nPlease rotate your device to portrait mode.';
+
+  @override
+  String get quit_game_dialog_title => 'Quit game?';
+
+  @override
+  String get quit_game_dialog_body => 'Are you sure you want to leave?';
+
+  @override
+  String get confirm_button => 'Confirm';
+
+  @override
+  String get cancel_button => 'Cancel';
+
+  @override
+  String get warning_web_welcome =>
+      'Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.';
+
+  @override
+  String get warning_web_not_supported =>
+      'This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.';
+
+  @override
+  String get warning_web_please_consider_mobile =>
+      'This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.';
 }

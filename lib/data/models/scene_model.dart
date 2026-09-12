@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 
@@ -9,6 +8,7 @@ abstract class SceneModel {
   String name;
   IconData icon;
   Color backgroundColor;
+  final String? spriteSheet;
   final double x = 0.1;
   final double y = 2.0;
   int generationRateLevel;
@@ -16,11 +16,13 @@ abstract class SceneModel {
   double generationRateUpgradeAmount;
   double generationRatePerSecond;
   ResourceType generationRateUpgradeCostType;
+  bool active;
 
   SceneModel({
     required this.id,
     required this.playgroundId,
     this.name = "Scene",
+    this.spriteSheet,
     this.icon = Icons.map_outlined,
     this.backgroundColor = Colors.grey,
     this.generationRateLevel = 0,
@@ -28,6 +30,7 @@ abstract class SceneModel {
     this.generationRateMaxLevel = 5,
     this.generationRateUpgradeAmount = 1.0,
     this.generationRateUpgradeCostType = ResourceType.wood,
+    this.active = false,
   });
 
   num get generationRateUpgradeCost =>
@@ -61,33 +64,5 @@ abstract class SceneModel {
   void reset() {
     generationRatePerSecond = 0.0;
     generationRateLevel = 0;
-  }
-}
-
-//
-class WeightedRandom<T> {
-  WeightedRandom(Map<T, double> allWeights)
-    : _totalWeight = allWeights.values.sum,
-      _allWeightsList = allWeights.entries.toList(growable: true);
-
-  double _totalWeight;
-  final Random _random = Random.secure();
-  final List<MapEntry<T, double>> _allWeightsList;
-
-  void add(T entry, double weight) {
-    _allWeightsList.add(MapEntry(entry, weight));
-    _totalWeight += weight;
-  }
-
-  T getNext() {
-    final weightedRandom = _random.nextDouble() * _totalWeight;
-    double totalSoFar = 0;
-    for (final entry in _allWeightsList) {
-      if (weightedRandom < totalSoFar + entry.value) {
-        return entry.key;
-      }
-      totalSoFar += entry.value;
-    }
-    return _allWeightsList.last.key;
   }
 }

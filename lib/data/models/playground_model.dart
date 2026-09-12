@@ -3,64 +3,83 @@ import 'package:flutter/material.dart';
 import 'package:idle_game/data/models/encounter_scene_model.dart';
 import 'package:idle_game/data/models/rest_scene_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 
 class PlaygroundModel {
   final int id;
   final String name;
-  final Set<SceneModel> scenes;
+  final EncounterSceneModel firstScene;
+  final EncounterSceneModel secondScene;
+  final RestSceneModel thirdScene;
+  late final Set<SceneModel> _scenes;
   WorkerModel worker;
-  int activeSceneId;
+  EncounterModel? confrontationTarget;
+  double confrontationAttackTimer = 0;
 
   PlaygroundModel({
     required this.id,
     this.name = "Playground",
-    this.activeSceneId = 0,
     WorkerModel? worker,
-    Set<SceneModel>? scenes,
+    EncounterSceneModel? firstScene,
+    EncounterSceneModel? secondScene,
+    RestSceneModel? thirdScene,
+    this.confrontationTarget,
+    this.confrontationAttackTimer = 0,
   }) : worker =
            worker ??
            WorkerModel(
              name: "Worker",
              damage: 1,
-             icon: Icons.man_outlined,
-             toolsIcon: Icons.waving_hand_outlined,
+             primaryIcon: Icons.man_outlined,
+             secondaryIcon: Icons.waving_hand_outlined,
            ),
-       scenes =
-           scenes ??
-           {
-             EncounterSceneModel(id: 0, playgroundId: id),
-             EncounterSceneModel(id: 1, playgroundId: id),
-             RestSceneModel(id: 2, playgroundId: id),
-           };
+       firstScene =
+           firstScene ??
+           EncounterSceneModel(id: 0, playgroundId: id, active: true),
+       secondScene =
+           secondScene ?? EncounterSceneModel(id: 1, playgroundId: id),
+       thirdScene = thirdScene ?? RestSceneModel(id: 2, playgroundId: id) {
+    _scenes = {this.firstScene, this.secondScene, this.thirdScene};
+  }
 
   PlaygroundModel copyWith({
     int? id,
     String? name,
-    Set<SceneModel>? scenes,
+    EncounterSceneModel? firstScene,
+    EncounterSceneModel? secondScene,
+    RestSceneModel? thirdScene,
     WorkerModel? worker,
     int? activeSceneId,
+    EncounterModel? confrontationTarget,
+    double? confrontationAttackTimer,
   }) {
     return PlaygroundModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      scenes: scenes ?? this.scenes,
+      firstScene: firstScene ?? this.firstScene,
+      secondScene: secondScene ?? this.secondScene,
+      thirdScene: thirdScene ?? this.thirdScene,
       worker: worker ?? this.worker,
-      activeSceneId: activeSceneId ?? this.activeSceneId,
+      confrontationTarget: confrontationTarget ?? this.confrontationTarget,
+      confrontationAttackTimer:
+          confrontationAttackTimer ?? this.confrontationAttackTimer,
+      //activeSceneId: activeSceneId ?? this.activeSceneId,
     );
   }
 
-  SceneModel get activeScene => scenes.firstWhere(
-    (scene) => scene.id == activeSceneId,
-    orElse: () => scenes.first,
-  );
+  SceneModel get activeScene =>
+      _scenes.firstWhere((scene) => scene.active, orElse: () => _scenes.first);
 
   SceneModel? getSceneById(int id) {
-    return scenes.firstWhereOrNull((scene) => scene.id == id);
+    return _scenes.firstWhereOrNull((scene) => scene.id == id);
   }
 
   void setActiveScene(int id) {
-    if (getSceneById(id) != null) activeSceneId = id;
+    for (final scene in _scenes) {
+      scene.active = scene.id == id;
+    }
+    //if (getSceneById(id) != null) activeSceneId = id;
   }
 
   void addExperience(double baseReward) {

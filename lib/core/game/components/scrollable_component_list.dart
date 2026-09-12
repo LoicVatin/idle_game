@@ -4,13 +4,15 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/playground_component.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class ScrollableComponentList extends PositionComponent with DragCallbacks {
   ScrollableComponentList({
     super.position,
     super.size,
-    this.spacing = 16,
-    this.padding = const EdgeInsets.all(16),
+    this.spacing = Dimensions.small,
+    this.padding = const EdgeInsets.all(Dimensions.small),
   });
 
   final double spacing;
@@ -33,7 +35,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
       ..addAll(items);
 
     for (final item in _items) {
-      item.priority = 0;
+      item.priority = Priorities.background;
       await add(item);
     }
 
@@ -45,7 +47,7 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
   Future<void> addItem(PlaygroundComponent item) async {
     _items.add(item);
 
-    item.priority = 0;
+    item.priority = Priorities.background;
     await add(item);
 
     await _ensureBordersMounted();
@@ -122,14 +124,17 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
     final trackHeight = size.y - padding.vertical;
 
     final visibleRatio = size.y / _contentHeight;
-    final thumbHeight = math.max(32.0, trackHeight * visibleRatio);
+    final thumbHeight = math.max(
+      Dimensions.regular,
+      trackHeight * visibleRatio,
+    );
 
     final scrollRatio = _scrollOffset / maxScrollOffset;
     final thumbY = padding.top + (trackHeight - thumbHeight) * scrollRatio;
 
     _scrollbarThumb
       ..position.setValues(size.x - (padding.right / 2), thumbY)
-      ..size.setValues(6, thumbHeight);
+      ..size.setValues(Dimensions.tiny, thumbHeight);
   }
 
   double get maxScrollOffset {
@@ -165,9 +170,9 @@ class ScrollableComponentList extends PositionComponent with DragCallbacks {
 
 class ScrollbarThumbIndicatorComponent extends PositionComponent {
   ScrollbarThumbIndicatorComponent()
-    : super(priority: 1000, anchor: Anchor.topCenter);
+    : super(priority: Priorities.alwaysOnTop, anchor: Anchor.topCenter);
 
-  final Paint _paint = Paint()..color = Colors.grey;
+  final Paint _paint = Paint()..color = AppColors.grey;
 
   bool visible = false;
 

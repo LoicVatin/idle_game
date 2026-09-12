@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:idle_game/data/models/encounter_model.dart';
+import 'package:idle_game/data/models/creature/encounter_model.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/utils/weighted_list.dart';
 
 class EncounterSceneModel extends SceneModel {
-  WeightedRandom<EncounterModel> encounters;
+  WeightedList<EncounterModel> encounters;
   double encounterInterval;
   double encounterSpacing;
   bool encounter;
@@ -16,20 +17,24 @@ class EncounterSceneModel extends SceneModel {
     super.name = "Encounter Scene",
     super.icon = Icons.forest_outlined,
     super.backgroundColor = Colors.green,
+    super.spriteSheet,
     super.generationRateUpgradeCostType = ResourceType.wood,
+    super.active,
     this.encounterInterval = 25,
     this.encounterSpacing = 100,
     this.encounter = false,
     this.enemyRewardMultiplier = 1,
-    WeightedRandom<EncounterModel>? encounters,
+    WeightedList<EncounterModel>? encounters,
   }) : encounters =
            encounters ??
-           WeightedRandom({
+           WeightedList({
              EncounterModel(
+               name: "Encounter",
                type: ResourceType.wood,
-               health: 3,
+               maxHealth: 3,
                reward: 5,
-               icon: Icons.data_object_outlined,
+               primaryIcon: Icons.data_object_outlined,
+               secondaryIcon: Icons.data_object_outlined,
              ): 1,
            }),
        super();

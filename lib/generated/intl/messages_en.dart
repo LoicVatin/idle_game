@@ -33,7 +33,18 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "app_name": MessageLookupByLibrary.simpleMessage("Idle Game"),
+    "cancel_button": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "confirm_button": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "device_orientation_warning": MessageLookupByLibrary.simpleMessage(
+      "Landscape orientation not supported.\nPlease rotate your device to portrait mode.",
+    ),
     "per_second_indicator": m0,
+    "quit_game_dialog_body": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to leave?",
+    ),
+    "quit_game_dialog_title": MessageLookupByLibrary.simpleMessage(
+      "Quit game?",
+    ),
     "tutorial_replay_button": MessageLookupByLibrary.simpleMessage(
       "Replay tutorial",
     ),
@@ -84,6 +95,15 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "upgrade_button": MessageLookupByLibrary.simpleMessage("Upgrade"),
     "upgrade_maxed_button": MessageLookupByLibrary.simpleMessage("Maxed out"),
+    "warning_web_not_supported": MessageLookupByLibrary.simpleMessage(
+      "This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.",
+    ),
+    "warning_web_please_consider_mobile": MessageLookupByLibrary.simpleMessage(
+      "This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.",
+    ),
+    "warning_web_welcome": MessageLookupByLibrary.simpleMessage(
+      "Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.",
+    ),
     "worker_damage_indicator": m1,
     "worker_health_indicator": m2,
     "worker_level_indicator": m3,

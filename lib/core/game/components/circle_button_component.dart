@@ -1,6 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/hold_button_component.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class CircleButtonComponent extends HoldableButtonComponent {
   CircleButtonComponent({
@@ -9,22 +11,22 @@ class CircleButtonComponent extends HoldableButtonComponent {
     super.onHold,
     super.anchor,
     super.position,
-    double radius = 24,
+    double radius = Dimensions.medium,
   }) : super(
          size: Vector2.all(radius * 2),
          defaultSkin: CircleButtonFace(
            icon: icon,
-           color: Colors.deepPurple,
+           color: AppColors.accent,
            radius: radius,
          ),
          downSkin: CircleButtonFace(
            icon: icon,
-           color: Colors.deepPurpleAccent,
+           color: AppColors.antiqueGold,
            radius: radius,
          ),
          disabledSkin: CircleButtonFace(
            icon: icon,
-           color: Colors.blueGrey,
+           color: AppColors.grey,
            radius: radius,
          ),
        );

@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/components/resource_component.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/data/models/resource_model.dart';
+
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class ResourcePanelComponent extends PositionComponent
     with HasGameReference<IdleGame> {
@@ -13,8 +16,8 @@ class ResourcePanelComponent extends PositionComponent
     super.position,
     super.size,
     super.anchor,
-    super.priority = 10,
-    this.padding = const EdgeInsets.all(16),
+    super.priority = Priorities.low,
+    this.padding = const EdgeInsets.all(Dimensions.small),
   });
 
   final EdgeInsets padding;
@@ -60,7 +63,7 @@ class ResourcePanelComponent extends PositionComponent
 
     _resourceAmountsBackground = RectangleComponent(
       size: Vector2.copy(size),
-      paint: Paint()..color = Colors.black,
+      paint: Paint()..color = AppColors.dark,
     );
 
     add(_resourceAmountsBackground);

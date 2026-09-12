@@ -71,5 +71,13 @@
   "tutorial_step_almost": "You are almost done.",
   "tutorial_step_complete": "Tutorial complete!\nYou can replay it any time.",
   "tutorial_step_close": "Tap to close.",
-  "tutorial_replay_button": "Replay tutorial"
+  "tutorial_replay_button": "Replay tutorial",
+  "device_orientation_warning": "Landscape orientation not supported.\nPlease rotate your device to portrait mode.",
+  "quit_game_dialog_title": "Quit game?",
+  "quit_game_dialog_body": "Are you sure you want to leave?",
+  "confirm_button": "Confirm",
+  "cancel_button": "Cancel",
+  "warning_web_welcome": "Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.",
+  "warning_web_not_supported": "This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.",
+  "warning_web_please_consider_mobile": "This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version."
 }

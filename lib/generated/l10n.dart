@@ -283,6 +283,76 @@ class S {
       args: [],
     );
   }
+
+  /// `Landscape orientation not supported.\nPlease rotate your device to portrait mode.`
+  String get device_orientation_warning {
+    return Intl.message(
+      'Landscape orientation not supported.\nPlease rotate your device to portrait mode.',
+      name: 'device_orientation_warning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quit game?`
+  String get quit_game_dialog_title {
+    return Intl.message(
+      'Quit game?',
+      name: 'quit_game_dialog_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to leave?`
+  String get quit_game_dialog_body {
+    return Intl.message(
+      'Are you sure you want to leave?',
+      name: 'quit_game_dialog_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm`
+  String get confirm_button {
+    return Intl.message('Confirm', name: 'confirm_button', desc: '', args: []);
+  }
+
+  /// `Cancel`
+  String get cancel_button {
+    return Intl.message('Cancel', name: 'cancel_button', desc: '', args: []);
+  }
+
+  /// `Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.`
+  String get warning_web_welcome {
+    return Intl.message(
+      'Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.',
+      name: 'warning_web_welcome',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.`
+  String get warning_web_not_supported {
+    return Intl.message(
+      'This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.',
+      name: 'warning_web_not_supported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.`
+  String get warning_web_please_consider_mobile {
+    return Intl.message(
+      'This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.',
+      name: 'warning_web_please_consider_mobile',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

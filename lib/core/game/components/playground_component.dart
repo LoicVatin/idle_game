@@ -5,24 +5,23 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:idle_game/core/game/components/rectangle_button_component.dart';
-import 'package:idle_game/core/game/components/status_bar_component.dart';
+import 'package:idle_game/core/game/components/creature/status_bar_component.dart';
+import 'package:idle_game/core/game/components/scene/encounter_scene_component.dart';
+import 'package:idle_game/core/game/components/scene/rest_scene_component.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
 import 'package:idle_game/core/game/idle_game.dart';
-import 'package:idle_game/core/game/components/encounter_component.dart';
-import 'package:idle_game/core/game/components/worker_component.dart';
-import 'package:idle_game/data/models/encounter_scene_model.dart';
+import 'package:idle_game/core/game/components/creature/worker_component.dart';
 import 'package:idle_game/data/models/playground_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
-import 'package:idle_game/data/models/rest_scene_model.dart';
-import 'package:idle_game/data/models/worker_model.dart';
+import 'package:idle_game/data/models/creature/worker_model.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class PlaygroundComponent extends RectangleComponent
     with HasGameReference<IdleGame>, TapCallbacks, HasVisibility {
   final PlaygroundModel _playground;
-  double encounterTimer = 0;
-  static const double _padding = 10.0;
-  static const double _encounterRadius = 24.0;
-  static const double _height = 200.0;
+  static final double _padding = Dimensions.extraSmall;
+  static const double _height = Dimensions.gigantic;
   static const double _sceneSwitchRecoveryHealthPercent = 0.25;
   static const double _sceneTransitionDuration = 0.4;
 
@@ -34,7 +33,9 @@ class PlaygroundComponent extends RectangleComponent
   RectangleComponent switchSceneComponent = RectangleComponent();
   late RectangleComponent _sceneFadeComponent;
   late RectangleComponent _defeatFadeComponent;
-  final Map<int, RectangleButtonComponent> switchSceneButtons = {};
+  late RectangleButtonComponent firstSwitchButton;
+  late RectangleButtonComponent secondSwitchButton;
+  late RectangleButtonComponent thirdSwitchButton;
   bool _switchScenesLockedUntilRecovered = false;
   bool _isSceneTransitioning = false;
   double _sceneTransitionElapsed = 0;
@@ -43,16 +44,17 @@ class PlaygroundComponent extends RectangleComponent
   double _defeatTransitionElapsed = 0;
   int? _defeatRestSceneId;
 
-  late TextComponent _nameComponent;
-  late TextComponent rateComponent;
-
   late RectangleButtonComponent upgradeButton;
 
   late WorkerComponent workerComponent;
   late TextComponent _workerLevelComponent;
   late StatusBarComponent _workerExperienceComponent;
+  late EncounterSceneComponent firstScene;
+  late EncounterSceneComponent secondScene;
+  late RestSceneComponent thirdScene;
 
   StreamSubscription? _subscription;
+  StreamSubscription? _defeatSubscription;
 
   @override
   void onMount() {
@@ -60,12 +62,18 @@ class PlaygroundComponent extends RectangleComponent
     _subscription = game.gameStateNotifier.onUpdate.listen(
       (_) => _updateState(),
     );
+    _defeatSubscription = game.gameStateNotifier.onWorkerDefeated.listen((
+      playgroundId,
+    ) {
+      if (playgroundId == _playground.id) handleWorkerDefeated();
+    });
     _updateState();
   }
 
   @override
   void onRemove() {
     _subscription?.cancel();
+    _defeatSubscription?.cancel();
     super.onRemove();
   }
 
@@ -76,9 +84,6 @@ class PlaygroundComponent extends RectangleComponent
     _updateScene(scene);
   }
 
-  int? _activeSceneId;
-  String? _lastSceneName;
-  String? _lastRateText;
   Vector2? _lastSize;
   double? _resourceAmount;
   double? _experienceRequired;
@@ -86,21 +91,12 @@ class PlaygroundComponent extends RectangleComponent
 
   @override
   FutureOr<void> onLoad() async {
-    size = Vector2(200, _height);
+    size = Vector2.all(_height);
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final scene = playground.activeScene;
 
-    paint = Paint()..color = scene.backgroundColor;
+    paint = Paint()..color = AppColors.dark;
 
-    _activeSceneId = scene.id;
-    _lastSceneName = scene.name;
-    _lastRateText = _formatRate(scene.generationRatePerSecond);
     _currentLevel = playground.worker.level;
-
-    _nameComponent = TextComponent(
-      text: _lastSceneName,
-      textRenderer: TextPaint(style: game.textTheme.titleLarge),
-    );
 
     _workerLevelComponent = TextComponent(
       text: game.text.worker_level_indicator(_currentLevel ?? 1),
@@ -109,43 +105,35 @@ class PlaygroundComponent extends RectangleComponent
 
     _workerExperienceComponent = StatusBarComponent();
 
-    rateComponent = TextComponent(
-      anchor: Anchor.bottomRight,
-      text: _lastRateText,
-      position: Vector2(width - _padding - 24 * 2, height - _padding),
-      priority: 10,
-      textRenderer: TextPaint(style: game.textTheme.titleLarge),
-    );
-
     headerComponent = ColumnComponent(
       position: Vector2.all(_padding),
       children: [
-        _nameComponent,
+        TextComponent(
+          textRenderer: TextPaint(style: game.textTheme.titleLarge),
+        ),
         _workerLevelComponent,
         _workerExperienceComponent,
       ],
-      priority: 10,
+      priority: Priorities.low,
     );
 
     add(headerComponent);
-    add(rateComponent);
 
     workerComponent = WorkerComponent(
       playgroundModel: _playground,
-      workerModel: _playground.worker,
+      model: _playground.worker,
       position: Vector2(_padding, height - _padding),
       anchor: Anchor.bottomLeft,
-      onDefeated: _handleWorkerDefeated,
     );
     add(workerComponent);
 
     _borderComponent = RectangleComponent(
       size: size.clone(),
       paint: Paint()
-        ..color = Colors.black
+        ..color = AppColors.dark
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
-      priority: 100,
+      priority: Priorities.overlay,
     );
     add(_borderComponent);
 
@@ -156,35 +144,57 @@ class PlaygroundComponent extends RectangleComponent
       },
     );
 
+    firstSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.firstScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.firstScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.firstScene.active &&
+              _switchScenesLockedUntilRecovered);
+
+    secondSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.secondScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.secondScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.secondScene.active &&
+              _switchScenesLockedUntilRecovered);
+
+    thirdSwitchButton =
+        RectangleButtonComponent(
+            icon: playground.thirdScene.icon,
+            onPressed: () {
+              _startSceneTransition(playground.id, playground.thirdScene.id);
+            },
+          )
+          ..isDisabled =
+              (playground.thirdScene.active &&
+              _switchScenesLockedUntilRecovered);
+
     switchSceneComponent
       ..paint = (Paint()
-        ..color = Colors.black
+        ..color = AppColors.dark
         ..strokeWidth = 2)
-      ..size = Vector2((24 * 2) + 4, height)
+      ..size = Vector2((Dimensions.medium * 2) + 4, height)
       ..anchor = Anchor.topRight
       ..position = Vector2(width, 0)
-      ..priority = 100
+      ..priority = Priorities.overlay
       ..addAll([
         ColumnComponent(
-          size: Vector2((24 * 2) + 4, height),
+          size: Vector2((Dimensions.medium * 2) + 4, height),
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
-          priority: 100,
+          priority: Priorities.overlay,
           children: [
-            ...playground.scenes.map((scene) {
-              final button =
-                  RectangleButtonComponent(
-                      icon: scene.icon,
-                      onPressed: () {
-                        _startSceneTransition(playground.id, scene.id);
-                      },
-                    )
-                    ..isDisabled =
-                        (scene.id == _activeSceneId &&
-                        _switchScenesLockedUntilRecovered);
-              switchSceneButtons[scene.id] = button;
-              return button;
-            }),
+            firstSwitchButton,
+            secondSwitchButton,
+            thirdSwitchButton,
             upgradeButton,
           ],
         ),
@@ -193,83 +203,55 @@ class PlaygroundComponent extends RectangleComponent
 
     _sceneFadeComponent = RectangleComponent(
       size: size.clone(),
-      paint: Paint()..color = Colors.black.withValues(alpha: 0.0),
-      priority: 25,
+      paint: Paint()..color = AppColors.dark.withValues(alpha: 0.0),
+      priority: Priorities.normal,
     );
     add(_sceneFadeComponent);
 
     _defeatFadeComponent = RectangleComponent(
       size: size.clone(),
-      paint: Paint()..color = Colors.red.withValues(alpha: 0.0),
-      priority: 75,
+      paint: Paint()..color = AppColors.red.withValues(alpha: 0.0),
+      priority: Priorities.top,
     );
     add(_defeatFadeComponent);
+
+    firstScene = EncounterSceneComponent(
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
+      playground: playground,
+      scene: playground.firstScene,
+      visible: true,
+    );
+    add(firstScene);
+
+    secondScene = EncounterSceneComponent(
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
+      playground: playground,
+      scene: playground.secondScene,
+    );
+    add(secondScene);
+
+    thirdScene = RestSceneComponent(
+      size: Vector2(width - ((Dimensions.medium * 2) + 4), height),
+      playground: playground,
+      scene: playground.thirdScene,
+    );
+    add(thirdScene);
 
     _updateResponsivePositions(force: true);
   }
 
   @override
   void update(double dt) {
-    final scene = _playground.activeScene;
-
     _updateSceneTransition(dt);
     _updateDefeatTransition(dt);
     _updateSceneSwitchLock(_playground.worker);
     _updateResponsivePositions();
 
-    if (scene is RestSceneModel) {
-      _playground.worker.restoreHealth(
-        scene.generationRatePerSecond * scene.healthRegenPerSecond * dt,
-      );
-      _playground.worker.restoreStamina(
-        scene.generationRatePerSecond * scene.staminaRegenPerSecond * dt,
-      );
-      encounterTimer = 0;
-    } else if (scene is EncounterSceneModel) {
-      if (scene.generationRatePerSecond > 0 && !scene.encounter) {
-        encounterTimer += dt * scene.generationRatePerSecond * 10;
-      }
-
-      if (encounterTimer >= scene.encounterInterval) {
-        encounterTimer = 0;
-        generateEncounter(scene);
-      }
-    }
-
-    _updateSceneSwitchLock(_playground.worker);
-
     super.update(dt);
   }
 
   void _updateScene(SceneModel scene) {
-    final sceneId = scene.id;
-    if (_activeSceneId != sceneId) {
-      paint = Paint()..color = scene.backgroundColor;
-      _activeSceneId = sceneId;
-
-      _updateSwitchSceneButtons();
-      for (final buttonEntry in switchSceneButtons.entries) {
-        buttonEntry.value.isDisabled = buttonEntry.key == sceneId;
-      }
-    }
-
-    for (final encounter in children.whereType<EncounterComponent>()) {
-      final isActiveEncounter = encounter.sceneModel.id == sceneId;
-      encounter.isSceneActive = isActiveEncounter;
-      encounter.isVisible = isActiveEncounter;
-    }
-
-    final sceneName = scene.name;
-    if (_lastSceneName != sceneName) {
-      _lastSceneName = sceneName;
-      _nameComponent.text = sceneName;
-    }
-
-    final rateText = _formatRate(scene.generationRatePerSecond);
-    if (_lastRateText != rateText) {
-      _lastRateText = rateText;
-      rateComponent.text = rateText;
-    }
+    _updateSwitchSceneButtons();
 
     final level = _playground.worker.level;
     if (_currentLevel != level) {
@@ -277,7 +259,7 @@ class PlaygroundComponent extends RectangleComponent
       _workerLevelComponent.text = game.text.worker_level_indicator(level);
     }
 
-    final xpRequired = _playground.worker.experienceNeeded;
+    final xpRequired = _playground.worker.experienceNeededToLevelUp;
     if (_experienceRequired != xpRequired) {
       _experienceRequired = xpRequired.toDouble();
     }
@@ -307,11 +289,11 @@ class PlaygroundComponent extends RectangleComponent
   }
 
   void _startSceneTransition(int playgroundId, int sceneId) {
-    if (_isSceneTransitioning || sceneId == _activeSceneId) {
+    if (_isSceneTransitioning) {
+      // || sceneId == _activeSceneId) {
       return;
     }
 
-    resetEncounterHealth(sceneId);
     _isSceneTransitioning = true;
     _sceneTransitionElapsed = 0;
     _sceneTransitionTargetId = sceneId;
@@ -356,22 +338,18 @@ class PlaygroundComponent extends RectangleComponent
 
   void _setSceneFadeOpacity(double opacity) {
     _sceneFadeComponent.paint = Paint()
-      ..color = Colors.black.withValues(alpha: opacity.clamp(0.0, 1.0));
+      ..color = AppColors.dark.withValues(alpha: opacity.clamp(0.0, 1.0));
   }
 
-  void _handleWorkerDefeated() {
+  void handleWorkerDefeated() {
     if (_isDefeatTransitioning) {
       return;
     }
 
-    resetEncounters();
-
     final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final restScene = playground.scenes.whereType<RestSceneModel>().firstOrNull;
-
-    if (restScene == null) {
-      return;
-    }
+    firstScene.resetEncounters();
+    secondScene.resetEncounters();
+    final restScene = playground.thirdScene;
 
     _isDefeatTransitioning = true;
     _defeatTransitionElapsed = 0;
@@ -417,15 +395,16 @@ class PlaygroundComponent extends RectangleComponent
 
   void _setDefeatFadeOpacity(double opacity) {
     _defeatFadeComponent.paint = Paint()
-      ..color = Colors.red.withValues(alpha: opacity.clamp(0.0, 1.0));
+      ..color = AppColors.red.withValues(alpha: opacity.clamp(0.0, 1.0));
   }
 
   void _updateSwitchSceneButtons() {
-    for (final buttonEntry in switchSceneButtons.entries) {
-      buttonEntry.value.isDisabled =
-          _switchScenesLockedUntilRecovered ||
-          buttonEntry.key == _activeSceneId;
-    }
+    firstSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered || _playground.firstScene.active;
+    secondSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered || _playground.secondScene.active;
+    thirdSwitchButton.isDisabled =
+        _switchScenesLockedUntilRecovered || _playground.thirdScene.active;
   }
 
   void _updateResponsivePositions({bool force = false}) {
@@ -434,110 +413,20 @@ class PlaygroundComponent extends RectangleComponent
     }
 
     _lastSize = size.clone();
-
-    rateComponent.position.setValues(
-      width - _padding - 24 * 2,
-      height - _padding,
-    );
     workerComponent.position.setValues(_padding, height - _padding);
     _borderComponent.size.setFrom(size.clone());
     switchSceneComponent.position.setValues(width, 0);
     _sceneFadeComponent.size.setFrom(size.clone());
     _defeatFadeComponent.size.setFrom(size.clone());
-  }
 
-  String _formatRate(double rate) =>
-      '(${game.text.per_second_indicator(rate.toStringAsPrecision(3))})';
-
-  @override
-  void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
-    moveOnClick();
-  }
-
-  void generateEncounter([SceneModel? cachedScene]) {
-    final scene =
-        cachedScene ??
-        game.gameStateNotifier.getPlaygroundById(_playground.id).activeScene;
-
-    if (scene is! EncounterSceneModel) {
-      return;
-    }
-
-    final encounterWidth = _encounterRadius * 2;
-    final defaultSpawnX = width - encounterWidth;
-    var maxEncounterX = double.negativeInfinity;
-
-    for (final child in children) {
-      if (child is! EncounterComponent || child.sceneModel.id != scene.id) {
-        continue;
-      }
-
-      if (child.x - encounterWidth > width) {
-        return;
-      }
-
-      if (child.x > maxEncounterX) {
-        maxEncounterX = child.x;
-      }
-    }
-
-    final hasEncounters = maxEncounterX.isFinite;
-    final spawnX = hasEncounters
-        ? maxEncounterX + encounterWidth + scene.encounterSpacing
-        : defaultSpawnX;
-
-    if (spawnX > defaultSpawnX) {
-      return;
-    }
-
-    add(
-      EncounterComponent(
-        sceneModel: scene,
-        encounterModel: scene.encounters.getNext(),
-        radius: _encounterRadius,
-        position: Vector2(spawnX, height - _padding),
-        anchor: Anchor.bottomLeft,
-      ),
+    firstScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
     );
-  }
-
-  void resetEncounters() {
-    for (final encounter in children.whereType<EncounterComponent>().toList()) {
-      encounter.removeFromParent();
-    }
-  }
-
-  void resetEncounterHealth(int sceneId) {
-    for (final encounter in children.whereType<EncounterComponent>().where(
-      (encounter) => encounter.sceneModel.id != sceneId,
-    )) {
-      encounter.resetHealth();
-    }
-  }
-
-  void moveOnClick() {
-    final playground = game.gameStateNotifier.getPlaygroundById(_playground.id);
-    final scene = playground.activeScene;
-
-    if (scene is RestSceneModel) {
-      RestSceneModel restingSpotModel = scene;
-      playground.worker.restoreHealth(
-        restingSpotModel.generationRatePerSecond *
-            restingSpotModel.healthRegenPerSecond,
-      );
-      playground.worker.restoreStamina(
-        restingSpotModel.generationRatePerSecond *
-            restingSpotModel.staminaRegenPerSecond,
-      );
-    } else if (scene is EncounterSceneModel) {
-      encounterTimer += scene.encounterInterval / 10;
-
-      for (final encounter in children.whereType<EncounterComponent>().where(
-        (encounter) => encounter.sceneModel.id == scene.id,
-      )) {
-        encounter.moveOnClick();
-      }
-    }
+    secondScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
+    );
+    thirdScene.size.setFrom(
+      Vector2(width - ((Dimensions.medium * 2) + 4), height),
+    );
   }
 }

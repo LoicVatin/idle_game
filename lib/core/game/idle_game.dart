@@ -2,13 +2,15 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:idle_game/core/audio/soloud_audio_player.dart';
 import 'package:idle_game/core/game/components/bottom_panel_component.dart';
+import 'package:idle_game/core/game/components/component_utils.dart';
+import 'package:idle_game/core/game/components/playground_component.dart';
 import 'package:idle_game/core/game/components/resource_panel_component.dart';
 import 'package:idle_game/core/game/components/scrollable_component_list.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/utils/logger_helper.dart';
-
-import 'components/playground_component.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   final GameStateNotifier gameStateNotifier;
@@ -32,20 +34,30 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       .firstOrNull;
 
   @override
-  Color backgroundColor() => Colors.indigo;
+  Color backgroundColor() => AppColors.lightDark;
 
   @override
   Future<void> onLoad() async {
     appLogger.d("IdleGame.onLoad()");
+
+    SoLoudAudioPlayer.startBgm();
+
     resourcePanelComponent = ResourcePanelComponent(
       position: Vector2.zero(),
-      size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
+      size: Vector2(
+        size.x,
+        Dimensions.medium +
+            Dimensions.extraSmall +
+            Dimensions.extraSmall +
+            Dimensions.small +
+            Dimensions.small,
+      ),
     );
     add(resourcePanelComponent);
 
     _playgroundList = ScrollableComponentList(
-      position: Vector2(0, 50),
-      size: Vector2(size.x, size.y - 100),
+      position: Vector2(0, Dimensions.large),
+      size: Vector2(size.x, size.y - Dimensions.huge),
     );
 
     await add(_playgroundList);
@@ -59,12 +71,25 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     bottomPanelComponent = BottomPanelComponent(
       anchor: Anchor.bottomRight,
       position: Vector2(size.x, size.y),
-      size: Vector2(size.x, 24 + 8 + 8 + 16 + 16),
+      size: Vector2(
+        size.x,
+        Dimensions.medium +
+            Dimensions.extraSmall +
+            Dimensions.extraSmall +
+            Dimensions.small +
+            Dimensions.small,
+      ),
       onPressed: addPlayground,
     );
     add(bottomPanelComponent);
 
     return super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    gameStateNotifier.updatePlaygrounds(dt);
   }
 
   @override
@@ -74,13 +99,43 @@ class IdleGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     if (isLoaded) {
       resourcePanelComponent
         ..position.setZero()
-        ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
+        ..size.setValues(
+          size.x,
+          Dimensions.medium +
+              Dimensions.extraSmall +
+              Dimensions.extraSmall +
+              Dimensions.small +
+              Dimensions.small,
+        );
       _playgroundList
-        ..position.setValues(0, 24 + 8 + 8 + 16 + 16)
-        ..size.setValues(size.x, size.y - (24 + 8 + 8 + 16 + 16) * 2);
+        ..position.setValues(
+          0,
+          Dimensions.medium +
+              Dimensions.extraSmall +
+              Dimensions.extraSmall +
+              Dimensions.small +
+              Dimensions.small,
+        )
+        ..size.setValues(
+          size.x,
+          size.y -
+              (Dimensions.medium +
+                      Dimensions.extraSmall +
+                      Dimensions.extraSmall +
+                      Dimensions.small +
+                      Dimensions.small) *
+                  2,
+        );
       bottomPanelComponent
         ..position.setValues(size.x, size.y)
-        ..size.setValues(size.x, 24 + 8 + 8 + 16 + 16);
+        ..size.setValues(
+          size.x,
+          Dimensions.medium +
+              Dimensions.extraSmall +
+              Dimensions.extraSmall +
+              Dimensions.small +
+              Dimensions.small,
+        );
     }
   }
 

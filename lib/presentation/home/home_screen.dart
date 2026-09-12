@@ -1,7 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:idle_game/core/audio/soloud_audio_player.dart';
 import 'package:idle_game/core/game/idle_game.dart';
 import 'package:idle_game/presentation/core/game_provider.dart';
 import 'package:idle_game/presentation/home/tutorial_overlay_widget.dart';
@@ -9,6 +11,7 @@ import 'package:idle_game/presentation/home/upgrade_overlay_widget.dart';
 import 'package:idle_game/utils/build_context_helper.dart';
 import 'package:idle_game/utils/logger_helper.dart';
 import 'package:idle_game/utils/shared_preferences_helper.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,14 +23,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   IdleGame? _game;
   late final Future _googleFontsPending;
-  late final bool _isTutorialAtStartupDismissed;
+  bool _isTutorialAtStartupDismissed = false;
+  bool _isBgmOn = SoLoudAudioPlayer.isOn;
+  bool _isInitialPreferencesLoaded = false;
+  bool _ignoreNextMainPop = false;
 
   @override
   void initState() {
     appLogger.d("HomeScreenState.initState()");
     super.initState();
 
-    isTutorialAtStartupDismissed();
+    loadInitialSharedPreferences();
 
     GoogleFonts.vt323();
     _googleFontsPending = GoogleFonts.pendingFonts();
@@ -40,56 +46,241 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       textTheme: Theme.of(context).textTheme,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(context.text.app_name),
-      ),
-      body: FutureBuilder(
-        future: _googleFontsPending,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return GameWidget(
-            game: _game!,
-            overlayBuilderMap: {
-              IdleGame.tutorialOverlay: (context, game) {
-                return TutorialOverlay(
-                  game: game as IdleGame,
-                  onClose: () {
-                    game.dismissTutorialOverlay();
-                    dismissTutorialAtStartup();
-                  },
-                );
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
+
+        if (_ignoreNextMainPop) {
+          _ignoreNextMainPop = false;
+          return;
+        }
+
+        final shouldLeave = await _showLeaveAppDialog(context);
+        if (shouldLeave) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(context.text.app_name),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _isBgmOn ? Icons.volume_up_outlined : Icons.volume_off_outlined,
+              ),
+              tooltip: _isBgmOn ? 'Pause music' : 'Resume music',
+              onPressed: () async {
+                final nextValue = !_isBgmOn;
+
+                await SoLoudAudioPlayer.setBackgroundMusicOn(nextValue);
+
+                if (!mounted) {
+                  return;
+                }
+
+                setState(() {
+                  _isBgmOn = nextValue;
+                });
               },
-              IdleGame.upgradeOverlay: (context, game) {
-                return UpgradeOverlay(
-                  game: game as IdleGame,
-                  onClose: () {
-                    game.dismissUpgradeOverlay();
-                  },
-                );
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: _googleFontsPending,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done ||
+                !_isInitialPreferencesLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final gameWidget = GameWidget(
+              game: _game!,
+              overlayBuilderMap: {
+                IdleGame.tutorialOverlay: (context, game) {
+                  return TutorialOverlay(
+                    game: game as IdleGame,
+                    onClose: () async {
+                      game.dismissTutorialOverlay();
+                      await dismissTutorialAtStartup();
+                    },
+                  );
+                },
+                IdleGame.upgradeOverlay: (context, game) {
+                  _ignoreNextMainPop = true;
+                  return UpgradeOverlay(
+                    game: game as IdleGame,
+                    onClose: () {
+                      _ignoreNextMainPop = false;
+                      game.dismissUpgradeOverlay();
+                    },
+                  );
+                },
               },
-            },
-            initialActiveOverlays: _isTutorialAtStartupDismissed
-                ? []
-                : [IdleGame.tutorialOverlay],
-          );
-        },
+              initialActiveOverlays: _isTutorialAtStartupDismissed
+                  ? []
+                  : [IdleGame.tutorialOverlay],
+            );
+
+            if (context.isWebMobile) {
+              if (context.isLandscape) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      context.text.device_orientation_warning,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                );
+              }
+
+              return gameWidget;
+            }
+
+            if (context.isWebDesktop) {
+              return Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: Image.asset('images/web_background.png').image,
+                    repeat: ImageRepeat.repeat,
+                    fit: BoxFit.none,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    webWarningWidget(),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 450),
+                      child: gameWidget,
+                    ),
+                    webWarningWidget(),
+                  ],
+                ),
+              );
+            }
+            return gameWidget;
+          },
+        ),
       ),
     );
   }
 
-  Future<void> isTutorialAtStartupDismissed() async {
+  Future<void> loadInitialSharedPreferences() async {
     final isTutorialAtStartupDismissed =
         await SharedPreferencesHelper.isTutorialAtStartupDismissed();
+
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _isTutorialAtStartupDismissed = isTutorialAtStartupDismissed;
+      _isInitialPreferencesLoaded = true;
     });
   }
 
+  Future<bool> _showLeaveAppDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          barrierColor: AppColors.dark.withValues(alpha: 0.5),
+          builder: (context) {
+            return Dialog(
+              backgroundColor: AppColors.dark,
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: AppColors.black, width: 4),
+                borderRadius: BorderRadius.zero,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.dark,
+                  border: Border.all(color: AppColors.black, width: 2),
+                  borderRadius: BorderRadius.zero,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 24,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      context.text.quit_game_dialog_title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Text(context.text.quit_game_dialog_body),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      spacing: 12,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: Text(context.text.cancel_button),
+                        ),
+                        OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: Text(context.text.confirm_button),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ) ??
+        false;
+  }
+
   Future<void> dismissTutorialAtStartup() async {
-    SharedPreferencesHelper.dismissTutorial();
+    await SharedPreferencesHelper.dismissTutorial();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isTutorialAtStartupDismissed = true;
+    });
+  }
+
+  Widget webWarningWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 64.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.dark,
+          border: Border.all(width: 4),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 32,
+            children: [
+              Text(
+                context.text.warning_web_welcome,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                context.text.warning_web_not_supported,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                context.text.warning_web_please_consider_mobile,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

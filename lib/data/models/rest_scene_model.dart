@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idle_game/data/models/resource_model.dart';
 import 'package:idle_game/data/models/scene_model.dart';
+import 'package:idle_game/core/styles/app_colors.dart';
 
 class RestSceneModel extends SceneModel {
   final double healthRegenPerSecond;
@@ -11,8 +12,10 @@ class RestSceneModel extends SceneModel {
     required super.playgroundId,
     super.name = 'Resting Spot',
     super.icon = Icons.fireplace_outlined,
-    super.backgroundColor = Colors.lightBlue,
+    super.backgroundColor = AppColors.lightBlue,
+    super.spriteSheet,
     super.generationRateUpgradeCostType = ResourceType.food,
+    super.active,
     this.healthRegenPerSecond = 5,
     this.staminaRegenPerSecond = 10,
   }) : super(
