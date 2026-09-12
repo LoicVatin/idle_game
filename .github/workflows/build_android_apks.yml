@@ -1,0 +1,43 @@
+name: CI-BuildAndroidApks
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        build-mode: [debug, profile]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Android APK (${{ matrix.build-mode }})
+        run: flutter build apk --${{ matrix.build-mode }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: idle_game-${{ matrix.build-mode }}-apk
+          path: build/app/outputs/flutter-apk/app-${{ matrix.build-mode }}.apk
+          if-no-files-found: error
