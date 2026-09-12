@@ -151,11 +151,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     fit: BoxFit.none,
                   ),
                 ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 450),
-                    child: gameWidget,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    webWarningWidget(),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 450),
+                      child: gameWidget,
+                    ),
+                    webWarningWidget(),
+                  ],
                 ),
               );
             }
@@ -241,5 +246,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() {
       _isTutorialAtStartupDismissed = true;
     });
+  }
+
+  Widget webWarningWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 64.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.dark,
+          border: Border.all(width: 4),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 32,
+            children: [
+              Text(
+                context.text.warning_web_welcome,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                context.text.warning_web_not_supported,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                context.text.warning_web_please_consider_mobile,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

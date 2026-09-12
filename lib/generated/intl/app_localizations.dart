@@ -267,6 +267,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel_button;
+
+  /// No description provided for @warning_web_welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Idle Game! (working title)\nAnd idle incremental game.\nThis is a work in progress.'**
+  String get warning_web_welcome;
+
+  /// No description provided for @warning_web_not_supported.
+  ///
+  /// In en, this message translates to:
+  /// **'This game is running on Flutter Flame,\nwhich is not fully supported on web.\nYou can consider this page as a preview of the game.'**
+  String get warning_web_not_supported;
+
+  /// No description provided for @warning_web_please_consider_mobile.
+  ///
+  /// In en, this message translates to:
+  /// **'This game is not intended to be played on a web browser.\nIf you want to play this game,\nplease consider using the mobile version.'**
+  String get warning_web_please_consider_mobile;
 }
 
 class _AppLocalizationsDelegate
