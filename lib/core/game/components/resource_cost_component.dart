@@ -53,11 +53,9 @@ class ResourceCostComponent extends PositionComponent
   }
 
   ResourceCostComponent({
-    required Resource resource,
-    required double upgradeCost,
-  }) : _resource = resource,
-       _upgradeCost = upgradeCost,
-       super(size: Vector2(Dimensions.huge, Dimensions.small));
+    required this._resource,
+    required this._upgradeCost,
+  }) : super(size: Vector2(Dimensions.huge, Dimensions.small));
 
   @override
   Future<void> onLoad() async {

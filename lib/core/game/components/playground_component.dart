@@ -25,8 +25,7 @@ class PlaygroundComponent extends RectangleComponent
   static const double _sceneSwitchRecoveryHealthPercent = 0.25;
   static const double _sceneTransitionDuration = 0.4;
 
-  PlaygroundComponent({required PlaygroundModel playground})
-    : _playground = playground;
+  PlaygroundComponent({required this._playground});
 
   late ColumnComponent headerComponent;
   late RectangleComponent _borderComponent;
